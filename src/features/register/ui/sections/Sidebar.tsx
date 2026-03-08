@@ -52,16 +52,15 @@ export default function RegisterSidebar({
         <div className="space-y-3 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:space-y-0 lg:overflow-hidden">
           <Button
             variant="primary"
-            size="cta"
-            radius="xl"
+            size="lg"
             type="button"
-            className="w-full border-blue-600 shadow-sm hover:shadow-md dark:border-blue-500 dark:bg-blue-500 dark:hover:bg-blue-400 lg:mb-3 lg:shrink-0"
+            className="w-full shadow-md hover:shadow-lg lg:mb-3 lg:shrink-0"
             onClick={onStartNewPackage}
           >
             <Plus size={18} />
             新規パッケージ作成
           </Button>
-          <div className="space-y-2 rounded-xl border border-slate-200/80 bg-slate-50/70 p-3 dark:border-slate-800 dark:bg-slate-900/40 lg:mb-3 lg:shrink-0">
+          <div className="space-y-2 rounded-xl border border-slate-200/80 bg-white p-3 dark:border-slate-800 dark:bg-slate-900 lg:mb-3 lg:shrink-0">
             <div className={layout.rowBetweenGap2}>
               <div className={sidebarSectionLabelClass}>送信予定一覧</div>
               {hasDraftPackages && (
@@ -93,15 +92,15 @@ export default function RegisterSidebar({
                     >
                       <div
                         className={cn(
-                          'truncate text-sm font-semibold',
+                          'w-full min-w-0 truncate text-sm font-semibold',
                           isSelected ? 'text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-200',
                         )}
                         title={draft.packageName || draft.packageId}
                       >
                         {draft.packageName || draft.packageId}
                       </div>
-                      <div className={layout.inlineGap1_5}>
-                        <div className="truncate text-[11px] text-slate-500 dark:text-slate-400">
+                      <div className={cn(layout.inlineGap1_5, 'w-full min-w-0')}>
+                        <div className="min-w-0 flex-1 truncate text-[11px] text-slate-500 dark:text-slate-400">
                           {formatSavedAt(draft.savedAt)}
                         </div>
                         <Badge
@@ -133,9 +132,9 @@ export default function RegisterSidebar({
               )}
             </div>
           </div>
-          <div className="space-y-2 rounded-xl border border-slate-200/80 bg-white p-3 dark:border-slate-800 dark:bg-slate-900 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
-            <div className={sidebarSectionLabelClass}>パッケージ一覧</div>
-            <div className="relative lg:shrink-0">
+          <div className="space-y-2 rounded-xl border border-slate-200/80 bg-white pl-3 pr-0 py-3 dark:border-slate-800 dark:bg-slate-900 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
+            <div className={cn(sidebarSectionLabelClass, 'pr-3')}>パッケージ一覧</div>
+            <div className="relative pr-3 lg:shrink-0">
               <Search size={16} className={layout.inputIconLeft} />
               <input
                 type="search"
@@ -145,9 +144,9 @@ export default function RegisterSidebar({
                 className="w-full pl-9"
               />
             </div>
-            <div className="max-h-72 overflow-y-auto space-y-1 pr-1 custom-scrollbar lg:max-h-none lg:min-h-0 lg:flex-1">
+            <div className="max-h-72 overflow-y-auto space-y-1 pr-0 custom-scrollbar lg:max-h-none lg:min-h-0 lg:flex-1">
               {catalogLoadState === 'loading' || catalogLoadState === 'idle' ? (
-                <div className={cn(layout.center, 'py-8 text-sm text-slate-500')}>
+                <div className={cn(layout.center, 'pr-3 py-8 text-sm text-slate-500')}>
                   <span className="spinner mr-2" />
                   読み込み中...
                 </div>
@@ -162,7 +161,7 @@ export default function RegisterSidebar({
                       type="button"
                       onClick={() => onSelectPackage(item)}
                       className={cn(
-                        'group flex w-full flex-col items-start justify-start gap-0.5 rounded-lg border px-3 py-2.5 text-left text-sm transition-all',
+                        'group flex w-full min-w-0 flex-col items-start justify-start gap-0.5 rounded-lg border px-3 py-2.5 text-left text-sm transition-all',
                         isSelected
                           ? 'border-blue-500 bg-blue-50 shadow-sm dark:bg-blue-900/20 dark:border-blue-500/50'
                           : unselectedItemClass,
@@ -170,17 +169,19 @@ export default function RegisterSidebar({
                     >
                       <span
                         className={cn(
-                          'font-semibold',
+                          'block w-full truncate font-semibold',
                           isSelected ? 'text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-200',
                         )}
+                        title={item.name || item.id}
                       >
                         {item.name || item.id}
                       </span>
                       <span
                         className={cn(
-                          'text-xs',
+                          'block w-full truncate text-xs',
                           isSelected ? 'text-blue-600/80 dark:text-blue-400/80' : 'text-slate-500 dark:text-slate-400',
                         )}
+                        title={item.author || '作者不明'}
                       >
                         {item.author || '作者不明'}
                       </span>
@@ -189,7 +190,7 @@ export default function RegisterSidebar({
                 })
               )}
               {catalogLoadState === 'loaded' && filteredPackages.length === 0 && (
-                <div className={cn(surface.dashedSoftPlaceholder, 'px-4 py-8 text-sm')}>該当なし</div>
+                <div className={cn(surface.dashedSoftPlaceholder, 'mr-3 px-4 py-8 text-sm')}>該当なし</div>
               )}
             </div>
           </div>

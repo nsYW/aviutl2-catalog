@@ -28,7 +28,7 @@ const PackageVersionSection = memo(
     const visibleVersions = showAll ? versions : versions.slice(Math.max(0, versions.length - 3));
 
     return (
-      <section className={surface.cardSectionSpacious}>
+      <section className={surface.cardSection}>
         <div className={layout.rowBetweenWrapGap2}>
           <h2 className={text.titleLg}>バージョン履歴</h2>
           <Button variant="primary" size="xs" type="button" className="shadow-sm" onClick={addVersion}>

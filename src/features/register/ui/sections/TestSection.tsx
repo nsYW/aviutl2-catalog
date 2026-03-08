@@ -147,7 +147,7 @@ export default function RegisterTestSection({
   const uninstallerProgressStyle = useMemo(() => ({ width: `${uninstallerTestPercent}%` }), [uninstallerTestPercent]);
 
   return (
-    <section className={surface.cardSectionStack}>
+    <section className={surface.cardSection}>
       <div className={layout.rowBetweenWrapGap3}>
         <div className="space-y-1">
           <h2 className={text.titleLg}>インストーラー / 削除テスト</h2>

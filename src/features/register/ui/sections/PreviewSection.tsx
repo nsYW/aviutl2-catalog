@@ -58,7 +58,7 @@ export default function RegisterPreviewSection({
     ],
   );
   return (
-    <section className={surface.cardSectionStack}>
+    <section className={surface.cardSection}>
       <div className={layout.rowBetweenGap2}>
         <h2 className={text.titleLg}>プレビュー</h2>
         <Button variant="muted" size="compact" type="button" onClick={onTogglePreviewDarkMode} className="font-medium">
@@ -70,7 +70,9 @@ export default function RegisterPreviewSection({
         className={cn(
           'overflow-x-auto p-8 transition-colors',
           surface.panel,
-          previewDarkMode ? 'bg-slate-950 border-slate-800 dark' : 'bg-slate-50 light',
+          previewDarkMode
+            ? 'bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark'
+            : 'bg-slate-50 border-slate-200 light',
         )}
       >
         <div className="flex justify-center pointer-events-none opacity-90 grayscale-[10%]">

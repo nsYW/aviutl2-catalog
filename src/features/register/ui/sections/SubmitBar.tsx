@@ -31,10 +31,7 @@ export default function RegisterSubmitBar({
 
   return (
     <section
-      className={cn(
-        surface.card,
-        'sticky bottom-6 z-20 mb-6 p-4 shadow-xl backdrop-blur-md bg-white/90 dark:bg-slate-900/90',
-      )}
+      className={cn(surface.card, 'sticky bottom-6 z-20 mb-6 bg-white/80 p-4 backdrop-blur-md dark:bg-slate-900/80')}
     >
       <div className={layout.rowBetweenWrapGap4}>
         <div className={layout.inlineGap2}>
@@ -59,7 +56,7 @@ export default function RegisterSubmitBar({
               value={packageSender}
               onChange={(e) => onPackageSenderChange(e.target.value)}
               placeholder="送信者のニックネーム"
-              className="min-w-[240px]"
+              className="min-w-[200px]"
               aria-label="送信者のニックネーム"
             />
           </div>

@@ -245,7 +245,7 @@ const PackageImagesSection = memo(
       [thumbnailPreview],
     );
     return (
-      <section className={surface.cardSectionStack}>
+      <section className={surface.cardSection}>
         <div className={layout.rowBetweenWrapGap2}>
           <h2 className={text.titleLg}>画像</h2>
         </div>

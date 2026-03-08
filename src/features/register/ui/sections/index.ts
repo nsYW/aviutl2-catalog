@@ -8,6 +8,7 @@ export { default as PackageVersionSection } from './VersionSection';
 export { default as RegisterDescriptionSection } from './DescriptionSection';
 export { default as RegisterJsonImportDialog } from './JsonImportDialog';
 export { default as RegisterMetaSection } from './MetaSection';
+export { default as RegisterNoticeSection } from './RegisterNoticeSection';
 export { default as RegisterPreviewSection } from './PreviewSection';
 export { default as RegisterSidebar } from './Sidebar';
 export { default as RegisterSubmitBar } from './SubmitBar';

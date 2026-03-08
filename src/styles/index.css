@@ -43,6 +43,32 @@
   label {
     @apply text-sm text-slate-600 dark:text-slate-300;
   }
+
+  .register-page input:not([type]),
+  .register-page input[type='text'],
+  .register-page input[type='search'],
+  .register-page input[type='email'],
+  .register-page input[type='url'],
+  .register-page input[type='password'],
+  .register-page input[type='number'],
+  .register-page input[type='date'],
+  .register-page input[type='datetime-local'],
+  .register-page input[type='time'],
+  .register-page input[type='tel'],
+  .register-page textarea,
+  .register-page select {
+    @apply select-text;
+  }
+
+  .register-page input[type='date']::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .register-page input[type='date']::-webkit-clear-button,
+  .register-page input[type='date']::-webkit-inner-spin-button {
+    display: none;
+  }
 }
 
 @layer components {

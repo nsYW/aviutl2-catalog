@@ -129,22 +129,7 @@ export const surface = {
   infoBox: 'rounded-lg border px-4 py-3 text-sm',
   sectionDivider: 'border-b border-slate-100 px-6 py-4 dark:border-slate-800',
   cardSection: joinTokens(
-    surfaceRadius.rounded2xl,
-    surfaceBorder.default,
-    surfaceTone.default,
-    'p-6',
-    surfaceDepth.shadow,
-  ),
-  cardSectionStack: joinTokens(
     'space-y-4',
-    surfaceRadius.rounded2xl,
-    surfaceBorder.default,
-    surfaceTone.default,
-    'p-6',
-    surfaceDepth.shadow,
-  ),
-  cardSectionSpacious: joinTokens(
-    'space-y-6',
     surfaceRadius.rounded2xl,
     surfaceBorder.default,
     surfaceTone.default,

@@ -117,7 +117,7 @@ export default function useRegisterSubmitHandler({
       const senderName = targetPackageSender.trim();
       const payload: SubmitPackagePayload = {
         action: SUBMIT_ACTIONS.package,
-        title: `${actionLabel}: ${String(entry.name || '')}`,
+        title: `${actionLabel}：${String(entry.name || '')}`,
         packageId: packageId,
         packageName: String(entry.name || ''),
         packageAuthor: String(entry.author || ''),

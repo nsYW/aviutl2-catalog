@@ -25,7 +25,7 @@ const PackageInstallerSection = memo(
     } = props;
 
     return (
-      <section className={surface.cardSectionSpacious}>
+      <section className={surface.cardSection}>
         <div className={layout.rowBetweenWrapGap2}>
           <h2 className={text.titleLg}>インストーラ</h2>
         </div>

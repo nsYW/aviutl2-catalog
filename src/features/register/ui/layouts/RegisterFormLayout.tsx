@@ -10,6 +10,7 @@ import {
   PackageVersionSection,
   RegisterDescriptionSection,
   RegisterMetaSection,
+  RegisterNoticeSection,
   RegisterPreviewSection,
   RegisterSidebar,
   RegisterSubmitBar,
@@ -34,7 +35,7 @@ export default function RegisterFormLayout({
   submitBar,
 }: RegisterFormLayoutProps) {
   return (
-    <main className="space-y-8">
+    <main className="register-page space-y-8 select-none">
       {error && (
         <Alert
           variant="danger"
@@ -49,10 +50,11 @@ export default function RegisterFormLayout({
       )}
 
       <form className="space-y-8" onSubmit={onSubmit}>
-        <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <div className="grid gap-8 lg:grid-cols-[300px_minmax(0,1fr)]">
           <RegisterSidebar {...sidebar} />
 
           <div className="space-y-8">
+            <RegisterNoticeSection />
             <RegisterMetaSection {...meta} />
             <RegisterDescriptionSection {...description} />
             <PackageLicenseSection {...license} />

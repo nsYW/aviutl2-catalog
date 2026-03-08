@@ -1,11 +1,10 @@
 /**
  * パッケージ基本情報登録セクションのコンポーネント
  */
-import { Info } from 'lucide-react';
 import type { RegisterMetaSectionProps } from '../types';
+import PackageTypeEditor from './PackageTypeEditor';
 import TagEditor from './TagEditor';
 import { grid, layout, surface, text } from '@/components/ui/_styles';
-import { cn } from '@/lib/cn';
 
 export default function RegisterMetaSection({
   packageForm,
@@ -16,21 +15,9 @@ export default function RegisterMetaSection({
 }: RegisterMetaSectionProps) {
   return (
     <section className={surface.cardSection}>
-      <div
-        className={cn(
-          surface.infoBox,
-          layout.inlineStartGap3,
-          'mb-6 border border-blue-100 bg-blue-50/50 rounded-xl text-blue-800 dark:border-blue-900/30 dark:bg-blue-900/10 dark:text-blue-300',
-        )}
-      >
-        <Info size={20} className="mt-0.5 flex-shrink-0 text-blue-500" />
-        <div>
-          このフォームに入力するプラグイン情報はすべて公開されます。
-          <br />
-          パッケージ登録は作者本人でなくてもどなたでも行えます。
-        </div>
+      <div className={layout.rowBetweenWrapGap2}>
+        <h2 className={text.titleLg}>基本情報</h2>
       </div>
-
       <div className="grid gap-6">
         <div className={grid.twoColWideGap}>
           <div className="space-y-2">
@@ -88,18 +75,8 @@ export default function RegisterMetaSection({
               placeholder="オリジナル版がある場合に入力"
             />
           </div>
-          <div className="space-y-2">
-            <label className={text.labelSm} htmlFor="package-type">
-              種類 <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="package-type"
-              name="type"
-              value={packageForm.type}
-              onChange={(e) => onUpdatePackageField('type', e.target.value)}
-              required
-              placeholder="入力/出力/汎用プラグイン, スクリプト, 言語ファイル"
-            />
+          <div className="md:col-span-2">
+            <PackageTypeEditor value={packageForm.type} onChange={(value) => onUpdatePackageField('type', value)} />
           </div>
           <div className="space-y-2">
             <label className={text.labelSm} htmlFor="package-repo-url">
@@ -129,41 +106,22 @@ export default function RegisterMetaSection({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label className={text.labelSm} htmlFor="package-dependencies">
-            依存パッケージ (現在非対応)
-          </label>
-          <input
-            id="package-dependencies"
-            name="dependencies"
-            value={packageForm.dependenciesText}
-            onChange={(e) => onUpdatePackageField('dependenciesText', e.target.value)}
-            placeholder="パッケージID (カンマ区切り)"
-          />
+        <div className={grid.twoColWideGap}>
+          <div className="space-y-2">
+            <label className={text.labelSm} htmlFor="package-dependencies">
+              依存パッケージ (現在非対応)
+            </label>
+            <input
+              id="package-dependencies"
+              name="dependencies"
+              value={packageForm.dependenciesText}
+              onChange={(e) => onUpdatePackageField('dependenciesText', e.target.value)}
+              placeholder="パッケージID (カンマ区切り)"
+            />
+          </div>
         </div>
 
         <TagEditor initialTags={initialTags} suggestions={tagCandidates} onChange={onTagsChange} />
-
-        <div className="space-y-2">
-          <label className={text.labelSm} htmlFor="package-summary">
-            概要 <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="package-summary"
-            name="summary"
-            value={packageForm.summary}
-            onChange={(e) => onUpdatePackageField('summary', e.target.value)}
-            required
-            placeholder="パッケージの概要 (35文字以内)"
-          />
-          <div className="flex justify-end">
-            <span
-              className={cn('text-xs', packageForm.summary.length > 35 ? 'text-red-500 font-bold' : 'text-slate-400')}
-            >
-              {packageForm.summary.length} / 35
-            </span>
-          </div>
-        </div>
       </div>
     </section>
   );

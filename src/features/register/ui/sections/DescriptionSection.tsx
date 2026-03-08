@@ -15,9 +15,9 @@ const descriptionModeActiveClass =
 const descriptionModeInactiveClass =
   'text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-slate-100';
 const descriptionTabActiveClass =
-  'bg-white text-blue-700 hover:text-blue-700 shadow-[0_-1px_2px_rgba(0,0,0,0.05)] dark:bg-slate-800 dark:text-blue-300 dark:hover:text-blue-300';
+  'border border-slate-200 border-b-white bg-white text-slate-800 shadow-sm hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:border-b-slate-800 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:hover:text-slate-50';
 const descriptionTabInactiveClass =
-  'bg-slate-50/50 text-slate-600 hover:text-slate-800 dark:bg-slate-900/50 dark:text-slate-300 dark:hover:text-slate-100';
+  'border border-transparent bg-transparent text-slate-500 hover:bg-white/70 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-slate-100';
 
 export default function RegisterDescriptionSection({
   packageForm,
@@ -34,7 +34,30 @@ export default function RegisterDescriptionSection({
   const previewMarkup = useMemo(() => ({ __html: descriptionPreviewHtml }), [descriptionPreviewHtml]);
 
   return (
-    <section className={cn(surface.cardSection, 'space-y-2')}>
+    <section className={surface.cardSection}>
+      <div className={layout.rowBetweenWrapGap2}>
+        <h2 className={text.titleLg}>説明</h2>
+      </div>
+      <div className="space-y-2">
+        <label className={text.labelSm} htmlFor="package-summary">
+          概要 <span className="text-red-500">*</span>
+        </label>
+        <input
+          id="package-summary"
+          name="summary"
+          value={packageForm.summary}
+          onChange={(e) => onUpdatePackageField('summary', e.target.value)}
+          required
+          placeholder="パッケージの概要 (35文字以内)"
+        />
+        <div className="flex justify-end">
+          <span
+            className={cn('text-xs', packageForm.summary.length > 35 ? 'text-red-500 font-bold' : 'text-slate-400')}
+          >
+            {packageForm.summary.length} / 35
+          </span>
+        </div>
+      </div>
       <div className={layout.rowBetweenWrapGap2}>
         <label htmlFor={isExternalDescription ? 'description-url' : 'description-textarea'} className={text.labelSm}>
           詳細説明 <span className="text-red-500">*</span>
@@ -71,7 +94,7 @@ export default function RegisterDescriptionSection({
       </div>
       <div className={surface.panelOverflow}>
         <div
-          className="flex border-b border-slate-100 bg-slate-50/50 px-2 pt-2 dark:border-slate-800 dark:bg-slate-900/50"
+          className="flex border-b border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/50"
           role="tablist"
         >
           <Button
@@ -81,7 +104,7 @@ export default function RegisterDescriptionSection({
             role="tab"
             aria-selected={descriptionTab === 'edit'}
             className={cn(
-              'flex-1 rounded-tl-lg transition-colors',
+              'flex-1 rounded-b-none rounded-tl-lg rounded-tr-none transition-colors',
               descriptionTab === 'edit' ? descriptionTabActiveClass : descriptionTabInactiveClass,
             )}
             onClick={() => onSetDescriptionTab('edit')}
@@ -95,7 +118,7 @@ export default function RegisterDescriptionSection({
             role="tab"
             aria-selected={descriptionTab === 'preview'}
             className={cn(
-              'flex-1 rounded-tr-lg transition-colors',
+              'flex-1 rounded-b-none rounded-tl-none rounded-tr-lg transition-colors',
               descriptionTab === 'preview' ? descriptionTabActiveClass : descriptionTabInactiveClass,
             )}
             onClick={() => onSetDescriptionTab('preview')}
