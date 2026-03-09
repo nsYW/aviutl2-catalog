@@ -11,7 +11,7 @@ export interface SidebarIconProps {
 }
 
 type SidebarIconType = ComponentType<SidebarIconProps> | ReactElement<SidebarIconProps>;
-type SidebarButtonVariant = 'default' | 'action' | 'ghost';
+export type SidebarButtonVariant = 'default' | 'ghost';
 
 interface PortalTooltipProps {
   text: string;
@@ -19,7 +19,7 @@ interface PortalTooltipProps {
 }
 
 interface SidebarButtonProps {
-  icon?: SidebarIconType | null;
+  icon: SidebarIconType;
   label: string;
   onClick: () => void | Promise<void>;
   isActive?: boolean;
@@ -61,7 +61,7 @@ function PortalTooltip({ text, rect }: PortalTooltipProps) {
 
   return createPortal(
     <div
-      className="fixed z-[9999] px-2.5 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs rounded-md shadow-xl font-sans border border-slate-700 dark:border-slate-600 pointer-events-none whitespace-nowrap"
+      className="fixed z-[9999] px-2.5 py-1.5 bg-white text-slate-900 text-xs rounded-md shadow-lg font-sans border border-slate-200 dark:bg-slate-800 dark:text-white dark:border-slate-600 pointer-events-none whitespace-nowrap"
       style={tooltipStyle}
     >
       {text}
@@ -114,8 +114,6 @@ export default function SidebarButton({
     default: isActive
       ? 'bg-blue-600 text-white shadow-md shadow-blue-900/20'
       : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800',
-    action:
-      'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800',
     ghost: isActive
       ? 'bg-blue-600 text-white shadow-md shadow-blue-900/20'
       : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800',
@@ -129,7 +127,7 @@ export default function SidebarButton({
       className: `${icon.props?.className || ''} ${iconClass}`.trim(),
       'aria-hidden': icon.props?.['aria-hidden'] ?? true,
     });
-  } else if (icon) {
+  } else {
     const IconComponent = icon as ComponentType<SidebarIconProps>;
     iconElement = <IconComponent size={20} className={iconClass} />;
   }

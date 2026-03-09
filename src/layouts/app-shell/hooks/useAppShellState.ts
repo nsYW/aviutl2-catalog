@@ -5,6 +5,12 @@ import { useCatalog } from '../../../utils/catalogStore';
 import { ipc } from '../../../utils/invokeIpc';
 import { filterByTagsAndType, getSorter, matchQuery, ORDERED_PACKAGE_TYPES } from '../../../utils/query';
 import { installStatusFromQueryValue, sortOrderFromQuery, sortParamsFromOrder } from '../constants';
+import {
+  createSidebarRouteActionHandlers,
+  resolveAppShellActivePage,
+  SIDEBAR_SHORTCUTS,
+  type SidebarActionHandlers,
+} from '../sidebarConfig';
 import type {
   ActivePage,
   HomeContextValue,
@@ -233,71 +239,34 @@ export default function useAppShellState() {
     }
   }, []);
 
-  const goHome = useCallback(() => navigate('/'), [navigate]);
-  const goUpdates = useCallback(() => navigate('/updates'), [navigate]);
-  const goRegister = useCallback(() => navigate('/register'), [navigate]);
-  const goNiconiCommons = useCallback(() => navigate('/niconi-commons'), [navigate]);
-  const goFeedback = useCallback(() => navigate('/feedback'), [navigate]);
-  const goSettings = useCallback(() => navigate('/settings'), [navigate]);
   const toggleSidebar = useCallback(() => setSidebarCollapsed((prev) => !prev), []);
+  const routeActionHandlers = useMemo(() => createSidebarRouteActionHandlers(navigate), [navigate]);
+  const sidebarActionHandlers = useMemo<SidebarActionHandlers>(
+    () => ({
+      ...routeActionHandlers,
+      'launch-aviutl2': launchAviUtl2,
+      'open-data-dir': openDataDir,
+      'toggle-sidebar': toggleSidebar,
+    }),
+    [launchAviUtl2, openDataDir, routeActionHandlers, toggleSidebar],
+  );
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName || '')) return;
       if (!event.altKey) return;
-      switch (event.code) {
-        case 'KeyP':
-          event.preventDefault();
-          goHome();
-          break;
-        case 'KeyU':
-          event.preventDefault();
-          goUpdates();
-          break;
-        case 'KeyR':
-          event.preventDefault();
-          goRegister();
-          break;
-        case 'KeyF':
-          event.preventDefault();
-          goFeedback();
-          break;
-        case 'KeyO':
-          event.preventDefault();
-          void openDataDir();
-          break;
-        case 'KeyL':
-          event.preventDefault();
-          void launchAviUtl2();
-          break;
-        case 'KeyS':
-          event.preventDefault();
-          goSettings();
-          break;
-        case 'KeyB':
-          event.preventDefault();
-          setSidebarCollapsed((prev) => !prev);
-          break;
-        default:
-          break;
-      }
+      const shortcutMatch = SIDEBAR_SHORTCUTS.find(({ shortcut }) => shortcut.code === event.code);
+      if (!shortcutMatch) return;
+
+      event.preventDefault();
+      void sidebarActionHandlers[shortcutMatch.id]();
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [goFeedback, goHome, goRegister, goSettings, goUpdates, launchAviUtl2, openDataDir]);
+  }, [sidebarActionHandlers]);
 
-  const activePage = useMemo<ActivePage>(() => {
-    const path = location.pathname;
-    if (path === '/') return 'home';
-    if (path.startsWith('/updates')) return 'updates';
-    if (path.startsWith('/register')) return 'register';
-    if (path.startsWith('/niconi-commons')) return 'niconi-commons';
-    if (path.startsWith('/feedback')) return 'feedback';
-    if (path.startsWith('/settings')) return 'settings';
-    if (path.startsWith('/package')) return 'package';
-    return '';
-  }, [location.pathname]);
+  const activePage = useMemo<ActivePage>(() => resolveAppShellActivePage(location.pathname), [location.pathname]);
 
   const outletContext = useMemo<HomeContextValue>(
     () => ({
@@ -345,14 +314,6 @@ export default function useAppShellState() {
     scrollContainerRef,
     outletContext,
     updateAvailableCount,
-    goHome,
-    goUpdates,
-    goRegister,
-    goNiconiCommons,
-    goFeedback,
-    goSettings,
-    openDataDir,
-    launchAviUtl2,
-    toggleSidebar,
+    sidebarActionHandlers,
   };
 }

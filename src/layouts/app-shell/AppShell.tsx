@@ -18,15 +18,7 @@ export default function AppShell() {
         isSidebarCollapsed={state.isSidebarCollapsed}
         activePage={state.activePage}
         updateAvailableCount={state.updateAvailableCount}
-        onGoHome={state.goHome}
-        onGoUpdates={state.goUpdates}
-        onGoRegister={state.goRegister}
-        onGoNiconiCommons={state.goNiconiCommons}
-        onGoFeedback={state.goFeedback}
-        onGoSettings={state.goSettings}
-        onOpenDataDir={state.openDataDir}
-        onLaunchAviUtl2={state.launchAviUtl2}
-        onToggleSidebar={state.toggleSidebar}
+        actionHandlers={state.sidebarActionHandlers}
       />
 
       <main className="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-slate-950">
