@@ -78,8 +78,8 @@ export async function downloadFileFromGoogleDrive(
     unlisteners.push(unlisten);
   }
   try {
-    await ipc.driveDownloadToFile({ fileId, destPath });
-    return String(destPath || '');
+    const finalPath = await ipc.driveDownloadToFile({ fileId, destPath });
+    return String(finalPath || '');
   } finally {
     for (const unlisten of unlisteners) {
       try {

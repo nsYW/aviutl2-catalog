@@ -13,7 +13,7 @@ type InvokeIpcMap = {
   removeInstalledIdCmd: CommandSpec<{ id: string }, void>;
   detectVersionsMap: CommandSpec<{ items: unknown[] }, Record<string, string> | null>;
   downloadFileToPath: CommandSpec<{ url: string; destPath: string; taskId: string }, string>;
-  driveDownloadToFile: CommandSpec<{ fileId: string; destPath: string }, void>;
+  driveDownloadToFile: CommandSpec<{ fileId: string; destPath: string }, string>;
   ensureBoothAuthWindow: CommandSpec<void, void>;
   closeBoothAuthWindow: CommandSpec<void, void>;
   downloadFileToPathBooth: CommandSpec<

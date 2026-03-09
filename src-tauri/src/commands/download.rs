@@ -95,7 +95,7 @@ fn is_booth_logged_in_url(url: &Url) -> bool {
 }
 
 #[tauri::command]
-pub async fn drive_download_to_file(window: tauri::Window, file_id: String, dest_path: String) -> Result<(), DriveError> {
+pub async fn drive_download_to_file(window: tauri::Window, file_id: String, dest_path: String) -> Result<String, DriveError> {
     use std::fs::{OpenOptions, create_dir_all};
     use std::io::Write;
 
@@ -133,8 +133,9 @@ pub async fn drive_download_to_file(window: tauri::Window, file_id: String, dest
         read += chunk.len() as u64;
         let _ = window.emit("drive:progress", serde_json::json!({ "fileId": file_id, "read": read, "total": total_opt }));
     }
-    let _ = window.emit("drive:done", serde_json::json!({ "fileId": file_id, "path": final_dest.to_string_lossy() }));
-    Ok(())
+    let final_dest_str = final_dest.to_string_lossy().to_string();
+    let _ = window.emit("drive:done", serde_json::json!({ "fileId": file_id, "path": final_dest_str }));
+    Ok(final_dest_str)
 }
 
 #[tauri::command]
