@@ -3,6 +3,8 @@ import type { PackageInstallBusyAction } from '../../utils/usePackageInstallerAc
 
 export interface PackageCardProps {
   item: PackageItem;
+  isPauseStateLoaded?: boolean;
+  isUpdatePaused?: boolean;
   listSearch?: string;
   onBeforeOpenDetail?: () => void;
 }
@@ -34,6 +36,8 @@ export interface PackageCardViewProps {
   lastUpdated: string;
   isInstalled: boolean;
   hasUpdate: boolean;
+  isPauseStateLoaded: boolean;
+  isUpdatePaused: boolean;
   canInstall: boolean;
   busyAction: PackageCardBusyAction;
   isBusy: boolean;

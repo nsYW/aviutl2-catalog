@@ -9,6 +9,7 @@ const settingsFileSchema = z.object({
   aviutl2_root: z.string().optional(),
   is_portable_mode: z.boolean().optional(),
   package_state_opt_out: z.boolean().optional(),
+  package_updates_paused_ids: z.array(z.string()).optional(),
 });
 
 export type AppSettings = z.infer<typeof settingsFileSchema>;

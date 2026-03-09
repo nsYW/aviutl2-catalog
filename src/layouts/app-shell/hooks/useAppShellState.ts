@@ -3,6 +3,7 @@ import * as tauriShell from '@tauri-apps/plugin-shell';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCatalog } from '../../../utils/catalogStore';
 import { ipc } from '../../../utils/invokeIpc';
+import usePausedPackageUpdates from '../../../utils/usePausedPackageUpdates';
 import { filterByTagsAndType, getSorter, matchQuery, ORDERED_PACKAGE_TYPES } from '../../../utils/query';
 import { installStatusFromQueryValue, sortOrderFromQuery, sortParamsFromOrder } from '../constants';
 import {
@@ -52,6 +53,7 @@ export default function useAppShellState() {
   const handledSearchSyncLocationKeyRef = useRef<string | null>(null);
   const previousIsHomeRef = useRef(false);
   const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { isLoaded: pausedPackageUpdatesLoaded, pausedPackageIdSet } = usePausedPackageUpdates();
 
   const parseQuery = useMemo<ParsedHomeQuery>(() => {
     const params = new URLSearchParams(location.search);
@@ -189,7 +191,13 @@ export default function useAppShellState() {
   }, [installStatus, items, parseQuery.dir, parseQuery.q, parseQuery.sortKey, selectedCategory, selectedTags]);
 
   const isFilterActive = installStatus !== 'all' || selectedCategory !== 'すべて' || selectedTags.length > 0;
-  const updateAvailableCount = useMemo(() => items.filter((item) => item.installed && !item.isLatest).length, [items]);
+  const updateAvailableCount = useMemo(
+    () =>
+      pausedPackageUpdatesLoaded
+        ? items.filter((item) => item.installed && !item.isLatest && !pausedPackageIdSet.has(item.id)).length
+        : 0,
+    [items, pausedPackageIdSet, pausedPackageUpdatesLoaded],
+  );
 
   const toggleTag = useCallback(
     (tag: string) => {
@@ -275,6 +283,8 @@ export default function useAppShellState() {
       selectedCategory,
       clearFilters,
       isFilterActive,
+      pausedPackageUpdatesLoaded,
+      pausedPackageUpdateIdSet: pausedPackageIdSet,
       updateAvailableCount,
       sortOrder,
       setSortOrder,
@@ -292,6 +302,8 @@ export default function useAppShellState() {
       installStatus,
       filteredPackages,
       isFilterActive,
+      pausedPackageUpdatesLoaded,
+      pausedPackageIdSet,
       saveHomeScrollPosition,
       selectedCategory,
       selectedTags,

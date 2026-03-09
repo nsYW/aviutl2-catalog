@@ -8,7 +8,13 @@ import usePackageCardActions from './usePackageCardActions';
 import PackageCardView from './PackageCardView';
 import type { PackageCardProps } from './types';
 
-export default function PackageCard({ item, listSearch = '', onBeforeOpenDetail }: PackageCardProps) {
+export default function PackageCard({
+  item,
+  isPauseStateLoaded = true,
+  isUpdatePaused = false,
+  listSearch = '',
+  onBeforeOpenDetail,
+}: PackageCardProps) {
   const navigate = useNavigate();
   const { error, setError, busyAction, isBusy, progress, onDownload, onUpdate, onRemove } = usePackageCardActions(item);
 
@@ -16,6 +22,7 @@ export default function PackageCard({ item, listSearch = '', onBeforeOpenDetail 
   const category = typeof item.type === 'string' ? item.type : 'その他';
   const isInstalled = Boolean(item.installed);
   const hasUpdate = isInstalled && !item.isLatest;
+  const showPausedUpdateState = isPauseStateLoaded && hasUpdate && isUpdatePaused;
   const canInstall = hasInstaller(item);
   const lastUpdated = item.updatedAt ? formatDate(item.updatedAt).replace(/-/g, '/') : '?';
 
@@ -33,6 +40,8 @@ export default function PackageCard({ item, listSearch = '', onBeforeOpenDetail 
         lastUpdated={lastUpdated}
         isInstalled={isInstalled}
         hasUpdate={hasUpdate}
+        isPauseStateLoaded={isPauseStateLoaded}
+        isUpdatePaused={showPausedUpdateState}
         canInstall={canInstall}
         busyAction={busyAction}
         isBusy={isBusy}

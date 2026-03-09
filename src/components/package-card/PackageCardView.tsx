@@ -13,6 +13,8 @@ export default function PackageCardView({
   lastUpdated,
   isInstalled,
   hasUpdate,
+  isPauseStateLoaded,
+  isUpdatePaused,
   canInstall,
   busyAction,
   isBusy,
@@ -42,6 +44,8 @@ export default function PackageCardView({
         <PackageCardActionSection
           isInstalled={isInstalled}
           hasUpdate={hasUpdate}
+          isPauseStateLoaded={isPauseStateLoaded}
+          isUpdatePaused={isUpdatePaused}
           canInstall={canInstall}
           busyAction={busyAction}
           isBusy={isBusy}

@@ -47,6 +47,7 @@ type InvokeIpcMap = {
     },
     void
   >;
+  setPackageUpdatePaused: CommandSpec<{ packageId: string; paused: boolean }, string[]>;
   completeInitialSetup: CommandSpec<void, void>;
   calcXxh3Hex: CommandSpec<{ path: string }, string>;
 };

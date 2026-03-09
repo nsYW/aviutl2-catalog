@@ -29,6 +29,8 @@ export interface FiltersSectionProps {
 
 export interface PackageGridSectionProps {
   filteredPackages: PackageItem[];
+  pausedPackageUpdatesLoaded: boolean;
+  pausedPackageUpdateIds: ReadonlySet<string>;
   listSearch: string;
   onBeforeOpenDetail: () => void;
 }

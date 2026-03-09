@@ -15,8 +15,12 @@ export interface BulkProgressSectionProps {
 }
 
 export interface UpdatesTableSectionProps {
-  updatableItems: UpdatesItem[];
+  items: UpdatesItem[];
+  emptyMessage: string;
   itemProgress: ItemUpdateProgressMap;
   bulkUpdating: boolean;
+  pausedPackageIds: ReadonlySet<string>;
+  pauseBusyIds: ReadonlySet<string>;
   onUpdate: (item: UpdatesItem) => void;
+  onTogglePause: (item: UpdatesItem, paused: boolean) => void;
 }

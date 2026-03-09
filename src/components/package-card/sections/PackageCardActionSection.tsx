@@ -1,5 +1,5 @@
 import type { MouseEvent } from 'react';
-import { CheckCircle2, Download, RefreshCw, Trash2, type LucideIcon } from 'lucide-react';
+import { CheckCircle2, CirclePause, Download, RefreshCw, Trash2, type LucideIcon } from 'lucide-react';
 import ProgressCircle from '../../ProgressCircle';
 import type { PackageCardActionHandler, PackageCardBusyAction, PackageCardProgressView } from '../types';
 import { layout, surface } from '@/components/ui/_styles';
@@ -8,6 +8,8 @@ import { cn } from '@/lib/cn';
 interface PackageCardActionSectionProps {
   isInstalled: boolean;
   hasUpdate: boolean;
+  isPauseStateLoaded: boolean;
+  isUpdatePaused: boolean;
   canInstall: boolean;
   busyAction: PackageCardBusyAction;
   isBusy: boolean;
@@ -21,8 +23,10 @@ interface PackageCardActionSectionProps {
 const actionButtonBaseClass = 'text-xs font-bold rounded-lg';
 const removeButtonClass =
   'h-9 w-9 shrink-0 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed';
-const installedActionClass =
-  'h-9 flex-1 bg-slate-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 gap-1 cursor-default';
+const statusBadgeBaseClass = 'h-9 flex-1 gap-1 cursor-default';
+const installedActionClass = 'bg-slate-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400';
+const pausedActionClass =
+  'border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400';
 
 function handleActionClick(action: PackageCardActionHandler) {
   return (event: MouseEvent<HTMLButtonElement>) => {
@@ -84,13 +88,21 @@ function PrimaryActionButton({
   );
 }
 
-function InstalledActionBadge() {
+function StatusBadge({ icon: Icon, label, className }: { icon: LucideIcon; label: string; className?: string }) {
   return (
-    <div className={cn(layout.center, actionButtonBaseClass, installedActionClass, surface.baseMuted)}>
-      <CheckCircle2 size={14} />
-      <span>導入済</span>
+    <div className={cn(layout.center, actionButtonBaseClass, statusBadgeBaseClass, className)}>
+      <Icon size={14} />
+      <span>{label}</span>
     </div>
   );
+}
+
+function InstalledActionBadge() {
+  return <StatusBadge icon={CheckCircle2} label="導入済" className={cn(installedActionClass, surface.baseMuted)} />;
+}
+
+function PausedUpdateBadge() {
+  return <StatusBadge icon={CirclePause} label="停止中" className={pausedActionClass} />;
 }
 
 function RemoveActionButton({ disabled, onRemove }: { disabled: boolean; onRemove: PackageCardActionHandler }) {
@@ -110,6 +122,8 @@ function RemoveActionButton({ disabled, onRemove }: { disabled: boolean; onRemov
 export default function PackageCardActionSection({
   isInstalled,
   hasUpdate,
+  isPauseStateLoaded,
+  isUpdatePaused,
   canInstall,
   busyAction,
   isBusy,
@@ -122,6 +136,7 @@ export default function PackageCardActionSection({
   const downloading = busyAction === 'download';
   const updating = busyAction === 'update';
   const primaryDisabled = isBusy || !canInstall;
+  const updateDisabled = primaryDisabled || !isPauseStateLoaded;
 
   return (
     <div className="relative z-20 flex items-end justify-between gap-3">
@@ -148,21 +163,25 @@ export default function PackageCardActionSection({
             onAction={onDownload}
           />
         ) : hasUpdate ? (
-          <PrimaryActionButton
-            busy={updating}
-            disabled={primaryDisabled}
-            progress={progress}
-            label="更新"
-            title="更新"
-            icon={RefreshCw}
-            iconClassName="animate-spin-slow"
-            progressClassName="text-amber-600 dark:text-amber-400"
-            className={cn(
-              busyAction === 'update' ? 'w-full' : 'flex-1',
-              'h-9 gap-1.5 px-2 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors cursor-pointer disabled:cursor-not-allowed',
-            )}
-            onAction={onUpdate}
-          />
+          isUpdatePaused ? (
+            <PausedUpdateBadge />
+          ) : (
+            <PrimaryActionButton
+              busy={updating}
+              disabled={updateDisabled}
+              progress={progress}
+              label="更新"
+              title="更新"
+              icon={RefreshCw}
+              iconClassName="animate-spin-slow"
+              progressClassName="text-amber-600 dark:text-amber-400"
+              className={cn(
+                busyAction === 'update' ? 'w-full' : 'flex-1',
+                'h-9 gap-1.5 px-2 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors cursor-pointer disabled:cursor-not-allowed',
+              )}
+              onAction={onUpdate}
+            />
+          )
         ) : (
           <InstalledActionBadge />
         )}

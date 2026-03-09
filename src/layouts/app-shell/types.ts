@@ -42,6 +42,8 @@ export interface HomeContextValue {
   selectedCategory: string;
   clearFilters: () => void;
   isFilterActive: boolean;
+  pausedPackageUpdatesLoaded: boolean;
+  pausedPackageUpdateIdSet: ReadonlySet<string>;
   updateAvailableCount: number;
   sortOrder: HomeSortOrder;
   setSortOrder: (order: HomeSortOrder) => void;

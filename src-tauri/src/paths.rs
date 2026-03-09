@@ -1,7 +1,8 @@
 use arc_swap::ArcSwap;
+use once_cell::sync::Lazy;
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::{
     fs,
     io::{Error, ErrorKind},
@@ -10,6 +11,7 @@ use std::{
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 
 static APP_DIR: OnceCell<ArcSwap<AppDirs>> = OnceCell::new();
+static SETTINGS_FILE_LOCK: Lazy<Mutex<()>> = Lazy::new(|| Mutex::new(()));
 
 fn pathbuf_to_string(path: &Path) -> String {
     path.to_string_lossy().into_owned()
@@ -19,12 +21,13 @@ fn pathbuf_to_string(path: &Path) -> String {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
 pub struct Settings {
-    pub aviutl2_root: PathBuf,       // AviUtl2 のルートディレクトリ
-    pub is_portable_mode: bool,      // ポータブルモードかどうか
-    pub theme: String,               // テーマ
-    pub package_state_opt_out: bool, // 匿名統計の送信を無効化する
-    pub app_version: String,         // 本アプリのバージョン(UpdateCheckerの更新で使用)
-    pub catalog_exe_path: PathBuf,   // 本ソフトの実行ファイルのパス(UpdateCheckerで使用))
+    pub aviutl2_root: PathBuf,                   // AviUtl2 のルートディレクトリ
+    pub is_portable_mode: bool,                  // ポータブルモードかどうか
+    pub theme: String,                           // テーマ
+    pub package_state_opt_out: bool,             // 匿名統計の送信を無効化
+    pub package_updates_paused_ids: Vec<String>, // 一時停止中のパッケージID一覧(UpdateCheckerの更新で使用予定)
+    pub app_version: String,                     // 本アプリのバージョン(UpdateCheckerの更新で使用)
+    pub catalog_exe_path: PathBuf,               // 本ソフトの実行ファイルのパス(UpdateCheckerで使用))
 }
 
 // アプリケーションで使用するディレクトリ一覧
@@ -264,12 +267,41 @@ pub async fn update_settings(app: AppHandle, aviutl2_root: String, is_portable_m
     let catalog_config_dir = app.path().app_config_dir().map_err(|e| e.to_string())?;
     fs::create_dir_all(&catalog_config_dir).map_err(|e| e.to_string())?;
     let settings_path = catalog_config_dir.join("settings.json");
+    let _settings_guard = SETTINGS_FILE_LOCK.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
     let mut settings = Settings::load_from_file(&settings_path);
     settings.aviutl2_root = root_path;
     settings.is_portable_mode = is_portable_mode;
     settings.theme = theme.to_string();
     settings.package_state_opt_out = package_state_opt_out;
     finalize_settings(&app, &mut settings, &settings_path, &catalog_config_dir).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn set_package_update_paused(app: AppHandle, package_id: String, paused: bool) -> Result<Vec<String>, String> {
+    let package_id = package_id.trim();
+    if package_id.is_empty() {
+        return Err(String::from("パッケージIDが空です。"));
+    }
+
+    let catalog_config_dir = app.path().app_config_dir().map_err(|e| e.to_string())?;
+    fs::create_dir_all(&catalog_config_dir).map_err(|e| e.to_string())?;
+    let settings_path = catalog_config_dir.join("settings.json");
+    let _settings_guard = SETTINGS_FILE_LOCK.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
+    let mut settings = Settings::load_from_file(&settings_path);
+    settings.package_updates_paused_ids.retain(|id| !id.trim().is_empty());
+
+    if paused {
+        if !settings.package_updates_paused_ids.iter().any(|id| id == package_id) {
+            settings.package_updates_paused_ids.push(package_id.to_string());
+        }
+    } else {
+        settings.package_updates_paused_ids.retain(|id| id != package_id);
+    }
+
+    settings.package_updates_paused_ids.sort_unstable();
+    settings.package_updates_paused_ids.dedup();
+    settings.save_to_file(&settings_path).map_err(|e| e.to_string())?;
+    Ok(settings.package_updates_paused_ids)
 }
 
 // aviutl2_rootの初期値を返す

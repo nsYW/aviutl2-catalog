@@ -8,16 +8,20 @@ import { cn } from '@/lib/cn';
 const cellTruncateClass = table.cellBodyTruncate;
 
 export default function UpdatesTableSection({
-  updatableItems,
+  items,
+  emptyMessage,
   itemProgress,
   bulkUpdating,
+  pausedPackageIds,
+  pauseBusyIds,
   onUpdate,
+  onTogglePause,
 }: UpdatesTableSectionProps) {
   return (
     <div className={surface.panel}>
-      {updatableItems.length === 0 ? (
+      {items.length === 0 ? (
         <div className={text.emptyStateMuted}>
-          <p>すべて最新の状態です</p>
+          <p>{emptyMessage}</p>
         </div>
       ) : (
         <div className={table.scrollX}>
@@ -25,7 +29,7 @@ export default function UpdatesTableSection({
             <div
               className={cn(
                 table.headerBase,
-                'grid-cols-[minmax(0,2.5fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_7.5rem]',
+                'grid-cols-[minmax(0,2.5fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_8rem]',
               )}
             >
               <span>パッケージ</span>
@@ -36,15 +40,17 @@ export default function UpdatesTableSection({
               <span className="text-right"></span>
             </div>
             <div className={surface.divideMuted}>
-              {updatableItems.map((item) => {
+              {items.map((item) => {
                 const progress = itemProgress[item.id];
+                const paused = pausedPackageIds.has(item.id);
+                const pauseBusy = pauseBusyIds.has(item.id);
                 return (
                   <div
                     key={item.id}
                     className={cn(
                       table.rowBase,
                       table.rowRelaxed,
-                      'grid-cols-[minmax(0,2.5fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_7.5rem] hover:bg-transparent dark:hover:bg-transparent',
+                      'grid-cols-[minmax(0,2.5fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_8rem] transition-none hover:bg-transparent dark:hover:bg-transparent',
                     )}
                   >
                     <div className="min-w-0">
@@ -68,14 +74,37 @@ export default function UpdatesTableSection({
                           />
                         </div>
                       ) : (
-                        <button
-                          className={table.actionButtonSubtle}
-                          onClick={() => onUpdate(item)}
-                          disabled={bulkUpdating}
-                          type="button"
-                        >
-                          更新
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          {paused ? (
+                            <button
+                              className={table.actionButtonSubtle}
+                              onClick={() => onTogglePause(item, false)}
+                              disabled={bulkUpdating || pauseBusy}
+                              type="button"
+                            >
+                              {pauseBusy ? '保存中…' : '再開'}
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                className={table.actionButtonSubtle}
+                                onClick={() => onTogglePause(item, true)}
+                                disabled={bulkUpdating || pauseBusy}
+                                type="button"
+                              >
+                                {pauseBusy ? '保存中…' : '一時停止'}
+                              </button>
+                              <button
+                                className={table.actionButtonSubtle}
+                                onClick={() => onUpdate(item)}
+                                disabled={bulkUpdating || pauseBusy}
+                                type="button"
+                              >
+                                更新
+                              </button>
+                            </>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>

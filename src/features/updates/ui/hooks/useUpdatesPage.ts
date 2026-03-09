@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useCatalog, useCatalogDispatch } from '../../../../utils/catalogStore';
 import { hasInstaller, runInstallerForItem } from '../../../../utils/installer';
 import { logError } from '../../../../utils/logging';
+import usePausedPackageUpdates from '../../../../utils/usePausedPackageUpdates';
 import { toErrorMessage, toProgressLabel, toProgressRatio } from '../../model/helpers';
 import type {
   BulkUpdateProgress,
@@ -91,6 +92,12 @@ export default function useUpdatesPage() {
   const [bulkProgress, setBulkProgress] = useState<BulkUpdateProgress | null>(initialSnapshot.bulkProgress);
   const [error, setErrorState] = useState(initialSnapshot.error);
   const [itemProgress, setItemProgress] = useState<ItemUpdateProgressMap>(initialSnapshot.itemProgress);
+  const {
+    isLoaded: pausedPackageUpdatesLoaded,
+    pausedPackageIdSet,
+    pauseBusyIdSet,
+    togglePause,
+  } = usePausedPackageUpdates();
 
   useEffect(() => {
     const syncFromRuntime = () => {
@@ -112,17 +119,26 @@ export default function useUpdatesPage() {
     () => items.filter((item) => item.installed && !item.isLatest && hasInstaller(item)),
     [items],
   );
+  const bulkUpdatableItems = useMemo(
+    () => (pausedPackageUpdatesLoaded ? updatableItems.filter((item) => !pausedPackageIdSet.has(item.id)) : []),
+    [pausedPackageIdSet, pausedPackageUpdatesLoaded, updatableItems],
+  );
+  const pausedUpdatableItems = useMemo(
+    () => (pausedPackageUpdatesLoaded ? updatableItems.filter((item) => pausedPackageIdSet.has(item.id)) : []),
+    [pausedPackageIdSet, pausedPackageUpdatesLoaded, updatableItems],
+  );
 
   const handleBulkUpdate = useCallback(async () => {
-    if (runtimeLocks.bulkUpdating || runtimeLocks.itemUpdatingIds.size > 0 || updatableItems.length === 0) return;
+    if (!pausedPackageUpdatesLoaded) return;
+    if (runtimeLocks.bulkUpdating || runtimeLocks.itemUpdatingIds.size > 0 || bulkUpdatableItems.length === 0) return;
     runtimeLocks.bulkUpdating = true;
     patchRuntimeState({
       bulkUpdating: true,
       error: '',
-      bulkProgress: { ratio: 0, status: '準備中…', current: 0, total: updatableItems.length },
+      bulkProgress: { ratio: 0, status: '準備中…', current: 0, total: bulkUpdatableItems.length },
     });
 
-    const targets = updatableItems.slice();
+    const targets = bulkUpdatableItems.slice();
     const total = targets.length || 1;
     const failed: Array<{ item: UpdatesItem; msg: string }> = [];
 
@@ -191,10 +207,12 @@ export default function useUpdatesPage() {
         bulkProgress: null,
       });
     }
-  }, [dispatch, updatableItems]);
+  }, [bulkUpdatableItems, dispatch, pausedPackageUpdatesLoaded]);
 
   const handleUpdate = useCallback(
     async (item: UpdatesItem) => {
+      if (!pausedPackageUpdatesLoaded) return;
+      if (pausedPackageIdSet.has(item.id)) return;
       if (runtimeLocks.bulkUpdating || runtimeLocks.itemUpdatingIds.has(item.id)) return;
       runtimeLocks.itemUpdatingIds.add(item.id);
       patchRuntimeState({ error: '' });
@@ -216,7 +234,25 @@ export default function useUpdatesPage() {
         setRuntimeItemProgress(item.id, null);
       }
     },
-    [dispatch],
+    [dispatch, pausedPackageIdSet, pausedPackageUpdatesLoaded],
+  );
+
+  const handleTogglePause = useCallback(
+    async (item: UpdatesItem, paused: boolean) => {
+      const id = String(item.id || '').trim();
+      if (!id) return;
+      if (!pausedPackageUpdatesLoaded) return;
+      if (runtimeLocks.bulkUpdating || runtimeLocks.itemUpdatingIds.has(id)) return;
+
+      try {
+        await togglePause(id, paused);
+      } catch (pauseError) {
+        patchRuntimeState({
+          error: `更新の一時停止設定を保存できませんでした\n\n${toErrorMessage(pauseError)}`,
+        });
+      }
+    },
+    [pausedPackageUpdatesLoaded, togglePause],
   );
 
   const bulkPercent = Math.round((bulkProgress?.ratio ?? 0) * 100);
@@ -226,15 +262,21 @@ export default function useUpdatesPage() {
   );
 
   return {
-    updatableItems,
+    activeUpdatableItems: bulkUpdatableItems,
+    pausedUpdatableItems,
+    pausedPackageUpdatesLoaded,
+    bulkUpdatableCount: bulkUpdatableItems.length,
     bulkUpdating,
     hasAnyItemUpdating,
     bulkProgress,
     bulkPercent,
     itemProgress,
+    pausedPackageIdSet,
+    pauseBusyIdSet,
     error,
     setError,
     handleBulkUpdate,
     handleUpdate,
+    handleTogglePause,
   };
 }

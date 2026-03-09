@@ -34,6 +34,8 @@ export default function HomePage() {
       {filteredCount > 0 ? (
         <PackageGridSection
           filteredPackages={state.filteredPackages}
+          pausedPackageUpdatesLoaded={state.pausedPackageUpdatesLoaded}
+          pausedPackageUpdateIds={state.pausedPackageUpdateIdSet}
           listSearch={state.listSearch}
           onBeforeOpenDetail={state.saveHomeScrollPosition}
         />

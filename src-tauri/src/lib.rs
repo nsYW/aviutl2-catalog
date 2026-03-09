@@ -148,6 +148,7 @@ pub fn run() {
             commands::system::run_auo_setup,
             paths::complete_initial_setup,
             paths::update_settings,
+            paths::set_package_update_paused,
             paths::default_aviutl2_root,
             paths::resolve_aviutl2_root,
             paths::get_app_dirs,
