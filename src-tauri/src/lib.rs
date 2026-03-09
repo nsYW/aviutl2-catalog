@@ -78,7 +78,7 @@ fn init_logger(app: &tauri::AppHandle) {
     tracing_subscriber::fmt().with_max_level(tracing::Level::INFO).with_writer(writer).init();
 }
 
-#[cfg(target_os = "windows")]
+#[cfg(all(target_os = "windows", not(debug_assertions)))]
 fn bring_existing_window_to_front(app: &tauri::AppHandle) {
     let Some(window) = app.get_webview_window("main").or_else(|| app.get_webview_window("init-setup")) else {
         return;
@@ -89,14 +89,12 @@ fn bring_existing_window_to_front(app: &tauri::AppHandle) {
 }
 
 pub fn run() {
-    let mut builder = tauri::Builder::default();
+    let builder = tauri::Builder::default();
 
     #[cfg(all(target_os = "windows", not(debug_assertions)))]
-    {
-        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+    let builder = builder.plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
             bring_existing_window_to_front(app);
-        }));
-    }
+    }));
 
     builder
         .plugin(tauri_plugin_deep_link::init())
