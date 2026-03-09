@@ -218,8 +218,8 @@ export default function useRegisterTestState({
       if (installerTestTokenRef.current !== token) return;
       setInstallerTestDetectedVersion(detected);
       const normalizedDetected = detected.trim();
-      if (!normalizedDetected || normalizedDetected === '???') {
-        throw new Error('検出バージョンが未検出または ??? のため、完了として扱えません。');
+      if (!normalizedDetected || normalizedDetected === '不明') {
+        throw new Error('検出バージョンが未検出または 不明 のため、完了として扱えません。');
       }
       if (installerTestTokenRef.current === token) {
         onTestPassed?.('installer');

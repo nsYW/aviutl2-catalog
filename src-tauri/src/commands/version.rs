@@ -228,7 +228,7 @@ fn determine_versions(_app: &tauri::AppHandle, list: &[VersionItemInput], file_h
             }
         }
         if detected.is_empty() && (any_present || any_mismatch) {
-            detected = String::from("???");
+            detected = String::from("不明");
         }
         out.insert(id, detected);
     }

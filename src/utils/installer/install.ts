@@ -91,7 +91,7 @@ export async function runInstallerForItem(
 
     await addInstalledId(item.id, version);
     const detectedVersion = await syncDetectedVersionWithDispatch(item, dispatch);
-    if (dispatch && detectedVersion === '???') {
+    if (dispatch && detectedVersion === '不明') {
       dispatch({ type: 'SET_DETECTED_ONE', payload: { id: item.id, version: detectedVersion, forceLatest: true } });
     }
     try {
