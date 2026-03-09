@@ -14,67 +14,137 @@ type GitHubRelease = {
   assets?: unknown;
   published_at?: string;
   created_at?: string;
+  name?: string;
+  tag_name?: string;
+  prerelease?: boolean;
 };
 
-function pickAssetFromRelease(release: unknown, regex: RegExp | null): GitHubAsset | null {
+class GitHubPrimaryRateLimitError extends Error {
+  readonly resetAtUnixSeconds: number;
+
+  constructor(resetAtUnixSeconds: number) {
+    super(
+      `GitHub API の primary rate limit に達しました。${formatResetAt(resetAtUnixSeconds)} まで待ってから再試行してください。`,
+    );
+    this.name = 'GitHubPrimaryRateLimitError';
+    this.resetAtUnixSeconds = resetAtUnixSeconds;
+  }
+}
+
+function formatResetAt(resetAtUnixSeconds: number): string {
+  return new Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(new Date(resetAtUnixSeconds * 1000));
+}
+
+function toPrimaryRateLimitError(response: Response): Error | null {
+  if (response.status !== 403 && response.status !== 429) return null;
+  const remaining = response.headers.get('x-ratelimit-remaining');
+  const reset = response.headers.get('x-ratelimit-reset');
+  if (remaining !== '0' || !reset) return null;
+  const resetAt = Number(reset);
+  if (!Number.isFinite(resetAt) || resetAt <= 0) return null;
+  return new GitHubPrimaryRateLimitError(resetAt);
+}
+
+async function throwIfPrimaryRateLimited(response: Response, context: string): Promise<void> {
+  const rateLimitError = toPrimaryRateLimitError(response);
+  if (!rateLimitError) return;
+  await logError(`[fetchGitHubAsset] rate limit ${context}: ${rateLimitError.message}`);
+  throw rateLimitError;
+}
+
+function pickAssetFromRelease(release: unknown, regex: RegExp): GitHubAsset | null {
   const releaseLike = release as GitHubRelease | null;
   if (!releaseLike || !Array.isArray(releaseLike.assets)) return null;
   const assets = releaseLike.assets as GitHubAsset[];
-  if (regex) {
-    const matched = assets.find((a) => regex.test(a.name || ''));
-    if (matched) return matched;
-  }
-  return assets[0] || null;
+  return assets.find((asset) => regex.test(asset.name || '')) || null;
 }
 
-function findLatestUpdatedAsset(releases: unknown, regex: RegExp | null): GitHubAsset | null {
+function findLatestRelease(releases: unknown): GitHubRelease | null {
   if (!Array.isArray(releases) || !releases.length) return null;
-  let best: GitHubAsset | null = null;
+  let best: GitHubRelease | null = null;
   let bestTs = -Infinity;
   for (const rel of releases) {
     const releaseLike = rel as GitHubRelease;
-    const assets = Array.isArray(releaseLike?.assets) ? (releaseLike.assets as GitHubAsset[]) : [];
-    for (const asset of assets) {
-      if (regex && !regex.test(asset?.name || '')) continue;
-      const ts =
-        Date.parse(
-          asset?.updated_at || asset?.created_at || releaseLike?.published_at || releaseLike?.created_at || '',
-        ) || 0;
-      if (ts > bestTs) {
-        best = asset;
-        bestTs = ts;
-      }
+    const ts = Date.parse(releaseLike?.published_at || releaseLike?.created_at || '') || 0;
+    if (ts > bestTs) {
+      best = releaseLike;
+      bestTs = ts;
     }
   }
   return best;
 }
 
-export async function fetchGitHubURL(github: GithubSource): Promise<string> {
-  const { owner, repo, pattern } = github;
-  const regex = pattern ? new RegExp(pattern) : null;
+function describeRelease(release: GitHubRelease | null): string {
+  if (!release) return 'unknown';
+  const label = String(release.name || release.tag_name || '').trim();
+  if (!label) return 'unknown';
+  return release.prerelease ? `${label} (prerelease)` : label;
+}
 
+async function fetchLatestRelease(owner: string, repo: string): Promise<GitHubRelease | null> {
   try {
     const res = await tauriHttp.fetch(`https://api.github.com/repos/${owner}/${repo}/releases/latest`);
-    const data = await res.json().catch(() => ({}));
-    const asset = pickAssetFromRelease(data, regex);
-    if (asset?.browser_download_url) {
-      return asset.browser_download_url;
+    if (!res.ok) {
+      await throwIfPrimaryRateLimited(res, `latest repo=${owner}/${repo}`);
+      if (res.status !== 404) {
+        await logError(`[fetchGitHubAsset] fetch latest failed: HTTP ${res.status} repo=${owner}/${repo}`);
+      }
+      return null;
     }
+    return (await res.json().catch(() => null)) as GitHubRelease | null;
   } catch (e: unknown) {
+    if (e instanceof GitHubPrimaryRateLimitError) {
+      throw e;
+    }
     try {
       await logError(`[fetchGitHubAsset] fetch latest failed: ${formatUnknownError(e)}`);
     } catch {}
+    return null;
+  }
+}
+
+async function fetchNewestRelease(owner: string, repo: string): Promise<GitHubRelease | null> {
+  const res = await tauriHttp.fetch(`https://api.github.com/repos/${owner}/${repo}/releases?per_page=30`);
+  if (!res.ok) {
+    await throwIfPrimaryRateLimited(res, `releases repo=${owner}/${repo}`);
+    throw new Error(`GitHub releases API returned HTTP ${res.status}`);
+  }
+  const list = await res.json().catch(() => []);
+  return findLatestRelease(list);
+}
+
+export async function fetchGitHubURL(github: GithubSource): Promise<string> {
+  const { owner, repo, pattern } = github;
+  let regex: RegExp;
+  try {
+    regex = new RegExp(pattern);
+  } catch (e: unknown) {
+    throw new Error(`GitHub asset pattern is invalid: ${formatUnknownError(e)}`, { cause: e });
   }
 
-  try {
-    const res = await tauriHttp.fetch(`https://api.github.com/repos/${owner}/${repo}/releases?per_page=30`);
-    const list = await res.json().catch(() => []);
-    const asset = findLatestUpdatedAsset(list, regex);
-    return asset?.browser_download_url || '';
-  } catch (e: unknown) {
-    try {
-      await logError(`[fetchGitHubAsset] fetch failed: ${formatUnknownError(e)}`);
-    } catch {}
-    return '';
+  const latestRelease = await fetchLatestRelease(owner, repo);
+  const targetRelease = latestRelease ?? (await fetchNewestRelease(owner, repo));
+  if (!targetRelease) {
+    throw new Error(`GitHub release not found: ${owner}/${repo}`);
   }
+
+  const asset = pickAssetFromRelease(targetRelease, regex);
+  if (!asset?.browser_download_url) {
+    const error = new Error(
+      `GitHub release asset not found for pattern "${pattern}" in ${owner}/${repo} release ${describeRelease(targetRelease)}`,
+    );
+    try {
+      await logError(`[fetchGitHubAsset] fetch failed: ${formatUnknownError(error)}`);
+    } catch {}
+    throw error;
+  }
+  return asset.browser_download_url;
 }
