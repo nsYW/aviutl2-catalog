@@ -121,6 +121,7 @@ function OperationList({ operations }: { operations: RegisterTestOperation[] }) 
 }
 
 export default function RegisterTestSection({
+  testsRequired,
   installerTestRunning,
   installerTestValidation,
   installerTestRatio,
@@ -151,7 +152,9 @@ export default function RegisterTestSection({
       <div className={layout.rowBetweenWrapGap3}>
         <div className="space-y-1">
           <h2 className={text.titleLg}>インストーラー / 削除テスト</h2>
-          <p className={text.mutedXs}>現在の設定でインストールと削除の動作を確認します。</p>
+          <p className={text.mutedXs}>
+            {testsRequired ? '現在の設定でインストールと削除の動作を確認します。' : '現在の差分ではテスト不要です。'}
+          </p>
         </div>
         <div className={layout.wrapItemsGap2}>
           <Button

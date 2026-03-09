@@ -4,14 +4,13 @@
 import { useCallback, useState } from 'react';
 import {
   deleteRegisterDraft,
-  getRegisterDraftTestStatus,
   isRegisterDraftPending,
-  isRegisterDraftReadyForSubmit,
   listRegisterDraftRecords,
   restoreRegisterDraft,
   updateRegisterDraftSubmitState,
 } from '../../model/draft';
 import { cleanupImagePreviews } from '../../model/helpers';
+import { resolveRegisterDraftTestState } from '../../model/registerTestRequirement';
 import type { CatalogEntry } from '../../../../utils/catalogSchema';
 import type { RegisterSuccessDialogState } from '../types';
 import type { SubmitSinglePackageInput, SubmitSinglePackageResult } from './useRegisterSubmitHandler';
@@ -49,10 +48,33 @@ export default function useRegisterBatchSubmit({
         if (pendingDrafts.length === 0) {
           return;
         }
-        const blockedDrafts = pendingDrafts.filter((draft) => !isRegisterDraftReadyForSubmit(draft));
+        const blockedDrafts = pendingDrafts.filter((draft) => {
+          const status = resolveRegisterDraftTestState({
+            catalogItems,
+            packageId: draft.packageId,
+            installerTestedHash: draft.installerTestedHash,
+            uninstallerTestedHash: draft.uninstallerTestedHash,
+            packageForm: {
+              id: draft.form.id,
+              installer: draft.form.installer,
+              versions: draft.form.versions,
+            },
+          });
+          return !status.installerReady || !status.uninstallerReady;
+        });
         if (blockedDrafts.length > 0) {
           const blockedLabels = blockedDrafts.map((draft) => {
-            const status = getRegisterDraftTestStatus(draft);
+            const status = resolveRegisterDraftTestState({
+              catalogItems,
+              packageId: draft.packageId,
+              installerTestedHash: draft.installerTestedHash,
+              uninstallerTestedHash: draft.uninstallerTestedHash,
+              packageForm: {
+                id: draft.form.id,
+                installer: draft.form.installer,
+                versions: draft.form.versions,
+              },
+            });
             const missing: string[] = [];
             if (!status.installerReady) missing.push('install');
             if (!status.uninstallerReady) missing.push('uninstall');

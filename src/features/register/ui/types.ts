@@ -3,6 +3,7 @@
  */
 import type { FormEvent, MouseEventHandler, PointerEvent } from 'react';
 import type { CatalogEntry } from '../../../utils/catalogSchema';
+import type { RegisterDraftTestState } from '../model/registerTestRequirement';
 import type {
   RegisterImageState,
   RegisterInstallerOption,
@@ -204,6 +205,7 @@ export interface RegisterDraftListItemView {
   savedAt: number;
   pending: boolean;
   readyForSubmit: boolean;
+  testStatus: RegisterDraftTestState;
   lastSubmitError: string;
 }
 
@@ -236,6 +238,7 @@ export interface RegisterPreviewSectionProps {
 }
 
 export interface RegisterTestSectionProps {
+  testsRequired: boolean;
   installerTestRunning: boolean;
   installerTestValidation: string;
   installerTestRatio: number;

@@ -4,7 +4,7 @@
 import { Alert } from '@/components/ui/Alert';
 import Button from '@/components/ui/Button';
 import { FileBraces } from 'lucide-react';
-import { layout, state, surface, text } from '@/components/ui/_styles';
+import { layout, overlay, state, surface, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';
 
 interface RegisterJsonImportDialogProps {
@@ -29,14 +29,7 @@ export default function RegisterJsonImportDialog({
 
   return (
     <div className={layout.fixedCenterBlur} role="dialog" aria-modal="true">
-      <Button
-        variant="plain"
-        size="none"
-        type="button"
-        aria-label="閉じる"
-        className={surface.overlayFade}
-        onClick={onClose}
-      />
+      <button type="button" aria-label="閉じる" className={overlay.backdrop} onClick={onClose} />
       <div className={cn(surface.modal, 'relative w-full max-w-3xl')}>
         <div className={surface.modalHeaderMuted}>
           <h3 className={cn(layout.inlineGap2, text.titleLg)}>

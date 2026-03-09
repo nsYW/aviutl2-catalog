@@ -1,8 +1,9 @@
 /**
  * Draft persistence utilities for register form
  */
-import { basename, generateKey, normalizeArrayText } from './helpers';
-import { getFileExtension } from './parse';
+import type { CatalogEntry } from '../../../utils/catalogSchema';
+import { basename, commaListToArray, computeStableTextHash, generateKey, normalizeArrayText } from './helpers';
+import { entryToForm, getFileExtension } from './parse';
 import type { RegisterImageEntry, RegisterPackageForm } from './types';
 import * as tauriFs from '@tauri-apps/plugin-fs';
 import * as z from 'zod';
@@ -57,16 +58,6 @@ export interface RegisterDraftRecord {
   form: RegisterDraftFormSnapshot;
 }
 
-export interface RegisterDraftListItem {
-  draftId: string;
-  packageId: string;
-  packageName: string;
-  savedAt: number;
-  pending: boolean;
-  readyForSubmit: boolean;
-  lastSubmitError: string;
-}
-
 export interface RegisterDraftRestoreResult {
   packageForm: RegisterPackageForm;
   packageSender: string;
@@ -75,11 +66,6 @@ export interface RegisterDraftRestoreResult {
 }
 
 export type RegisterDraftTestKind = 'installer' | 'uninstaller';
-
-export interface RegisterDraftTestStatus {
-  installerReady: boolean;
-  uninstallerReady: boolean;
-}
 
 function getStorage(): Storage | null {
   if (typeof window === 'undefined') return null;
@@ -99,16 +85,6 @@ function createDraftId(): string {
     return crypto.randomUUID();
   }
   return `draft-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-function computeTextHash(text: string): string {
-  // Simple deterministic hash for local dirty-state tracking.
-  let hash = 2166136261;
-  for (let i = 0; i < text.length; i += 1) {
-    hash ^= text.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return `h${(hash >>> 0).toString(16)}`;
 }
 
 function isStoredBlobUrl(url: string): boolean {
@@ -206,32 +182,11 @@ export function computeRegisterDraftContentHash(args: {
     tags: normalizeArrayText(args.tags),
     packageSender: String(args.packageSender || '').trim(),
   };
-  return computeTextHash(JSON.stringify(normalized));
+  return computeStableTextHash(JSON.stringify(normalized));
 }
 
 export function isRegisterDraftPending(record: RegisterDraftRecord): boolean {
   return String(record.contentHash || '') !== String(record.lastSubmittedHash || '');
-}
-
-export function getRegisterDraftTestStatus(record: RegisterDraftRecord): RegisterDraftTestStatus {
-  const contentHash = String(record.contentHash || '');
-  const installerTestedHash = String(record.installerTestedHash || '');
-  const uninstallerTestedHash = String(record.uninstallerTestedHash || '');
-  if (!contentHash) {
-    return {
-      installerReady: false,
-      uninstallerReady: false,
-    };
-  }
-  return {
-    installerReady: installerTestedHash === contentHash,
-    uninstallerReady: uninstallerTestedHash === contentHash,
-  };
-}
-
-export function isRegisterDraftReadyForSubmit(record: RegisterDraftRecord): boolean {
-  const status = getRegisterDraftTestStatus(record);
-  return status.installerReady && status.uninstallerReady;
 }
 
 function parseDraftRecord(raw: unknown): RegisterDraftRecord | null {
@@ -239,7 +194,7 @@ function parseDraftRecord(raw: unknown): RegisterDraftRecord | null {
   if (!parsed.success) return null;
   const candidate = parsed.data;
   const draftId = candidate.draftId.trim();
-  const fallbackContentHash = computeTextHash(
+  const fallbackContentHash = computeStableTextHash(
     JSON.stringify({
       form: normalizeDraftFormSnapshot(candidate.form as RegisterDraftFormSnapshot),
       tags: normalizeArrayText(Array.isArray(candidate.tags) ? candidate.tags : []),
@@ -325,17 +280,22 @@ export function saveRegisterDraft(args: {
   tags: string[];
   packageSender: string;
   draftId?: string;
+  packageId?: string;
 }): RegisterDraftRecord {
   const storage = getStorage();
   if (!storage) {
     throw new Error('一時保存を利用できません。');
   }
-  const packageId = String(args.packageForm.id || '').trim();
+  const requestedDraftId = String(args.draftId || '').trim();
+  const requestedPackageId = String(args.packageId || '').trim();
+  const fallbackPackageId = String(args.packageForm.id || '').trim();
+  const previous = requestedDraftId
+    ? getRegisterDraftById(requestedDraftId)
+    : getRegisterDraft(requestedPackageId || fallbackPackageId);
+  const packageId = requestedPackageId || fallbackPackageId || String(previous?.packageId || '').trim();
   if (!packageId) {
     throw new Error('一時保存には ID の入力が必要です。');
   }
-  const requestedDraftId = String(args.draftId || '').trim();
-  const previous = requestedDraftId ? getRegisterDraftById(requestedDraftId) : getRegisterDraft(packageId);
   const draftId = String(previous?.draftId || requestedDraftId || createDraftId()).trim();
   const contentHash = computeRegisterDraftContentHash(args);
   const record: RegisterDraftRecord = {
@@ -364,6 +324,22 @@ export function saveRegisterDraft(args: {
   return record;
 }
 
+export function saveRegisterDraftFromCatalogEntry(args: {
+  item: CatalogEntry;
+  catalogBaseUrl?: string;
+  packageSender?: string;
+}): RegisterDraftRecord {
+  const form = entryToForm(args.item, args.catalogBaseUrl);
+  const existingDraft = getRegisterDraft(args.item.id);
+  return saveRegisterDraft({
+    packageForm: form,
+    tags: commaListToArray(form.tagsText),
+    packageSender: existingDraft?.packageSender || String(args.packageSender || ''),
+    draftId: existingDraft?.draftId,
+    packageId: args.item.id,
+  });
+}
+
 export function getRegisterDraftById(draftId: string): RegisterDraftRecord | null {
   const storage = getStorage();
   if (!storage) return null;
@@ -386,18 +362,6 @@ export function getRegisterDraft(packageId: string): RegisterDraftRecord | null 
     if (records[i].packageId === id) return records[i];
   }
   return null;
-}
-
-export function listRegisterDrafts(): RegisterDraftListItem[] {
-  return listRegisterDraftRecords().map((record) => ({
-    draftId: record.draftId,
-    packageId: record.packageId,
-    packageName: record.packageName,
-    savedAt: record.savedAt,
-    pending: isRegisterDraftPending(record),
-    readyForSubmit: isRegisterDraftReadyForSubmit(record),
-    lastSubmitError: String(record.lastSubmitError || ''),
-  }));
 }
 
 export function listRegisterDraftRecords(): RegisterDraftRecord[] {
@@ -447,7 +411,7 @@ export function updateRegisterDraftTestState(args: {
   const record = getRegisterDraftById(args.draftId);
   if (!record) return null;
   const testedHash = String(args.testedHash || '');
-  if (!testedHash || testedHash !== String(record.contentHash || '')) {
+  if (!testedHash) {
     return null;
   }
   const next: RegisterDraftRecord = {

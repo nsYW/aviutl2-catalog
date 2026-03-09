@@ -161,7 +161,7 @@ export default function RegisterDescriptionSection({
             ) : (
               <textarea
                 id="description-textarea"
-                className="min-h-[400px] w-full resize-y border-0 bg-transparent p-4 font-mono text-sm leading-relaxed focus:ring-0"
+                className="min-h-[400px] w-full resize-y rounded-b-xl rounded-t-none border-0 bg-white p-4 font-mono text-sm leading-relaxed text-slate-900 shadow-none focus-visible:outline-none focus-visible:ring-0 dark:bg-slate-800 dark:text-slate-100"
                 value={packageForm.descriptionText}
                 onChange={(e) => onUpdatePackageField('descriptionText', e.target.value)}
                 required

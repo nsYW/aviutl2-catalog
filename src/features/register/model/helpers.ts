@@ -111,3 +111,12 @@ export function isInsideRect(rect: DOMRect | null, x: number, y: number): boolea
 export function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
+
+export function computeStableTextHash(text: string): string {
+  let hash = 2166136261;
+  for (let i = 0; i < text.length; i += 1) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `h${(hash >>> 0).toString(16)}`;
+}

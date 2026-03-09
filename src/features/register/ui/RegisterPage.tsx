@@ -3,9 +3,9 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getSettings } from '../../../utils/settings';
-import { getRegisterDraft, saveRegisterDraft } from '../model/draft';
-import { PACKAGE_GUIDE_FALLBACK_URL, createEmptyPackageForm, entryToForm } from '../model/form';
-import { commaListToArray, getErrorMessage } from '../model/helpers';
+import { saveRegisterDraftFromCatalogEntry } from '../model/draft';
+import { PACKAGE_GUIDE_FALLBACK_URL, createEmptyPackageForm } from '../model/form';
+import { getErrorMessage } from '../model/helpers';
 import type { RegisterPackageForm } from '../model/types';
 import type { DragHandleState, RegisterSuccessDialogState } from './types';
 import useRegisterBatchSubmit from './hooks/useRegisterBatchSubmit';
@@ -110,6 +110,7 @@ export default function Register() {
     currentTags: catalog.currentTags,
     userEditToken,
     selectedPackageId: catalog.selectedPackageId,
+    catalogItems: catalog.catalogItems,
     setSelectedPackageId: catalog.setSelectedPackageId,
     getCatalogPackageById,
     onSelectCatalogPackage: catalog.handleSelectPackage,
@@ -125,6 +126,7 @@ export default function Register() {
   const testState = useRegisterTestState({
     packageForm,
     selectedPackageId: catalog.selectedPackageId,
+    catalogItems: catalog.catalogItems,
     flushDraftBeforeTest: draftState.flushAutoSaveNow,
     onTestPassed: draftState.markCurrentDraftTestPassed,
   });
@@ -199,27 +201,26 @@ export default function Register() {
     setJsonDialogError('');
   }, []);
 
-  const applyCatalogJsonPatch = useCallback(() => {
+  const applyCatalogJsonPatch = useCallback(async () => {
     try {
-      const { changedItems, nextCatalogItems } = catalog.applyCatalogJsonPatch(jsonDialogText);
+      const { changedItems } = catalog.applyCatalogJsonPatch(jsonDialogText);
       if (changedItems.length === 0) {
         setJsonDialogError('変更がありませんでした。');
         return;
       }
 
-      catalog.setCatalogItems(nextCatalogItems);
       changedItems.forEach((item) => {
-        const form = entryToForm(item, catalog.catalogBaseUrl);
-        const tags = commaListToArray(form.tagsText);
-        const existingDraft = getRegisterDraft(form.id);
-        saveRegisterDraft({
-          packageForm: form,
-          tags,
-          packageSender: existingDraft?.packageSender || packageSender,
-          draftId: existingDraft?.draftId,
+        saveRegisterDraftFromCatalogEntry({
+          item,
+          catalogBaseUrl: catalog.catalogBaseUrl,
+          packageSender,
         });
       });
       draftState.reloadDraftPackages();
+      const selectedPackageId = String(catalog.selectedPackageId || '').trim();
+      if (selectedPackageId && changedItems.some((item) => item.id === selectedPackageId)) {
+        await draftState.reapplyDraftForPackage(selectedPackageId);
+      }
       closeJsonDialog();
     } catch (e: unknown) {
       setJsonDialogError(getErrorMessage(e));
@@ -227,7 +228,9 @@ export default function Register() {
   }, [
     catalog.applyCatalogJsonPatch,
     catalog.catalogBaseUrl,
+    catalog.selectedPackageId,
     closeJsonDialog,
+    draftState.reapplyDraftForPackage,
     draftState.reloadDraftPackages,
     jsonDialogText,
     packageSender,
@@ -409,6 +412,7 @@ export default function Register() {
   );
   const testsProps = useMemo(
     () => ({
+      testsRequired: testState.testsRequired,
       installerTestRunning: testState.installerTestRunning,
       installerTestValidation: testState.installerTestValidation,
       installerTestRatio: testState.installerTestRatio,
@@ -432,6 +436,7 @@ export default function Register() {
       onUninstallerTest: testState.handleUninstallerTest,
     }),
     [
+      testState.testsRequired,
       testState.installerTestRunning,
       testState.installerTestValidation,
       testState.installerTestRatio,

@@ -5,12 +5,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { detectInstalledVersionsMap } from '../../../../utils/installed-map';
 import { runInstallerForItem, runUninstallerForItem } from '../../../../utils/installer';
 import { buildInstallerTestItem, validateInstallerForTest, validateUninstallerForTest } from '../../model/form';
+import { computeRegisterRelevantHash, resolveRegisterCatalogRelevantHash } from '../../model/registerTestRequirement';
+import type { CatalogEntry } from '../../../../utils/catalogSchema';
 import type { RegisterPackageForm } from '../../model/types';
 import type { InstallerTestItem, InstallerTestProgress, RegisterTestOperation } from '../types';
 
 interface UseRegisterTestStateArgs {
   packageForm: RegisterPackageForm;
   selectedPackageId: string;
+  catalogItems: CatalogEntry[];
   flushDraftBeforeTest?: () => void;
   onTestPassed?: (kind: 'installer' | 'uninstaller') => void;
 }
@@ -68,6 +71,7 @@ function normalizeOperation(
 export default function useRegisterTestState({
   packageForm,
   selectedPackageId,
+  catalogItems,
   flushDraftBeforeTest,
   onTestPassed,
 }: UseRegisterTestStateArgs) {
@@ -110,6 +114,15 @@ export default function useRegisterTestState({
       ]);
     },
     [],
+  );
+  const currentRelevantHash = useMemo(() => computeRegisterRelevantHash(packageForm), [packageForm]);
+  const catalogRelevantHash = useMemo(
+    () => resolveRegisterCatalogRelevantHash(catalogItems, selectedPackageId),
+    [catalogItems, selectedPackageId],
+  );
+  const testsRequired = useMemo(
+    () => !catalogRelevantHash || catalogRelevantHash !== currentRelevantHash,
+    [catalogRelevantHash, currentRelevantHash],
   );
 
   const installerTestValidation = useMemo(() => validateInstallerForTest(packageForm), [packageForm]);
@@ -159,7 +172,7 @@ export default function useRegisterTestState({
     setUninstallerTestError('');
     setUninstallerTestDone(false);
     setUninstallerTestOperations([]);
-  }, [selectedPackageId]);
+  }, [catalogRelevantHash, currentRelevantHash, selectedPackageId]);
 
   const handleInstallerTest = useCallback(async () => {
     if (installerTestRunning || installerTestBusyRef.current) return;
@@ -285,6 +298,7 @@ export default function useRegisterTestState({
   ]);
 
   return {
+    testsRequired,
     installerTestRunning,
     installerTestValidation,
     installerTestRatio,

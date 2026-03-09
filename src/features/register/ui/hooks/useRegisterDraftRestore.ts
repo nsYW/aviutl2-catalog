@@ -108,7 +108,25 @@ export default function useRegisterDraftRestore({
     [applyDraftRecord, reloadDraftPackages, setError, setSelectedPackageId],
   );
 
+  const restoreDraftForPackage = useCallback(
+    async (packageId: string) => {
+      const normalizedPackageId = String(packageId || '').trim();
+      if (!normalizedPackageId) return false;
+      const draft = getRegisterDraft(normalizedPackageId);
+      if (!draft) {
+        reloadDraftPackages();
+        return false;
+      }
+      skipNextSelectedRestoreIdRef.current = normalizedPackageId;
+      setSelectedPackageId(normalizedPackageId);
+      await applyDraftRecord(draft);
+      return true;
+    },
+    [applyDraftRecord, reloadDraftPackages, setSelectedPackageId],
+  );
+
   return {
     handleOpenDraftPackage,
+    restoreDraftForPackage,
   };
 }

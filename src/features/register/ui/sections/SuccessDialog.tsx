@@ -4,7 +4,7 @@
 import Button, { buttonVariants } from '@/components/ui/Button';
 import { Check, ExternalLink } from 'lucide-react';
 import type { RegisterSuccessDialogProps } from '../types';
-import { layout, surface, text } from '@/components/ui/_styles';
+import { layout, overlay, surface, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';
 
 export default function RegisterSuccessDialog({
@@ -16,14 +16,7 @@ export default function RegisterSuccessDialog({
   if (!dialog.open) return null;
   return (
     <div className={layout.fixedCenterBlur} role="dialog" aria-modal="true" aria-labelledby="submit-success-title">
-      <Button
-        variant="plain"
-        size="none"
-        type="button"
-        aria-label="閉じる"
-        className={surface.overlayFade}
-        onClick={onClose}
-      />
+      <button type="button" aria-label="閉じる" className={overlay.backdrop} onClick={onClose} />
       <div className={cn(surface.modal, layout.modalWidthLg, 'transform transition-all')}>
         <div className={surface.modalHeaderMuted}>
           <h3 id="submit-success-title" className={text.titleLg}>

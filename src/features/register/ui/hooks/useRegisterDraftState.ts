@@ -1,15 +1,15 @@
 /**
  * 一時保存・自動保存・復元フローを管理する hook
  */
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
-  computeRegisterDraftContentHash,
   deleteRegisterDraft,
   getRegisterDraft,
   getRegisterDraftById,
   updateRegisterDraftTestState,
   type RegisterDraftTestKind,
 } from '../../model/draft';
+import { computeRegisterRelevantHash } from '../../model/registerTestRequirement';
 import type { CatalogEntry } from '../../../../utils/catalogSchema';
 import type { RegisterPackageForm } from '../../model/types';
 import useRegisterDraftPersistence from './useRegisterDraftPersistence';
@@ -21,6 +21,7 @@ interface UseRegisterDraftStateArgs {
   currentTags: string[];
   userEditToken: number;
   selectedPackageId: string;
+  catalogItems: CatalogEntry[];
   setSelectedPackageId: React.Dispatch<React.SetStateAction<string>>;
   getCatalogPackageById: (packageId: string) => CatalogEntry | null;
   onSelectCatalogPackage: (item: CatalogEntry | null) => void;
@@ -39,6 +40,7 @@ export default function useRegisterDraftState({
   currentTags,
   userEditToken,
   selectedPackageId,
+  catalogItems,
   setSelectedPackageId,
   getCatalogPackageById,
   onSelectCatalogPackage,
@@ -50,6 +52,14 @@ export default function useRegisterDraftState({
   setExpandedVersionKeys,
   setError,
 }: UseRegisterDraftStateArgs) {
+  const draftPackageId = useMemo(() => {
+    const normalizedSelectedId = String(selectedPackageId || '').trim();
+    if (normalizedSelectedId && getCatalogPackageById(normalizedSelectedId)) {
+      return normalizedSelectedId;
+    }
+    return String(packageForm.id || '').trim();
+  }, [getCatalogPackageById, packageForm.id, selectedPackageId]);
+
   const {
     activeDraftIdRef,
     pendingDraftPackages,
@@ -68,10 +78,12 @@ export default function useRegisterDraftState({
     packageSender,
     currentTags,
     userEditToken,
+    draftPackageId,
+    catalogItems,
     setError,
   });
 
-  const { handleOpenDraftPackage: restoreDraftPackage } = useRegisterDraftRestore({
+  const { handleOpenDraftPackage: restoreDraftPackage, restoreDraftForPackage } = useRegisterDraftRestore({
     selectedPackageId,
     setSelectedPackageId,
     setPackageForm,
@@ -155,9 +167,18 @@ export default function useRegisterDraftState({
     [flushBeforeNavigation, restoreDraftPackage],
   );
 
+  const reapplyDraftForPackage = useCallback(
+    async (packageId: string) => {
+      clearPendingAutoSave();
+      suspendNextAutoSave();
+      await restoreDraftForPackage(packageId);
+    },
+    [clearPendingAutoSave, restoreDraftForPackage, suspendNextAutoSave],
+  );
+
   const markCurrentDraftTestPassed = useCallback(
     (kind: RegisterDraftTestKind) => {
-      const packageId = String(packageForm.id || '').trim();
+      const packageId = String(draftPackageId || '').trim();
       if (!packageId) return;
       let draftId = String(activeDraftIdRef.current || '').trim();
       if (!draftId) {
@@ -166,11 +187,7 @@ export default function useRegisterDraftState({
         draftId = latest.draftId;
         activeDraftIdRef.current = draftId;
       }
-      const testedHash = computeRegisterDraftContentHash({
-        packageForm,
-        tags: currentTags,
-        packageSender,
-      });
+      const testedHash = computeRegisterRelevantHash(packageForm);
       const updated = updateRegisterDraftTestState({
         draftId,
         kind,
@@ -179,7 +196,7 @@ export default function useRegisterDraftState({
       if (!updated) return;
       upsertDraftRecord(updated);
     },
-    [activeDraftIdRef, currentTags, packageForm, packageSender, upsertDraftRecord],
+    [activeDraftIdRef, draftPackageId, packageForm, upsertDraftRecord],
   );
 
   return {
@@ -193,5 +210,6 @@ export default function useRegisterDraftState({
     handleStartNewPackage,
     handleOpenDraftPackage,
     handleDeleteDraftPackage,
+    reapplyDraftForPackage,
   };
 }

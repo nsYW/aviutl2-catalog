@@ -40,7 +40,7 @@ export default function RegisterSidebar({
 }: RegisterSidebarProps) {
   const hasDraftPackages = draftPackages.length > 0;
   const blockedDraftCount = draftPackages.filter((draft) => !draft.readyForSubmit).length;
-  const submitListTestStatus = blockedDraftCount > 0 ? `${blockedDraftCount}件テスト未完了` : 'テスト完了';
+  const submitListTestStatus = blockedDraftCount > 0 ? `${blockedDraftCount}件テスト未完了` : '送信可能';
   const headerStatusClass =
     blockedDraftCount > 0
       ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-900/20 dark:text-amber-200'
@@ -72,7 +72,15 @@ export default function RegisterSidebar({
             <div className="max-h-52 overflow-y-auto space-y-1 pr-1 custom-scrollbar lg:max-h-[30vh]">
               {draftPackages.map((draft) => {
                 const isSelected = selectedPackageId === draft.packageId;
-                const isTestReady = draft.readyForSubmit;
+                const isTestReady = draft.testStatus === 'ready';
+                const testStatusLabel =
+                  draft.testStatus === 'not_required' ? 'テスト不要' : isTestReady ? 'テスト完了' : 'テスト未完了';
+                const testStatusClass =
+                  draft.testStatus === 'not_required'
+                    ? 'border-slate-300 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'
+                    : isTestReady
+                      ? 'border-emerald-300 bg-emerald-100 text-emerald-700 dark:border-emerald-800/80 dark:bg-emerald-900/40 dark:text-emerald-200'
+                      : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-900/20 dark:text-amber-200';
                 return (
                   <div
                     key={draft.draftId}
@@ -103,17 +111,8 @@ export default function RegisterSidebar({
                         <div className="min-w-0 flex-1 truncate text-[11px] text-slate-500 dark:text-slate-400">
                           {formatSavedAt(draft.savedAt)}
                         </div>
-                        <Badge
-                          shape="rounded"
-                          size="xxs"
-                          className={cn(
-                            'shrink-0',
-                            isTestReady
-                              ? 'border-emerald-300 bg-emerald-100 text-emerald-700 dark:border-emerald-800/80 dark:bg-emerald-900/40 dark:text-emerald-200'
-                              : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-900/20 dark:text-amber-200',
-                          )}
-                        >
-                          {isTestReady ? 'テスト完了' : 'テスト未完了'}
+                        <Badge shape="rounded" size="xxs" className={cn('shrink-0', testStatusClass)}>
+                          {testStatusLabel}
                         </Badge>
                       </div>
                     </Button>

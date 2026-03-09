@@ -1,22 +1,35 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   isRegisterDraftPending,
-  isRegisterDraftReadyForSubmit,
-  listRegisterDrafts,
+  listRegisterDraftRecords,
   saveRegisterDraft,
   type RegisterDraftRecord,
 } from '../../model/draft';
+import { resolveRegisterDraftTestState } from '../../model/registerTestRequirement';
+import type { CatalogEntry } from '../../../../utils/catalogSchema';
 import type { RegisterPackageForm } from '../../model/types';
 import type { RegisterDraftListItemView } from '../types';
 
-function toDraftListItem(record: RegisterDraftRecord): RegisterDraftListItemView {
+function toDraftListItem(record: RegisterDraftRecord, catalogItems: CatalogEntry[]): RegisterDraftListItemView {
+  const testStatus = resolveRegisterDraftTestState({
+    catalogItems,
+    packageId: record.packageId,
+    installerTestedHash: record.installerTestedHash,
+    uninstallerTestedHash: record.uninstallerTestedHash,
+    packageForm: {
+      id: record.form.id,
+      installer: record.form.installer,
+      versions: record.form.versions,
+    },
+  });
   return {
     draftId: record.draftId,
     packageId: record.packageId,
     packageName: record.packageName,
     savedAt: record.savedAt,
     pending: isRegisterDraftPending(record),
-    readyForSubmit: isRegisterDraftReadyForSubmit(record),
+    readyForSubmit: testStatus.installerReady && testStatus.uninstallerReady,
+    testStatus: testStatus.state,
     lastSubmitError: String(record.lastSubmitError || ''),
   };
 }
@@ -26,6 +39,8 @@ interface UseRegisterDraftPersistenceArgs {
   packageSender: string;
   currentTags: string[];
   userEditToken: number;
+  draftPackageId: string;
+  catalogItems: CatalogEntry[];
   setError: React.Dispatch<React.SetStateAction<string>>;
 }
 
@@ -34,22 +49,35 @@ export default function useRegisterDraftPersistence({
   packageSender,
   currentTags,
   userEditToken,
+  draftPackageId,
+  catalogItems,
   setError,
 }: UseRegisterDraftPersistenceArgs) {
-  const [draftPackages, setDraftPackages] = useState<RegisterDraftListItemView[]>(() => listRegisterDrafts());
+  const [draftPackages, setDraftPackages] = useState<RegisterDraftListItemView[]>(() =>
+    listRegisterDraftRecords().map((record) => toDraftListItem(record, catalogItems)),
+  );
   const suspendAutoSaveUntilRef = useRef(Date.now() + 600);
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestUserEditTokenRef = useRef(userEditToken);
   const persistedUserEditTokenRef = useRef(userEditToken);
   const activeDraftIdRef = useRef('');
+  const didHydrateDraftPackagesRef = useRef(false);
 
   useEffect(() => {
     latestUserEditTokenRef.current = userEditToken;
   }, [userEditToken]);
 
   const reloadDraftPackages = useCallback(() => {
-    setDraftPackages(listRegisterDrafts());
-  }, []);
+    setDraftPackages(listRegisterDraftRecords().map((record) => toDraftListItem(record, catalogItems)));
+  }, [catalogItems]);
+
+  useEffect(() => {
+    if (!didHydrateDraftPackagesRef.current) {
+      didHydrateDraftPackagesRef.current = true;
+      return;
+    }
+    reloadDraftPackages();
+  }, [reloadDraftPackages]);
 
   const suspendNextAutoSave = useCallback((durationMs = 250) => {
     const until = Date.now() + Math.max(50, durationMs);
@@ -62,31 +90,35 @@ export default function useRegisterDraftPersistence({
     persistedUserEditTokenRef.current = latestUserEditTokenRef.current;
   }, []);
 
-  const upsertDraftRecord = useCallback((record: RegisterDraftRecord) => {
-    const nextItem = toDraftListItem(record);
-    setDraftPackages((prev) => {
-      const filtered = prev.filter((item) => item.draftId !== nextItem.draftId);
-      return [nextItem, ...filtered];
-    });
-  }, []);
+  const upsertDraftRecord = useCallback(
+    (record: RegisterDraftRecord) => {
+      const nextItem = toDraftListItem(record, catalogItems);
+      setDraftPackages((prev) => {
+        const filtered = prev.filter((item) => item.draftId !== nextItem.draftId);
+        return [nextItem, ...filtered];
+      });
+    },
+    [catalogItems],
+  );
 
   const removeDraftListItem = useCallback((draftId: string) => {
     setDraftPackages((prev) => prev.filter((item) => item.draftId !== draftId));
   }, []);
 
   const persistCurrentDraft = useCallback((): void => {
-    const packageId = String(packageForm.id || '').trim();
+    const packageId = String(draftPackageId || '').trim() || String(packageForm.id || '').trim();
     if (!packageId) return;
     const record = saveRegisterDraft({
       packageForm,
       tags: currentTags,
       packageSender,
       draftId: activeDraftIdRef.current,
+      packageId,
     });
     activeDraftIdRef.current = record.draftId;
     upsertDraftRecord(record);
     markUserEditsAsHandled();
-  }, [currentTags, markUserEditsAsHandled, packageForm, packageSender, upsertDraftRecord]);
+  }, [currentTags, draftPackageId, markUserEditsAsHandled, packageForm, packageSender, upsertDraftRecord]);
 
   const clearPendingAutoSave = useCallback(() => {
     if (autoSaveTimerRef.current) {
@@ -103,7 +135,7 @@ export default function useRegisterDraftPersistence({
 
   useEffect(() => {
     if (!hasUnsavedUserEdits()) return;
-    const packageId = String(packageForm.id || '').trim();
+    const packageId = String(draftPackageId || '').trim() || String(packageForm.id || '').trim();
     if (!packageId) return;
     clearPendingAutoSave();
     const waitMs = Math.max(800, suspendAutoSaveUntilRef.current - Date.now() + 50);
@@ -121,6 +153,7 @@ export default function useRegisterDraftPersistence({
   }, [
     clearPendingAutoSave,
     currentTags,
+    draftPackageId,
     hasUnsavedUserEdits,
     packageForm,
     packageSender,
