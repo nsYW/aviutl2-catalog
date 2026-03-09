@@ -1,7 +1,6 @@
 import ProgressCircle from '../../../../components/ProgressCircle';
-import { buildPackageDetailHref } from '../../../package/model/helpers';
+import PackageNameLink from '../../../../components/PackageNameLink';
 import { latestVersionOf } from '../../../../utils/catalog';
-import { Link } from 'react-router-dom';
 import type { UpdatesTableSectionProps } from '../types';
 import { surface, table, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';
@@ -49,15 +48,7 @@ export default function UpdatesTableSection({
                     )}
                   >
                     <div className="min-w-0">
-                      <Link
-                        to={buildPackageDetailHref(item.id, '', 'updates')}
-                        className={cn(
-                          text.titleSmTruncate,
-                          'block hover:text-blue-600 dark:hover:text-blue-400 transition-colors underline-offset-2 hover:underline',
-                        )}
-                      >
-                        {item.name}
-                      </Link>
+                      <PackageNameLink id={item.id} name={item.name} source="updates" />
                     </div>
                     <div className={cellTruncateClass}>{item.author || '?'}</div>
                     <div className={cellTruncateClass}>{item.type || '?'}</div>

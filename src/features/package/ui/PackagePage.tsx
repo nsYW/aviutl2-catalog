@@ -38,10 +38,16 @@ export default function PackagePage() {
   const detailSource = useMemo(() => readPackageDetailSource(location.search), [location.search]);
   const listLink = useMemo(() => {
     if (detailSource === 'updates') return APP_ROUTE_PATHS.updates;
+    if (detailSource === 'niconi-commons') return APP_ROUTE_PATHS.niconiCommons;
     return listSearch ? { pathname: '/', search: listSearch } : APP_ROUTE_PATHS.home;
   }, [detailSource, listSearch]);
-  const listLabel = detailSource === 'updates' ? 'アップデートセンター' : 'パッケージ一覧';
-  const listLinkState = detailSource === 'updates' ? undefined : HOME_LIST_RESTORE_STATE;
+  const listLabel =
+    detailSource === 'updates'
+      ? 'アップデートセンター'
+      : detailSource === 'niconi-commons'
+        ? 'ニコニコモンズ'
+        : 'パッケージ一覧';
+  const listLinkState = detailSource === 'home' ? HOME_LIST_RESTORE_STATE : undefined;
 
   const item = useMemo(() => packageItems.find((entry) => entry.id === id), [id, packageItems]);
   const { heroImage, carouselImages } = useMemo(() => collectPackageImages(item?.images), [item?.images]);

@@ -3,7 +3,7 @@ import type { CarouselImage, PackageImageGroup } from './types';
 const PACKAGE_LIST_BACK_PARAM = 'back';
 const PACKAGE_DETAIL_SOURCE_PARAM = 'source';
 
-export type PackageDetailSource = 'home' | 'updates';
+export type PackageDetailSource = 'home' | 'updates' | 'niconi-commons';
 
 export function isMarkdownFilePath(path: string): boolean {
   const trimmedPath = path.trim();
@@ -82,7 +82,10 @@ export function readPackageListSearchFromDetail(search: string): string {
 export function readPackageDetailSource(search: string): PackageDetailSource {
   const normalizedSearch = search.startsWith('?') ? search.slice(1) : search;
   const params = new URLSearchParams(normalizedSearch);
-  return params.get(PACKAGE_DETAIL_SOURCE_PARAM) === 'updates' ? 'updates' : 'home';
+  const source = params.get(PACKAGE_DETAIL_SOURCE_PARAM);
+  if (source === 'updates') return 'updates';
+  if (source === 'niconi-commons') return 'niconi-commons';
+  return 'home';
 }
 
 export function collectPackageImages(imageGroups: PackageImageGroup[] | undefined): {

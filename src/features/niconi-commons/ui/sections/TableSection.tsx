@@ -1,3 +1,4 @@
+import PackageNameLink from '../../../../components/PackageNameLink';
 import Checkbox from '../../../../components/ui/Checkbox';
 import type { TableSectionProps } from '../types';
 import { layout, state, surface, table, text } from '@/components/ui/_styles';
@@ -64,7 +65,7 @@ export default function TableSection({
                     />
                   </div>
                   <div className="min-w-0">
-                    <div className={text.titleSmTruncate}>{item.name || item.id}</div>
+                    <PackageNameLink id={item.id} name={item.name || item.id} source="niconi-commons" />
                   </div>
                   <div className={table.cellBodyTruncate}>{item.author}</div>
                   <div
