@@ -27,6 +27,14 @@ export {
 export { entryToForm, getFileExtension } from './parse';
 
 export { applyCatalogJsonPatch } from './catalogPatch';
+export {
+  AU2PKG_ALLOWED_ROOTS,
+  buildAu2pkgInstallSteps,
+  buildAu2pkgUninstallSteps,
+  collectAu2pkgEntries,
+  isAu2pkgFileName,
+  summarizeAu2pkgFiles,
+} from './au2pkg';
 
 export {
   buildInstallerPayload,

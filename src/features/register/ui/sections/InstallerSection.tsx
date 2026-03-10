@@ -22,6 +22,11 @@ const PackageInstallerSection = memo(
       updateInstallStep,
       updateInstallerField,
       updateUninstallStep,
+      packageFileName,
+      packageFileSummary,
+      packageFileError,
+      packageFileImporting,
+      onSelectPackageFile,
     } = props;
 
     return (
@@ -30,7 +35,15 @@ const PackageInstallerSection = memo(
           <h2 className={text.titleLg}>インストーラ</h2>
         </div>
 
-        <InstallerSourceSection installer={installer} updateInstallerField={updateInstallerField} />
+        <InstallerSourceSection
+          installer={installer}
+          updateInstallerField={updateInstallerField}
+          packageFileName={packageFileName}
+          packageFileSummary={packageFileSummary}
+          packageFileError={packageFileError}
+          packageFileImporting={packageFileImporting}
+          onSelectPackageFile={onSelectPackageFile}
+        />
 
         <InstallStepsSection
           installer={installer}
@@ -63,7 +76,12 @@ const PackageInstallerSection = memo(
     prev.startHandleDrag === next.startHandleDrag &&
     prev.updateInstallStep === next.updateInstallStep &&
     prev.updateInstallerField === next.updateInstallerField &&
-    prev.updateUninstallStep === next.updateUninstallStep,
+    prev.updateUninstallStep === next.updateUninstallStep &&
+    prev.packageFileName === next.packageFileName &&
+    prev.packageFileSummary === next.packageFileSummary &&
+    prev.packageFileError === next.packageFileError &&
+    prev.packageFileImporting === next.packageFileImporting &&
+    prev.onSelectPackageFile === next.onSelectPackageFile,
 );
 
 export default PackageInstallerSection;

@@ -23,6 +23,7 @@ type InvokeIpcMap = {
   runInstallerExecutable: CommandSpec<{ exePath: string; args: string[]; elevate: boolean }, void>;
   runAuoSetup: CommandSpec<{ exePath: string }, void>;
   extractZip: CommandSpec<{ zipPath: string; destPath: string }, void>;
+  listZipEntries: CommandSpec<{ zipPath: string }, string[]>;
   extract7zSfx: CommandSpec<{ sfxPath: string; destPath: string }, void>;
   copyItemJs: CommandSpec<{ srcStr: string; dstStr: string }, unknown>;
   getAppDirs: CommandSpec<

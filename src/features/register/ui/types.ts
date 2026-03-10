@@ -3,6 +3,7 @@
  */
 import type { FormEvent, MouseEventHandler, PointerEvent } from 'react';
 import type { CatalogEntry } from '../../../utils/catalogSchema';
+import type { Au2pkgImportSummary } from '../model/au2pkg';
 import type { RegisterDraftTestState } from '../model/registerTestRequirement';
 import type {
   RegisterImageState,
@@ -116,6 +117,11 @@ export interface PackageInstallerSectionProps {
   updateInstallStep: (key: string, field: string, value: string | boolean) => void;
   updateInstallerField: (field: string, value: string) => void;
   updateUninstallStep: (key: string, field: string, value: string | boolean) => void;
+  packageFileName: string;
+  packageFileSummary: Au2pkgImportSummary | null;
+  packageFileError: string;
+  packageFileImporting: boolean;
+  onSelectPackageFile: () => void;
 }
 
 export interface VersionFileCardProps {

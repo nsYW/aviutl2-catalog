@@ -14,6 +14,7 @@ import useRegisterDescriptionState from './hooks/useRegisterDescriptionState';
 import useRegisterDraftState from './hooks/useRegisterDraftState';
 import useRegisterImageHandlers from './hooks/useRegisterImageHandlers';
 import useRegisterInstallerLicenseHandlers from './hooks/useRegisterInstallerLicenseHandlers';
+import useRegisterPackageFileImport from './hooks/useRegisterPackageFileImport';
 import useRegisterStepDragHandlers from './hooks/useRegisterStepDragHandlers';
 import useRegisterSubmitHandler from './hooks/useRegisterSubmitHandler';
 import useRegisterTestState from './hooks/useRegisterTestState';
@@ -71,6 +72,11 @@ export default function Register() {
   const formHandlers = useRegisterInstallerLicenseHandlers({
     setPackageForm,
     onUserEdit: markUserEdit,
+  });
+
+  const packageFileImport = useRegisterPackageFileImport({
+    replaceInstallSteps: formHandlers.replaceInstallSteps,
+    replaceUninstallSteps: formHandlers.replaceUninstallSteps,
   });
 
   const versionHandlers = useRegisterVersionHandlers({
@@ -182,6 +188,10 @@ export default function Register() {
       return next;
     });
   }, [packageForm.versions]);
+
+  useEffect(() => {
+    packageFileImport.resetPackageFileImport();
+  }, [catalog.selectedPackageId, packageFileImport.resetPackageFileImport]);
 
   const closeSuccessDialog = useCallback(() => {
     setSuccessDialog({ open: false, message: '', url: '', packageName: '', packageAction: '' });
@@ -359,6 +369,11 @@ export default function Register() {
       updateInstallStep: formHandlers.updateInstallStep,
       updateInstallerField: formHandlers.updateInstallerField,
       updateUninstallStep: formHandlers.updateUninstallStep,
+      packageFileName: packageFileImport.selectedPackageFileName,
+      packageFileSummary: packageFileImport.packageFileSummary,
+      packageFileError: packageFileImport.packageFileError,
+      packageFileImporting: packageFileImport.packageFileImporting,
+      onSelectPackageFile: packageFileImport.handleSelectPackageFile,
     }),
     [
       packageForm.installer,
@@ -370,6 +385,11 @@ export default function Register() {
       formHandlers.updateInstallStep,
       formHandlers.updateInstallerField,
       formHandlers.updateUninstallStep,
+      packageFileImport.selectedPackageFileName,
+      packageFileImport.packageFileSummary,
+      packageFileImport.packageFileError,
+      packageFileImport.packageFileImporting,
+      packageFileImport.handleSelectPackageFile,
     ],
   );
   const versionsProps = useMemo(

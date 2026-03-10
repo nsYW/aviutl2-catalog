@@ -1,15 +1,37 @@
 /**
  * インストーラーのソースコンポーネント
  */
+import { Alert } from '@/components/ui/Alert';
 import Button from '@/components/ui/Button';
 import { INSTALLER_SOURCES } from '../../model/form';
 import type { PackageInstallerSectionProps } from '../types';
-import { grid, surface, text } from '@/components/ui/_styles';
+import { grid, layout, surface, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';
 
-type InstallerSourceSectionProps = Pick<PackageInstallerSectionProps, 'installer' | 'updateInstallerField'>;
+type InstallerSourceSectionProps = Pick<
+  PackageInstallerSectionProps,
+  | 'installer'
+  | 'updateInstallerField'
+  | 'packageFileName'
+  | 'packageFileSummary'
+  | 'packageFileError'
+  | 'packageFileImporting'
+  | 'onSelectPackageFile'
+>;
 
-export default function InstallerSourceSection({ installer, updateInstallerField }: InstallerSourceSectionProps) {
+export default function InstallerSourceSection({
+  installer,
+  updateInstallerField,
+  packageFileName,
+  packageFileSummary,
+  packageFileError,
+  packageFileImporting,
+  onSelectPackageFile,
+}: InstallerSourceSectionProps) {
+  const packageFileSummaryText = packageFileSummary
+    ? packageFileSummary.groups.map((group) => `${group.root}: ${group.count}件`).join(' / ')
+    : '';
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -115,6 +137,37 @@ export default function InstallerSourceSection({ installer, updateInstallerField
             />
           </div>
         )}
+      </div>
+      <div className={cn(surface.panelSubtle, 'space-y-3 p-4')}>
+        <div className="space-y-1">
+          <div className={text.labelSm}>パッケージファイル ( .au2pkg.zip )</div>
+          <p className={text.bodySmMuted}>
+            '.au2pkg.zip'形式のファイルからインストール手順を生成します。
+            該当しない場合は、以下の手順欄に手動で入力してください。
+          </p>
+        </div>
+        <div className={layout.wrapItemsGap2}>
+          <Button
+            variant="secondary"
+            size="sm"
+            type="button"
+            onClick={onSelectPackageFile}
+            disabled={packageFileImporting}
+          >
+            {packageFileImporting ? '解析中...' : 'ファイルを選択'}
+          </Button>
+          {packageFileName && <span className={text.bodySmMuted}>{packageFileName}</span>}
+        </div>
+        {packageFileSummary && (
+          <div className={cn(surface.panelRoundedSubtle, 'space-y-1 p-3')}>
+            <div className={text.labelXsSemibold}>生成対象</div>
+            <p className={text.bodySmMuted}>
+              {packageFileSummary.totalFiles}件のファイルから手順を生成しました
+              {packageFileSummaryText ? ` (${packageFileSummaryText})` : ''}
+            </p>
+          </div>
+        )}
+        {packageFileError && <Alert variant="danger">{packageFileError}</Alert>}
       </div>
     </div>
   );

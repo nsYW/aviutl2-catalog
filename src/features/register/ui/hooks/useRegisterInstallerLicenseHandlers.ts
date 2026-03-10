@@ -180,6 +180,13 @@ export default function useRegisterInstallerLicenseHandlers({
     [updateStepCollection],
   );
 
+  const replaceInstallSteps = useCallback(
+    (steps: RegisterInstallStep[]) => {
+      updateStepCollection('installSteps', () => steps);
+    },
+    [updateStepCollection],
+  );
+
   const addUninstallStep = useCallback(() => {
     updateStepCollection('uninstallSteps', (steps) => [
       ...steps,
@@ -205,6 +212,13 @@ export default function useRegisterInstallerLicenseHandlers({
   const removeUninstallStep = useCallback(
     (key: string) => {
       updateStepCollection('uninstallSteps', (steps) => steps.filter((step) => step.key !== key));
+    },
+    [updateStepCollection],
+  );
+
+  const replaceUninstallSteps = useCallback(
+    (steps: RegisterUninstallStep[]) => {
+      updateStepCollection('uninstallSteps', () => steps);
     },
     [updateStepCollection],
   );
@@ -245,9 +259,11 @@ export default function useRegisterInstallerLicenseHandlers({
     addInstallStep,
     updateInstallStep,
     removeInstallStep,
+    replaceInstallSteps,
     addUninstallStep,
     updateUninstallStep,
     removeUninstallStep,
+    replaceUninstallSteps,
     reorderSteps,
   };
 }

@@ -17,6 +17,21 @@ pub fn extract_zip(_app: tauri::AppHandle, zip_path: String, dest_path: String) 
 }
 
 #[tauri::command]
+pub fn list_zip_entries(_app: tauri::AppHandle, zip_path: String) -> Result<Vec<String>, String> {
+    let file = File::open(&zip_path).map_err(|e| format!("open zip error: {}", e))?;
+    let mut archive = ZipArchive::new(file).map_err(|e| format!("zip open error: {}", e))?;
+    let mut entries = Vec::new();
+    for index in 0..archive.len() {
+        let entry = archive.by_index(index).map_err(|e| format!("zip read error: {}", e))?;
+        if entry.is_dir() {
+            continue;
+        }
+        entries.push(entry.name().replace('\\', "/"));
+    }
+    Ok(entries)
+}
+
+#[tauri::command]
 pub async fn extract_7z_sfx(_: tauri::AppHandle, sfx_path: String, dest_path: String) -> Result<(), String> {
     tauri::async_runtime::spawn_blocking(move || -> Result<(), String> {
         const SIGNATURE: &[u8] = b"\x37\x7A\xBC\xAF\x27\x1C";

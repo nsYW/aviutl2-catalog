@@ -126,6 +126,7 @@ pub fn run() {
             commands::catalog::set_catalog_index,
             commands::catalog::query_catalog_index,
             commands::archive::extract_zip,
+            commands::archive::list_zip_entries,
             commands::archive::extract_7z_sfx,
             commands::version::detect_versions_map,
             commands::logging::log_cmd,
