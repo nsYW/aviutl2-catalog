@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import * as tauriApp from '@tauri-apps/api/app';
 import { toInstalledPackages } from '../../model/helpers';
 import type { DeviceInfo, FeedbackDiagnosticsState, FeedbackMode } from '../../model/types';
-import { collectDeviceInfo, readAppLog } from '../../../../utils/diagnostics';
+import { collectDeviceInfo, readAppLog } from '../../../../utils/diagnostics/collector';
 import { loadInstalledMap } from '../../../../utils/installed-map';
 
 async function loadAppVersion() {

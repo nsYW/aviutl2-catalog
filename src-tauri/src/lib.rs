@@ -93,7 +93,7 @@ pub fn run() {
 
     #[cfg(all(target_os = "windows", not(debug_assertions)))]
     let builder = builder.plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
-            bring_existing_window_to_front(app);
+        bring_existing_window_to_front(app);
     }));
 
     builder
@@ -128,6 +128,7 @@ pub fn run() {
             commands::archive::extract_zip,
             commands::archive::list_zip_entries,
             commands::archive::extract_7z_sfx,
+            commands::diagnostics::collect_device_info,
             commands::version::detect_versions_map,
             commands::logging::log_cmd,
             commands::version::calc_xxh3_hex,

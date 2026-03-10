@@ -1,5 +1,6 @@
 pub mod archive;
 pub mod catalog;
+pub mod diagnostics;
 pub mod download;
 pub mod installed;
 pub mod logging;

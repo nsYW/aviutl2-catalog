@@ -1,4 +1,5 @@
 import * as tauriCore from '@tauri-apps/api/core';
+import type { DeviceInfo } from './diagnostics/types';
 
 type CommandSpec<Args = void, Result = unknown> = {
   args: Args;
@@ -7,6 +8,7 @@ type CommandSpec<Args = void, Result = unknown> = {
 
 type InvokeIpcMap = {
   logCmd: CommandSpec<{ level: string; msg: string }, void>;
+  collectDeviceInfo: CommandSpec<void, DeviceInfo>;
   setCatalogIndex: CommandSpec<{ items: unknown[] }, void>;
   getInstalledMapCmd: CommandSpec<void, unknown>;
   addInstalledIdCmd: CommandSpec<{ id: string; version: string }, void>;

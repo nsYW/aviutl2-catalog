@@ -3,7 +3,10 @@
   "identifier": "default",
   "description": "Capability for the main window",
   "local": true,
-  "windows": ["main", "init-setup"],
+  "windows": [
+    "main",
+    "init-setup"
+  ],
   "permissions": [
     "core:default",
     "core:event:default",
@@ -21,11 +24,6 @@
     {
       "identifier": "shell:allow-execute",
       "allow": [
-        {
-          "name": "powershell",
-          "cmd": "powershell",
-          "args": true
-        },
         {
           "name": "explorer",
           "cmd": "explorer.exe",

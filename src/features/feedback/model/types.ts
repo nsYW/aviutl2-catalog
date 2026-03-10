@@ -1,30 +1,8 @@
 export type FeedbackMode = 'bug' | 'inquiry';
 export type SubmitAction = 'issues' | 'feedback';
 
-export interface DeviceOsInfo {
-  name?: string;
-  version?: string;
-  arch?: string;
-}
-
-export interface DeviceCpuInfo {
-  model?: string;
-  cores?: number;
-  logicalProcessors?: number;
-  maxClockMHz?: number;
-}
-
-export interface DeviceGpuInfo {
-  name?: string;
-  vendor?: string;
-  driver?: string;
-}
-
-export interface DeviceInfo {
-  os?: DeviceOsInfo;
-  cpu?: DeviceCpuInfo;
-  gpu?: DeviceGpuInfo;
-}
+import type { DeviceInfo } from '../../../utils/diagnostics/types';
+export type { DeviceCpuInfo, DeviceGpuInfo, DeviceInfo, DeviceOsInfo } from '../../../utils/diagnostics/types';
 
 export interface BugFormState {
   title: string;
