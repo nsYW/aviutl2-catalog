@@ -4,6 +4,7 @@
 import { useCallback } from 'react';
 import { createEmptyCopyright, createEmptyLicense } from '../../model/form';
 import { generateKey } from '../../model/helpers';
+import { resetInstallStepForAction, resetUninstallStepForAction } from '../../model/installerRules';
 import type { RegisterInstallStep, RegisterPackageForm, RegisterUninstallStep } from '../../model/types';
 import type { RegisterStepType } from '../types';
 
@@ -159,14 +160,13 @@ export default function useRegisterInstallerLicenseHandlers({
 
   const updateInstallStep = useCallback(
     (key: string, field: string, value: string | boolean) => {
-      updateStepCollection('installSteps', (steps) =>
+      updateStepCollection('installSteps', (steps: RegisterInstallStep[]) =>
         steps.map((step) => {
           if (step.key !== key) return step;
-          const next = { ...step, [field]: value };
-          if (field === 'action' && value !== 'run') {
-            next.elevate = false;
+          if (field === 'action' && typeof value === 'string') {
+            return resetInstallStepForAction(step, value);
           }
-          return next;
+          return { ...step, [field]: value };
         }),
       );
     },
@@ -189,14 +189,13 @@ export default function useRegisterInstallerLicenseHandlers({
 
   const updateUninstallStep = useCallback(
     (key: string, field: string, value: string | boolean) => {
-      updateStepCollection('uninstallSteps', (steps) =>
+      updateStepCollection('uninstallSteps', (steps: RegisterUninstallStep[]) =>
         steps.map((step) => {
           if (step.key !== key) return step;
-          const next = { ...step, [field]: value };
-          if (field === 'action' && value !== 'run') {
-            next.elevate = false;
+          if (field === 'action' && typeof value === 'string') {
+            return resetUninstallStepForAction(step, value);
           }
-          return next;
+          return { ...step, [field]: value };
         }),
       );
     },

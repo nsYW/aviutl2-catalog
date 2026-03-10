@@ -3,6 +3,7 @@
  */
 import type { CatalogEntry } from '../../../utils/catalogSchema';
 import { basename, commaListToArray, computeStableTextHash, generateKey, normalizeArrayText } from './helpers';
+import { normalizeInstallStepState, normalizeUninstallStepState } from './installerRules';
 import { entryToForm, getFileExtension } from './parse';
 import type { RegisterImageEntry, RegisterPackageForm } from './types';
 import * as tauriFs from '@tauri-apps/plugin-fs';
@@ -140,20 +141,26 @@ function normalizeDraftFormSnapshot(form: RegisterDraftFormSnapshot) {
     })),
     installer: {
       ...form.installer,
-      installSteps: form.installer.installSteps.map((step) => ({
-        action: step.action,
-        path: step.path,
-        argsText: step.argsText,
-        from: step.from,
-        to: step.to,
-        elevate: step.elevate,
-      })),
-      uninstallSteps: form.installer.uninstallSteps.map((step) => ({
-        action: step.action,
-        path: step.path,
-        argsText: step.argsText,
-        elevate: step.elevate,
-      })),
+      installSteps: form.installer.installSteps.map((step) => {
+        const normalized = normalizeInstallStepState(step);
+        return {
+          action: normalized.action,
+          path: normalized.path,
+          argsText: normalized.argsText,
+          from: normalized.from,
+          to: normalized.to,
+          elevate: normalized.elevate,
+        };
+      }),
+      uninstallSteps: form.installer.uninstallSteps.map((step) => {
+        const normalized = normalizeUninstallStepState(step);
+        return {
+          action: normalized.action,
+          path: normalized.path,
+          argsText: normalized.argsText,
+          elevate: normalized.elevate,
+        };
+      }),
     },
     versions: form.versions.map((version) => ({
       version: version.version,

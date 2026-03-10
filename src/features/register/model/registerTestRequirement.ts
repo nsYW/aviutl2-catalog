@@ -1,5 +1,6 @@
 import { entryToForm } from './parse';
 import { computeStableTextHash } from './helpers';
+import { normalizeInstallStepState, normalizeUninstallStepState } from './installerRules';
 import type { CatalogEntry } from '../../../utils/catalogSchema';
 import type { RegisterPackageForm } from './types';
 
@@ -14,20 +15,26 @@ function normalizeInstaller(installer: RegisterPackageForm['installer']) {
     githubRepo: String(installer.githubRepo || '').trim(),
     githubPattern: String(installer.githubPattern || '').trim(),
     googleDriveId: String(installer.googleDriveId || '').trim(),
-    installSteps: installer.installSteps.map((step) => ({
-      action: String(step.action || ''),
-      path: String(step.path || '').trim(),
-      argsText: String(step.argsText || '').trim(),
-      from: String(step.from || '').trim(),
-      to: String(step.to || '').trim(),
-      elevate: step.elevate === true,
-    })),
-    uninstallSteps: installer.uninstallSteps.map((step) => ({
-      action: String(step.action || ''),
-      path: String(step.path || '').trim(),
-      argsText: String(step.argsText || '').trim(),
-      elevate: step.elevate === true,
-    })),
+    installSteps: installer.installSteps.map((step) => {
+      const normalized = normalizeInstallStepState(step);
+      return {
+        action: String(normalized.action || ''),
+        path: String(normalized.path || '').trim(),
+        argsText: String(normalized.argsText || '').trim(),
+        from: String(normalized.from || '').trim(),
+        to: String(normalized.to || '').trim(),
+        elevate: normalized.elevate === true,
+      };
+    }),
+    uninstallSteps: installer.uninstallSteps.map((step) => {
+      const normalized = normalizeUninstallStepState(step);
+      return {
+        action: String(normalized.action || ''),
+        path: String(normalized.path || '').trim(),
+        argsText: String(normalized.argsText || '').trim(),
+        elevate: normalized.elevate === true,
+      };
+    }),
   };
 }
 

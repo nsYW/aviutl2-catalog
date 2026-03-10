@@ -40,6 +40,59 @@ function parseArgsText(argsText: string): string[] {
     .filter(Boolean);
 }
 
+export function normalizeInstallStepState(step: RegisterInstallStep): RegisterInstallStep {
+  const action = String(step.action || '').trim();
+  if (action === 'download') {
+    return { ...step, action, path: '', argsText: '', from: '', to: '', elevate: false };
+  }
+  if (action === 'extract' || action === 'extract_sfx') {
+    return { ...step, action, path: '', argsText: '', elevate: false };
+  }
+  if (action === 'copy') {
+    return { ...step, action, path: '', argsText: '', elevate: false };
+  }
+  if (action === 'delete') {
+    return { ...step, action, argsText: '', from: '', to: '', elevate: false };
+  }
+  if (action === 'run') {
+    return { ...step, action, from: '', to: '', elevate: step.elevate === true };
+  }
+  if (action === 'run_auo_setup') {
+    return { ...step, action, argsText: '', from: '', to: '', elevate: false };
+  }
+  return { ...step, action, elevate: step.elevate === true };
+}
+
+export function resetInstallStepForAction(step: RegisterInstallStep, action: string): RegisterInstallStep {
+  return normalizeInstallStepState({
+    ...step,
+    action,
+    path: '',
+    argsText: '',
+    from: '',
+    to: '',
+    elevate: false,
+  });
+}
+
+export function normalizeUninstallStepState(step: RegisterUninstallStep): RegisterUninstallStep {
+  const action = String(step.action || '').trim();
+  if (action === 'run') {
+    return { ...step, action, elevate: step.elevate === true };
+  }
+  return { ...step, action, argsText: '', elevate: false };
+}
+
+export function resetUninstallStepForAction(step: RegisterUninstallStep, action: string): RegisterUninstallStep {
+  return normalizeUninstallStepState({
+    ...step,
+    action,
+    path: '',
+    argsText: '',
+    elevate: false,
+  });
+}
+
 export function getInstallerSourceIssue(installer: RegisterInstallerState): InstallerSourceIssue {
   if (installer.sourceType === 'direct') {
     return installer.directUrl.trim() ? null : 'direct';
@@ -92,7 +145,7 @@ export function isKnownUninstallAction(action: string): boolean {
   return Object.prototype.hasOwnProperty.call(uninstallActionRules, action);
 }
 
-export function getInstallStepIssue(step: RegisterInstallStep): InstallerStepIssue {
+function getInstallStepIssueFromNormalized(step: RegisterInstallStep): InstallerStepIssue {
   const action = String(step.action || '').trim();
   const rule = installActionRules[action];
   if (!rule || !isKnownInstallAction(action)) return 'unsupported';
@@ -102,7 +155,12 @@ export function getInstallStepIssue(step: RegisterInstallStep): InstallerStepIss
   return null;
 }
 
-export function getUninstallStepIssue(step: RegisterUninstallStep): InstallerStepIssue {
+export function getInstallStepIssue(step: RegisterInstallStep): InstallerStepIssue {
+  const normalized = normalizeInstallStepState(step);
+  return getInstallStepIssueFromNormalized(normalized);
+}
+
+function getUninstallStepIssueFromNormalized(step: RegisterUninstallStep): InstallerStepIssue {
   const action = String(step.action || '').trim();
   const rule = uninstallActionRules[action];
   if (!rule || !isKnownUninstallAction(action)) return 'unsupported';
@@ -111,17 +169,23 @@ export function getUninstallStepIssue(step: RegisterUninstallStep): InstallerSte
   return null;
 }
 
+export function getUninstallStepIssue(step: RegisterUninstallStep): InstallerStepIssue {
+  const normalized = normalizeUninstallStepState(step);
+  return getUninstallStepIssueFromNormalized(normalized);
+}
+
 export function serializeInstallStep(step: RegisterInstallStep): InstallerAction {
-  const action = String(step.action || '').trim();
-  const issue = getInstallStepIssue(step);
+  const normalized = normalizeInstallStepState(step);
+  const action = String(normalized.action || '').trim();
+  const issue = getInstallStepIssueFromNormalized(normalized);
   if (issue === 'unsupported') throw new Error(`unsupported install action: ${action || '(empty)'}`);
   if (issue === 'path') throw new Error(`${action || 'install'} action requires path`);
   if (issue === 'from_to') throw new Error('copy action requires from/to');
   if (issue === 'elevate') throw new Error('elevate is only supported for run action');
 
-  const path = String(step.path || '').trim();
-  const from = String(step.from || '').trim();
-  const to = String(step.to || '').trim();
+  const path = String(normalized.path || '').trim();
+  const from = String(normalized.from || '').trim();
+  const to = String(normalized.to || '').trim();
   if (action === 'download') return { action: 'download' };
   if (action === 'extract') {
     return { action: 'extract', ...(from ? { from } : {}), ...(to ? { to } : {}) };
@@ -139,28 +203,29 @@ export function serializeInstallStep(step: RegisterInstallStep): InstallerAction
     return {
       action: 'run',
       path,
-      args: parseArgsText(step.argsText),
-      ...(step.elevate ? { elevate: true } : {}),
+      args: parseArgsText(normalized.argsText),
+      ...(normalized.elevate ? { elevate: true } : {}),
     };
   }
   return { action: 'run_auo_setup', path };
 }
 
 export function serializeUninstallStep(step: RegisterUninstallStep): InstallerAction {
-  const action = String(step.action || '').trim();
-  const issue = getUninstallStepIssue(step);
+  const normalized = normalizeUninstallStepState(step);
+  const action = String(normalized.action || '').trim();
+  const issue = getUninstallStepIssueFromNormalized(normalized);
   if (issue === 'unsupported') throw new Error(`unsupported uninstall action: ${action || '(empty)'}`);
   if (issue === 'path') throw new Error(`${action || 'uninstall'} action requires path`);
   if (issue === 'elevate') throw new Error('elevate is only supported for run action');
 
-  const path = String(step.path || '').trim();
+  const path = String(normalized.path || '').trim();
   if (action === 'delete') {
     return { action: 'delete', path };
   }
   return {
     action: 'run',
     path,
-    args: parseArgsText(step.argsText),
-    ...(step.elevate ? { elevate: true } : {}),
+    args: parseArgsText(normalized.argsText),
+    ...(normalized.elevate ? { elevate: true } : {}),
   };
 }
