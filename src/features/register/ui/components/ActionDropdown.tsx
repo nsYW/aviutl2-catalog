@@ -68,12 +68,12 @@ const ActionDropdown = memo(function ActionDropdown({
     onChange?.(val);
   }
 
-  function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+  function onKeyDown(e: KeyboardEvent<HTMLElement>) {
     if (e.key === 'Escape') setOpen(false);
   }
 
   return (
-    <div className="relative min-w-[140px]" ref={ref} onKeyDown={onKeyDown}>
+    <div className="relative min-w-[140px]" ref={ref}>
       <Button
         variant="plain"
         size="none"
@@ -81,6 +81,7 @@ const ActionDropdown = memo(function ActionDropdown({
         id={buttonId}
         className={triggerVariants({ open })}
         onClick={() => setOpen((prev) => !prev)}
+        onKeyDown={onKeyDown}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={ariaLabel}
@@ -100,6 +101,7 @@ const ActionDropdown = memo(function ActionDropdown({
             'absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-y-auto p-1 shadow-xl ring-1 ring-slate-900/5 dark:ring-white/10',
           )}
           role="listbox"
+          onKeyDown={onKeyDown}
         >
           {dropdownOptions.map((opt) => (
             <Button

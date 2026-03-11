@@ -39,7 +39,7 @@ export default function TableSection({
               <span>作者名</span>
               <span>ニコニ・コモンズID</span>
             </div>
-            <div className={surface.divideMuted}>
+            <div className={surface.divideMuted} role="listbox" aria-label="パッケージ一覧" aria-multiselectable="true">
               {filteredItems.map((item) => (
                 <div
                   key={item.id}
@@ -48,9 +48,13 @@ export default function TableSection({
                     table.rowCompact,
                     'grid-cols-[2.5rem_minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1fr)] cursor-pointer',
                   )}
+                  role="option"
+                  aria-selected={Boolean(selectedMap[item.id])}
+                  aria-label={`${item.name || item.id} を選択`}
                   tabIndex={0}
                   onClick={() => onToggleItem(item.id)}
                   onKeyDown={(event) => {
+                    if (event.target !== event.currentTarget) return;
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
                       onToggleItem(item.id);

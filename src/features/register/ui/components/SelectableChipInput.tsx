@@ -133,14 +133,6 @@ const SelectableChipInput = memo(function SelectableChipInput({
           surface.panelLg,
           'flex min-h-[42px] flex-wrap items-center gap-2 p-1.5 shadow-sm transition focus-within:ring-2 focus-within:ring-blue-500',
         )}
-        onClick={() => inputRef.current?.focus()}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            inputRef.current?.focus();
-          }
-        }}
-        tabIndex={0}
       >
         {selectedValues.map((value) => (
           <span

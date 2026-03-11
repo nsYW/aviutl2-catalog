@@ -1,7 +1,7 @@
 /**
  * 詳細説明エリアの表示コンポーネント
  */
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -23,6 +23,23 @@ export default function RegisterDescriptionSection({
   onSetDescriptionTab,
 }: RegisterDescriptionSectionProps) {
   const previewMarkup = useMemo(() => ({ __html: descriptionPreviewHtml }), [descriptionPreviewHtml]);
+  const previewRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = previewRef.current;
+    if (!el || descriptionTab !== 'preview') return;
+
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const link = target?.closest('a[href]');
+      if (!(link instanceof HTMLAnchorElement) || !link.href) return;
+      event.preventDefault();
+      void tauriShell.open(link.href);
+    };
+
+    el.addEventListener('click', handleClick);
+    return () => el.removeEventListener('click', handleClick);
+  }, [descriptionTab]);
 
   return (
     <section className={surface.cardSection}>
@@ -165,26 +182,9 @@ export default function RegisterDescriptionSection({
             )
           ) : (
             <div
+              ref={previewRef}
               className="prose prose-slate max-h-[400px] w-full max-w-none overflow-y-auto p-6 dark:prose-invert"
               dangerouslySetInnerHTML={previewMarkup}
-              onClick={async (e) => {
-                // プレビュー内リンクはアプリ外ブラウザで開き、SPA 遷移を汚染しない。
-                const target = e.target as HTMLElement | null;
-                const link = target?.closest('a');
-                if (link && link.href) {
-                  e.preventDefault();
-                  await tauriShell.open(link.href);
-                }
-              }}
-              onKeyDown={async (e) => {
-                if (e.key !== 'Enter' && e.key !== ' ') return;
-                const target = e.target as HTMLElement | null;
-                const link = target?.closest('a');
-                if (link && link.href) {
-                  e.preventDefault();
-                  await tauriShell.open(link.href);
-                }
-              }}
             />
           )}
         </div>

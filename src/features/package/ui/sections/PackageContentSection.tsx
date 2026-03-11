@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-import type { KeyboardEvent, MouseEvent } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import ImageCarousel from '../components/ImageCarousel';
 import type { PackageContentSectionProps } from '../types';
 import { surface, text } from '@/components/ui/_styles';
@@ -22,21 +21,22 @@ export default function PackageContentSection({
   onOpenLink,
 }: PackageContentSectionProps) {
   const descriptionMarkup = useMemo(() => ({ __html: descriptionHtml }), [descriptionHtml]);
+  const descriptionRef = useRef<HTMLDivElement | null>(null);
 
-  const handleDescriptionClick = (event: MouseEvent<HTMLDivElement>) => {
-    const href = resolveAnchorHref(event.target);
-    if (!href) return;
-    event.preventDefault();
-    void onOpenLink(href);
-  };
+  useEffect(() => {
+    const el = descriptionRef.current;
+    if (!el || descriptionLoading || !item.description) return;
 
-  const handleDescriptionKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    const href = resolveAnchorHref(event.target);
-    if (!href) return;
-    event.preventDefault();
-    void onOpenLink(href);
-  };
+    const handleClick = (event: MouseEvent) => {
+      const href = resolveAnchorHref(event.target);
+      if (!href) return;
+      event.preventDefault();
+      void onOpenLink(href);
+    };
+
+    el.addEventListener('click', handleClick);
+    return () => el.removeEventListener('click', handleClick);
+  }, [descriptionLoading, item.description, onOpenLink]);
 
   return (
     <div className="space-y-6">
@@ -59,10 +59,9 @@ export default function PackageContentSection({
             <p className={text.mutedSm}>詳細説明を読み込み中です…</p>
           ) : (
             <div
+              ref={descriptionRef}
               className="prose prose-slate max-w-none dark:prose-invert select-text"
               dangerouslySetInnerHTML={descriptionMarkup}
-              onClick={handleDescriptionClick}
-              onKeyDown={handleDescriptionKeyDown}
             />
           )}
           {descriptionError ? (

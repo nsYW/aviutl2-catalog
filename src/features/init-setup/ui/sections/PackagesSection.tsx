@@ -45,8 +45,8 @@ export default function PackagesSection({
       ) : (
         <>
           <div className="flex-1 overflow-y-auto min-h-0 space-y-3 pr-2 -mr-2 pb-4">
-            {requiredPackages.map(({ id, item, state }) => {
-              const progress = state.progress;
+            {requiredPackages.map(({ id, item, state: packageState }) => {
+              const progress = packageState.progress;
               const ratio = progress?.ratio ?? 0;
               const progressPercent = progress?.percent;
               const percent = Number.isFinite(progressPercent) ? progressPercent : Math.round(ratio * 100);
@@ -74,7 +74,7 @@ export default function PackagesSection({
                   </div>
 
                   <div className="shrink-0">
-                    {state.downloading ? (
+                    {packageState.downloading ? (
                       <Badge
                         variant="outlineNeutral"
                         shape="pill"
@@ -92,7 +92,7 @@ export default function PackagesSection({
                           className="text-blue-600 dark:text-blue-400"
                         />
                       </Badge>
-                    ) : state.installed ? (
+                    ) : packageState.installed ? (
                       <Badge
                         shape="pill"
                         size="sm"

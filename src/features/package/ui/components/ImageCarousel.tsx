@@ -44,7 +44,14 @@ export default function ImageCarousel({ images = [] }: ImageCarouselProps) {
   const hasNext = index < images.length - 1;
 
   return (
-    <div className="relative" onKeyDown={onKey} tabIndex={0} aria-roledescription="carousel">
+    <div
+      className="relative"
+      onKeyDown={onKey}
+      tabIndex={0}
+      role="region"
+      aria-label="スクリーンショットカルーセル"
+      aria-roledescription="carousel"
+    >
       <div className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-4" ref={ref}>
         {images.map((img, i) => (
           <img
