@@ -1,5 +1,6 @@
 export const APP_ROUTE_PATHS = {
   home: '/',
+  links: '/links',
   updates: '/updates',
   settings: '/settings',
   register: '/register',

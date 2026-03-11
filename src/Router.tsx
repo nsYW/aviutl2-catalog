@@ -6,6 +6,7 @@ import DeepLinkHandler from './features/deep-link/ui/DeepLinkHandler';
 import { APP_ROUTE_PATHS } from './routePaths';
 
 const Home = lazy(() => import('./features/home/ui/HomePage'));
+const Links = lazy(() => import('./features/links/ui/LinksPage'));
 const Package = lazy(() => import('./features/package/ui/PackagePage'));
 const Updates = lazy(() => import('./features/updates/ui/UpdatesPage'));
 const Settings = lazy(() => import('./features/settings/ui/SettingsPage'));
@@ -21,6 +22,7 @@ export default function AppRouter() {
         <Routes>
           <Route element={<AppShell />}>
             <Route path={APP_ROUTE_PATHS.home} element={<Home />} />
+            <Route path={APP_ROUTE_PATHS.links} element={<Links />} />
             <Route path={APP_ROUTE_PATHS.updates} element={<Updates />} />
             <Route path={APP_ROUTE_PATHS.settings} element={<Settings />} />
             <Route path={APP_ROUTE_PATHS.register} element={<Register />} />

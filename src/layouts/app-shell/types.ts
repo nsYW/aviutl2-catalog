@@ -21,7 +21,16 @@ export interface ParsedHomeQuery {
   installStatus: HomeInstallStatus;
 }
 
-export type ActivePage = 'home' | 'updates' | 'register' | 'niconi-commons' | 'feedback' | 'settings' | 'package' | '';
+export type ActivePage =
+  | 'home'
+  | 'links'
+  | 'updates'
+  | 'register'
+  | 'niconi-commons'
+  | 'feedback'
+  | 'settings'
+  | 'package'
+  | '';
 
 export interface AppDirsPayload {
   aviutl2_data?: string;

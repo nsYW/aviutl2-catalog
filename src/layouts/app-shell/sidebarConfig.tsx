@@ -2,6 +2,7 @@ import type { ComponentType, ReactElement } from 'react';
 import {
   ExternalLink,
   FolderOpen,
+  Link,
   MessagesSquare,
   PackageSearch,
   PanelLeftClose,
@@ -20,6 +21,7 @@ type SidebarRouteMatchMode = 'exact' | 'prefix';
 
 export type SidebarActionId =
   | 'home'
+  | 'links'
   | 'updates'
   | 'niconi-commons'
   | 'register'
@@ -132,6 +134,16 @@ const updatesSidebarItem = {
   shortcut: { code: 'KeyU', label: 'Alt+U' },
 } as const satisfies SidebarRouteItemDefinition;
 
+const linksSidebarItem = {
+  id: 'links',
+  label: 'リンク集',
+  icon: Link,
+  page: 'links',
+  path: '/links',
+  variant: 'ghost',
+  shortcut: { code: 'KeyL', label: 'Alt+L' },
+} as const satisfies SidebarRouteItemDefinition;
+
 const niconiCommonsSidebarItem = {
   id: 'niconi-commons',
   label: 'ニコニコモンズ',
@@ -175,6 +187,7 @@ const settingsSidebarItem = {
 const SIDEBAR_ROUTE_ITEMS = [
   homeSidebarItem,
   updatesSidebarItem,
+  linksSidebarItem,
   niconiCommonsSidebarItem,
   registerSidebarItem,
   feedbackSidebarItem,
@@ -189,7 +202,7 @@ export const SIDEBAR_SECTIONS: readonly SidebarSectionDefinition[] = [
     label: 'メインメニュー',
     labelClassName: 'mb-1',
     hideDivider: true,
-    items: [homeSidebarItem, updatesSidebarItem, niconiCommonsSidebarItem, registerSidebarItem],
+    items: [homeSidebarItem, updatesSidebarItem, linksSidebarItem, niconiCommonsSidebarItem, registerSidebarItem],
   },
   {
     id: 'shortcuts',
@@ -201,14 +214,14 @@ export const SIDEBAR_SECTIONS: readonly SidebarSectionDefinition[] = [
         id: 'launch-aviutl2',
         label: 'AviUtl2を起動',
         icon: AviUtlIcon,
-        shortcut: { code: 'KeyL', label: 'Alt+L' },
+        shortcut: { code: 'KeyA', label: 'Alt+A' },
         rightIcon: ExternalLink,
       },
       {
         id: 'open-data-dir',
         label: 'データフォルダを開く',
         icon: FolderOpen,
-        shortcut: { code: 'KeyO', label: 'Alt+O' },
+        shortcut: { code: 'KeyD', label: 'Alt+D' },
         rightIcon: ExternalLink,
       },
     ],
@@ -251,6 +264,7 @@ export function createSidebarRouteActionHandlers(
 ): Pick<SidebarActionHandlers, SidebarRouteActionId> {
   return {
     home: () => navigate(homeSidebarItem.path),
+    links: () => navigate(linksSidebarItem.path),
     updates: () => navigate(updatesSidebarItem.path),
     'niconi-commons': () => navigate(niconiCommonsSidebarItem.path),
     register: () => navigate(registerSidebarItem.path),

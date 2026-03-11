@@ -208,6 +208,108 @@
     @apply space-y-2;
   }
 
+  .links-section {
+    --links-base: oklch(0.62 0.17 252);
+    --links-ink: color-mix(in oklch, var(--links-base) 72%, black);
+    --links-icon-surface: color-mix(in oklch, var(--links-base) 16%, white);
+    --links-icon-border: color-mix(in oklch, var(--links-base) 24%, white);
+    --links-card-icon-bg: color-mix(in oklch, var(--links-base) 12%, white);
+    --links-card-icon-border: color-mix(in oklch, var(--links-base) 24%, white);
+    --links-card-icon-border-hover: color-mix(in oklch, var(--links-base) 24%, white);
+    --links-card-icon-ink: color-mix(in oklch, var(--links-base) 76%, black);
+  }
+
+  .dark .links-section {
+    --links-ink: color-mix(in oklch, var(--links-base) 42%, white);
+    --links-icon-surface: color-mix(in oklch, var(--links-base) 22%, oklch(0.21 0.03 258));
+    --links-icon-border: color-mix(in oklch, var(--links-base) 30%, oklch(0.24 0.03 258));
+    --links-card-icon-bg: color-mix(in oklch, var(--links-base) 18%, oklch(0.22 0.03 258));
+    --links-card-icon-border: color-mix(in oklch, var(--links-base) 28%, oklch(0.24 0.03 258));
+    --links-card-icon-border-hover: color-mix(in oklch, var(--links-base) 28%, oklch(0.24 0.03 258));
+    --links-card-icon-ink: color-mix(in oklch, var(--links-base) 58%, white);
+  }
+
+  .links-section__iconSurface {
+    background-color: var(--links-icon-surface);
+    border-color: var(--links-icon-border);
+  }
+
+  .links-section__icon {
+    color: var(--links-ink);
+  }
+
+  .links-card {
+    border-color: rgb(226 232 240 / 1);
+    background: rgb(255 255 255 / 1);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 10px 24px rgba(15, 23, 42, 0.04);
+  }
+
+  .links-card:hover,
+  .links-card:focus-visible {
+    border-color: rgb(203 213 225 / 1);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.05),
+      0 16px 32px rgba(15, 23, 42, 0.08);
+  }
+
+  .dark .links-card {
+    border-color: rgb(30 41 59 / 1);
+    background: rgb(15 23 42 / 0.88);
+    box-shadow:
+      0 1px 2px rgba(2, 6, 23, 0.16),
+      0 18px 36px rgba(2, 6, 23, 0.18);
+  }
+
+  .dark .links-card:hover,
+  .dark .links-card:focus-visible {
+    border-color: rgb(51 65 85 / 1);
+    box-shadow:
+      0 1px 2px rgba(2, 6, 23, 0.2),
+      0 20px 38px rgba(2, 6, 23, 0.24);
+  }
+
+  .links-card__iconWrap {
+    background-color: var(--links-card-icon-bg);
+    border-color: var(--links-card-icon-border);
+    color: var(--links-card-icon-ink);
+    box-shadow:
+      0 8px 18px color-mix(in oklch, var(--links-base) 12%, transparent),
+      0 1px 0 rgba(255, 255, 255, 0.55) inset;
+  }
+
+  .links-card:hover .links-card__iconWrap,
+  .links-card:focus-visible .links-card__iconWrap {
+    border-color: var(--links-card-icon-border-hover);
+  }
+
+  .dark .links-card__iconWrap {
+    box-shadow:
+      0 10px 24px rgba(2, 6, 23, 0.18),
+      0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  }
+
+  .links-card__launch {
+    border-color: rgb(226 232 240 / 1);
+    background-color: rgb(248 250 252 / 0.92);
+    color: rgb(100 116 139 / 1);
+  }
+
+  .dark .links-card__launch {
+    border-color: rgb(51 65 85 / 1);
+    background-color: rgb(15 23 42 / 0.92);
+    color: rgb(148 163 184 / 1);
+  }
+
+  .links-card__copy {
+    max-width: 32ch;
+  }
+
+  .links-card__title {
+    text-wrap: balance;
+  }
+
   .setup-field__input {
     @apply flex flex-wrap gap-2;
   }
