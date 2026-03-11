@@ -4,6 +4,7 @@ import { highlight } from './markdown-plugins/highlight';
 import { safeHtml } from './markdown-plugins/safeHtml';
 import { resolveGithubLink } from './markdown-plugins/githubLink';
 import { alertBlock } from './markdown-plugins/alertBlock';
+import { detailsBlock } from './markdown-plugins/detailsBlock';
 import { fixImageUrl } from './markdown-plugins/fixImageUrl';
 
 const md = createMarkdownExit({
@@ -14,6 +15,7 @@ const md = createMarkdownExit({
 md.use(safeHtml);
 md.use(resolveGithubLink);
 md.use(alertBlock);
+md.use(detailsBlock);
 md.use(fixImageUrl);
 
 function normalizeBadgeParagraphs(html: string): string {

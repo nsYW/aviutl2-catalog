@@ -623,12 +623,3 @@ body {
 .markdown-alert .markdown-alert-title svg[data-is-alert-icon] {
   margin-right: 0.75rem;
 }
-
-.markdown-codeblock {
-  --markdown-code-bg: #e5e7eb;
-  background: var(--markdown-code-bg);
-}
-
-.dark .markdown-codeblock {
-  --markdown-code-bg: #161b22;
-}

@@ -24,6 +24,7 @@ export function doSanitize(html: string): string {
     ],
     allowedAttributes: {
       a: ['href', 'target', 'rel'],
+      details: ['open'],
     },
     allowedSchemes: ['http', 'https', 'mailto'],
   });
