@@ -7,17 +7,8 @@ import Input from '@/components/ui/Input';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import * as tauriShell from '@tauri-apps/plugin-shell';
 import type { RegisterDescriptionSectionProps } from '../types';
-import { layout, surface, text } from '@/components/ui/_styles';
+import { action, layout, surface, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';
-
-const descriptionModeActiveClass =
-  'bg-blue-50 text-blue-700 hover:text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:text-blue-300';
-const descriptionModeInactiveClass =
-  'text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-slate-100';
-const descriptionTabActiveClass =
-  'border border-slate-200 border-b-white bg-white text-slate-800 shadow-sm hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:border-b-slate-800 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:hover:text-slate-50';
-const descriptionTabInactiveClass =
-  'border border-transparent bg-transparent text-slate-500 hover:bg-white/70 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-slate-100';
 
 export default function RegisterDescriptionSection({
   packageForm,
@@ -63,14 +54,15 @@ export default function RegisterDescriptionSection({
           詳細説明 <span className="text-red-500">*</span>
         </label>
         <div className={layout.wrapItemsGap2}>
-          <div className={cn(surface.panelLg, 'inline-flex text-xs font-medium shadow-sm')}>
+          <div className={action.segmentedGroupFlush}>
             <Button
               variant="plain"
               size="none"
               type="button"
               className={cn(
-                'rounded-l-lg px-3 py-1.5 transition-colors',
-                !isExternalDescription ? descriptionModeActiveClass : descriptionModeInactiveClass,
+                action.segmentedOptionBase,
+                'rounded-l-lg rounded-r-none px-3 py-1.5',
+                !isExternalDescription ? action.switchTabActive : action.switchTabInactive,
               )}
               onClick={() => onUpdatePackageField('descriptionMode', 'inline')}
             >
@@ -81,8 +73,9 @@ export default function RegisterDescriptionSection({
               size="none"
               type="button"
               className={cn(
-                'rounded-r-lg px-3 py-1.5 transition-colors',
-                isExternalDescription ? descriptionModeActiveClass : descriptionModeInactiveClass,
+                action.segmentedOptionBase,
+                'rounded-l-none rounded-r-lg px-3 py-1.5',
+                isExternalDescription ? action.switchTabActive : action.switchTabInactive,
               )}
               onClick={() => onUpdatePackageField('descriptionMode', 'external')}
             >
@@ -104,8 +97,9 @@ export default function RegisterDescriptionSection({
             role="tab"
             aria-selected={descriptionTab === 'edit'}
             className={cn(
-              'flex-1 rounded-b-none rounded-tl-lg rounded-tr-none transition-colors',
-              descriptionTab === 'edit' ? descriptionTabActiveClass : descriptionTabInactiveClass,
+              action.segmentedOptionBase,
+              'flex-1 rounded-b-none rounded-tl-lg rounded-tr-none',
+              descriptionTab === 'edit' ? action.switchTabActive : action.switchTabInactive,
             )}
             onClick={() => onSetDescriptionTab('edit')}
           >
@@ -118,8 +112,9 @@ export default function RegisterDescriptionSection({
             role="tab"
             aria-selected={descriptionTab === 'preview'}
             className={cn(
-              'flex-1 rounded-b-none rounded-tl-none rounded-tr-lg transition-colors',
-              descriptionTab === 'preview' ? descriptionTabActiveClass : descriptionTabInactiveClass,
+              action.segmentedOptionBase,
+              'flex-1 rounded-b-none rounded-tl-none rounded-tr-lg',
+              descriptionTab === 'preview' ? action.switchTabActive : action.switchTabInactive,
             )}
             onClick={() => onSetDescriptionTab('preview')}
           >

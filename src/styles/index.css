@@ -275,7 +275,7 @@
     border-color: var(--links-card-icon-border);
     color: var(--links-card-icon-ink);
     box-shadow:
-      0 8px 18px color-mix(in oklch, var(--links-base) 12%, transparent),
+      0 6px 14px color-mix(in oklch, var(--links-base) 9%, transparent),
       0 1px 0 rgba(255, 255, 255, 0.55) inset;
   }
 

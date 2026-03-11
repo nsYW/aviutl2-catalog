@@ -185,6 +185,20 @@ export const action = {
     'inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700',
   inlineToggleOption:
     'inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
+  segmentedGroup:
+    'inline-flex rounded-lg border border-slate-200 bg-slate-50/90 p-1 shadow-sm dark:border-slate-700 dark:bg-slate-800/70',
+  segmentedGroupFlush:
+    'inline-flex overflow-hidden rounded-lg border border-slate-200 bg-slate-50/50 p-0 text-xs shadow-sm dark:border-slate-700 dark:bg-slate-900/50',
+  segmentedOptionBase:
+    'font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
+  segmentedOptionActive:
+    'bg-white text-blue-600 shadow-sm ring-1 ring-blue-100 hover:bg-white hover:text-blue-600 dark:bg-slate-700/90 dark:text-blue-200 dark:ring-slate-600 dark:shadow-black/20 dark:hover:bg-slate-700/90 dark:hover:text-blue-200',
+  segmentedOptionInactive:
+    'text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100',
+  switchTabActive:
+    'border border-slate-200 border-b-white bg-white text-blue-600 shadow-sm hover:bg-white hover:text-blue-600 dark:border-slate-700 dark:border-b-slate-800 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-800 dark:hover:text-blue-300',
+  switchTabInactive:
+    'border border-transparent bg-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-700/70 dark:hover:text-slate-100',
   dragHandle:
     'cursor-grab text-slate-300 hover:text-slate-500 active:cursor-grabbing dark:text-slate-600 dark:hover:text-slate-400',
   initSecondary:

@@ -37,6 +37,9 @@ const PackageVersionSection = memo(
           </Button>
         </div>
         <div className="space-y-4">
+          <p className={text.bodySmMuted}>
+            GitHub Release をご利用の場合は、バージョン名とリリースタグを同じ内容にしていただけますと助かります。
+          </p>
           {!showAll && hiddenCount > 0 && (
             <Button
               variant="plain"

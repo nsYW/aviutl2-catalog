@@ -49,7 +49,7 @@ export default function PackageContentSection({
 
       <section className={surface.cardSection}>
         <h2 className={sectionTitleClass}>概要</h2>
-        <p className={`${text.bodySmMuted} select-text`}>{item.summary || '?'}</p>
+        <p className="select-text text-base leading-7 text-slate-600 dark:text-slate-300">{item.summary || '?'}</p>
       </section>
 
       {item.description ? (

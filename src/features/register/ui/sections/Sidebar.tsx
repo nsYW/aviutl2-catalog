@@ -69,7 +69,7 @@ export default function RegisterSidebar({
                 </Badge>
               )}
             </div>
-            <div className="max-h-52 overflow-y-auto space-y-1 pr-1 custom-scrollbar lg:max-h-[30vh]">
+            <div className="max-h-52 overflow-y-auto space-y-1 pr-1 custom-scrollbar lg:max-h-none lg:overflow-visible">
               {draftPackages.map((draft) => {
                 const isSelected = selectedPackageId === draft.packageId;
                 const isTestReady = draft.testStatus === 'ready';

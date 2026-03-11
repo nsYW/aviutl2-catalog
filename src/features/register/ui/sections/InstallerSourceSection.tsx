@@ -2,10 +2,11 @@
  * インストーラーのソースコンポーネント
  */
 import { Alert } from '@/components/ui/Alert';
-import Button from '@/components/ui/Button';
+import Button, { buttonVariants } from '@/components/ui/Button';
+import { ExternalLink } from 'lucide-react';
 import { INSTALLER_SOURCES } from '../../model/form';
 import type { PackageInstallerSectionProps } from '../types';
-import { grid, layout, surface, text } from '@/components/ui/_styles';
+import { action, grid, layout, surface, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';
 
 type InstallerSourceSectionProps = Pick<
@@ -18,6 +19,9 @@ type InstallerSourceSectionProps = Pick<
   | 'packageFileImporting'
   | 'onSelectPackageFile'
 >;
+
+const autoUpdateStatusUrl =
+  'https://github.com/Neosku/aviutl2-catalog-data/blob/main/%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8.md';
 
 export default function InstallerSourceSection({
   installer,
@@ -36,7 +40,7 @@ export default function InstallerSourceSection({
     <div className="space-y-4">
       <div className="space-y-2">
         <div className={text.labelSm}>ダウンロード元</div>
-        <div className={cn(surface.panelSubtle, 'flex flex-wrap gap-1 p-1')}>
+        <div className={cn(action.segmentedGroup, 'flex flex-wrap gap-1')}>
           {INSTALLER_SOURCES.map((option) => {
             const isActive = installer.sourceType === option.value;
             return (
@@ -46,10 +50,9 @@ export default function InstallerSourceSection({
                 key={option.value}
                 type="button"
                 className={cn(
-                  'flex-1 transition-all',
-                  isActive
-                    ? 'bg-white text-blue-600 shadow-sm dark:bg-slate-800 dark:text-blue-400'
-                    : 'text-slate-600 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:bg-slate-800/50',
+                  action.segmentedOptionBase,
+                  'flex-1',
+                  isActive ? action.segmentedOptionActive : action.segmentedOptionInactive,
                 )}
                 onClick={() => updateInstallerField('sourceType', option.value)}
               >
@@ -87,40 +90,60 @@ export default function InstallerSourceSection({
           </div>
         )}
         {installer.sourceType === 'github' && (
-          <div className={grid.twoCol}>
-            <div className="space-y-2">
-              <label className={text.labelSm} htmlFor="installer-github-owner">
-                GitHub ID (Owner)
-              </label>
-              <input
-                id="installer-github-owner"
-                value={installer.githubOwner}
-                onChange={(e) => updateInstallerField('githubOwner', e.target.value)}
-                placeholder="例: neosku"
-              />
+          <div className="space-y-4">
+            <div className={grid.twoCol}>
+              <div className="space-y-2">
+                <label className={text.labelSm} htmlFor="installer-github-owner">
+                  GitHub ID (Owner)
+                </label>
+                <input
+                  id="installer-github-owner"
+                  value={installer.githubOwner}
+                  onChange={(e) => updateInstallerField('githubOwner', e.target.value)}
+                  placeholder="例: neosku"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className={text.labelSm} htmlFor="installer-github-repo">
+                  レポジトリ名 (Repo)
+                </label>
+                <input
+                  id="installer-github-repo"
+                  value={installer.githubRepo}
+                  onChange={(e) => updateInstallerField('githubRepo', e.target.value)}
+                  placeholder="例: aviutl2-catalog"
+                />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <label className={text.labelSm} htmlFor="installer-github-pattern">
+                  正規表現パターン
+                </label>
+                <input
+                  id="installer-github-pattern"
+                  value={installer.githubPattern}
+                  onChange={(e) => updateInstallerField('githubPattern', e.target.value)}
+                  placeholder="^aviutl_plugin_.*\.zip$"
+                />
+                <p className={text.mutedXs}>リリースファイル名に一致する正規表現を指定してください。</p>
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className={text.labelSm} htmlFor="installer-github-repo">
-                レポジトリ名 (Repo)
-              </label>
-              <input
-                id="installer-github-repo"
-                value={installer.githubRepo}
-                onChange={(e) => updateInstallerField('githubRepo', e.target.value)}
-                placeholder="例: aviutl2-catalog"
-              />
-            </div>
-            <div className="space-y-2 md:col-span-2">
-              <label className={text.labelSm} htmlFor="installer-github-pattern">
-                正規表現パターン
-              </label>
-              <input
-                id="installer-github-pattern"
-                value={installer.githubPattern}
-                onChange={(e) => updateInstallerField('githubPattern', e.target.value)}
-                placeholder="^aviutl_plugin_.*\.zip$"
-              />
-              <p className={text.mutedXs}>リリースファイル名に一致する正規表現を指定してください。</p>
+
+            <div className={cn(surface.panelRoundedSubtle, 'space-y-3 p-3')}>
+              <p className={text.bodySmMuted}>
+                GitHub Release を利用しているパッケージは、`.exe`
+                形式など一部の配布形態を除き、管理側で自動更新プログラムの対象に追加いたします。自動更新プログラムでは
+                30
+                分ごとに更新を確認し、更新があればカタログデータを更新します。対象への追加は管理側で順次手動対応しています。
+              </p>
+              <a
+                className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'w-fit')}
+                href={autoUpdateStatusUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <ExternalLink size={14} />
+                自動更新対応状況
+              </a>
             </div>
           </div>
         )}
