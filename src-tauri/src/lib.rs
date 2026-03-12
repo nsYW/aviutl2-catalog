@@ -1,4 +1,6 @@
 use tauri::Manager;
+use time::{UtcOffset, format_description::parse};
+use tracing_subscriber::fmt::time::OffsetTime;
 use tracing_subscriber::fmt::writer::MakeWriterExt;
 
 mod commands;
@@ -56,26 +58,26 @@ fn write_installed_map(app: &tauri::AppHandle, map: &std::collections::HashMap<S
 }
 
 fn init_logger(app: &tauri::AppHandle) {
-    // TODO: もっといい書き方がありそう
-    static LOG_FILE: std::sync::OnceLock<std::path::PathBuf> = std::sync::OnceLock::new();
     let log_file = app_config_dir(app).join("logs/app.log");
     if let Some(parent) = log_file.parent() {
         std::fs::create_dir_all(parent).unwrap_or_else(|e| panic!("Failed to create log directory {}: {}", parent.display(), e));
     }
-    LOG_FILE.get_or_init(|| log_file.clone());
+
+    let log_file_handle = std::fs::OpenOptions::new().create(true).append(true).open(&log_file).unwrap_or_else(|e| panic!("Failed to open log file {}: {}", log_file.display(), e));
 
     let stdout = std::io::stdout.with_max_level(tracing::Level::INFO);
-
-    let file = tracing_subscriber::fmt::writer::BoxMakeWriter::new(|| {
-        let log_file = LOG_FILE.get().expect("LOG_FILE should be initialized");
-        let file = std::fs::OpenOptions::new().create(true).append(true).open(log_file).unwrap_or_else(|e| panic!("Failed to open log file {}: {}", log_file.display(), e));
+    let file = move || {
+        let file = log_file_handle.try_clone().expect("Failed to clone log file handle");
         strip_ansi_escapes::Writer::new(file)
-    })
-    .with_max_level(tracing::Level::INFO);
+    };
 
     let writer = stdout.and(file);
+    let timer = OffsetTime::new(
+        UtcOffset::from_hms(9, 0, 0).expect("valid JST offset"),
+        parse("[year]-[month]-[day] [hour]:[minute]:[second].[subsecond digits:3]").expect("valid log time format"),
+    );
 
-    tracing_subscriber::fmt().with_max_level(tracing::Level::INFO).with_writer(writer).init();
+    tracing_subscriber::fmt().with_timer(timer).with_file(true).with_line_number(true).with_target(false).with_max_level(tracing::Level::INFO).with_writer(writer).init();
 }
 
 #[cfg(all(target_os = "windows", not(debug_assertions)))]
