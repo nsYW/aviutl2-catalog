@@ -95,7 +95,7 @@ jobs:
           }
 
           $content = (Get-Content -Path $changelogPath -Raw -Encoding utf8) -replace "`r`n", "`n"
-          $pattern = "(?ms)^##\s+.*$([regex]::Escape($appVersion)).*$\n?(.*?)(?=^##\s+|\z)"
+          $pattern = "(?m)^##\s+v$([regex]::Escape($appVersion))\b.*\n([\s\S]*?)(?=^##\s+v|\z)"
           $match = [regex]::Match($content, $pattern)
 
           if (-not $match.Success) {
