@@ -91,6 +91,7 @@ export function validateUninstallerForTest(form: RegisterPackageForm): string {
 export function validatePackageForm(form: RegisterPackageForm): string {
   if (!form.id.trim()) return 'ID は必須です';
   if (!ID_PATTERN.test(form.id.trim())) return 'ID は英数字・ドット・アンダーバー・ハイフンのみ使用できます';
+  if (!form.id.trim().includes('.')) return 'ID は 作者名.パッケージ名 の形式で、ドットを1つ以上含めてください';
   if (!form.name.trim()) return 'パッケージ名は必須です';
   if (!form.author.trim()) return '作者名は必須です';
   if (!form.type.trim()) return '種類は必須です';

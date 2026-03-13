@@ -32,7 +32,7 @@ export default function RegisterMetaSection({
               required
               placeholder="Kenkun.AviUtlExEdit2"
             />
-            <p className={text.mutedXs}>英数字と記号 ( . - _ ) のみ</p>
+            <p className={text.mutedXs}>作者名.パッケージ名 の形式で入力してください。英数字と記号 ( . - _ ) のみ</p>
           </div>
           <div className="space-y-2">
             <label className={text.labelSm} htmlFor="package-name">

@@ -100,7 +100,7 @@ export const LINK_SECTIONS: readonly LinkSection[] = [
       {
         id: 'developers-register-guide',
         title: 'パッケージの掲載方法',
-        description: 'パッケージを掲載するための手順を開設したガイドドキュメント',
+        description: 'パッケージを掲載するための手順を解説したガイドドキュメント',
         href: 'https://github.com/Neosku/aviutl2-catalog-data/blob/main/register-package.md',
         icon: BookOpenText,
       },
