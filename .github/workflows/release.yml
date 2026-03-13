@@ -1,0 +1,218 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "リリース対象のタグ名（例: v0.1.1）"
+        required: true
+        type: string
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  CHANGELOG_PATH: changelog.md
+  UPDATE_JSON_PATH: latest.json
+  TAURI_BUNDLE_DIR: src-tauri/target/release/bundle/nsis
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: pwsh
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+      app_version: ${{ steps.meta.outputs.app_version }}
+      release_asset_name: ${{ steps.release_files.outputs.release_asset_name }}
+      original_sig_name: ${{ steps.release_files.outputs.original_sig_name }}
+
+    steps:
+      - name: Resolve tag / version
+        id: meta
+        run: |
+          $tag = '${{ inputs.tag || github.ref_name }}'
+          if ($tag -notmatch '^v\d+\.\d+\.\d+$') {
+            throw 'タグ名が正しい形式ではありません。'
+          }
+
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "app_version=$($tag.Substring(1))" >> $env:GITHUB_OUTPUT
+
+      - name: Checkout release tag
+        uses: actions/checkout@v6
+        with:
+          ref: refs/tags/${{ steps.meta.outputs.tag }}
+          fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".node-version"
+          cache: pnpm
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            src-tauri -> target
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Tauri app
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: pnpm run tauri:build
+
+      - name: Prepare release files
+        id: release_files
+        run: |
+          $artifactDir = Join-Path $env:RUNNER_TEMP 'release-files'
+          New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null
+
+          $appVersion = '${{ steps.meta.outputs.app_version }}'
+          $changelogPath = Join-Path $env:GITHUB_WORKSPACE $env:CHANGELOG_PATH
+          $releaseNotesPath = Join-Path $artifactDir 'release_notes.md'
+
+          if (-not (Test-Path $changelogPath)) {
+            throw "changelog が見つかりません: $changelogPath"
+          }
+
+          $content = (Get-Content -Path $changelogPath -Raw -Encoding utf8) -replace "`r`n", "`n"
+          $pattern = "(?ms)^##\s+.*$([regex]::Escape($appVersion)).*$\n?(.*?)(?=^##\s+|\z)"
+          $match = [regex]::Match($content, $pattern)
+
+          if (-not $match.Success) {
+            throw "changelog.md からバージョン $appVersion のリリースノートを見つけられませんでした。"
+          }
+
+          $notes = $match.Groups[1].Value
+          if ([string]::IsNullOrWhiteSpace($notes)) {
+            throw '抽出したリリースノートが空です。'
+          }
+          Set-Content -Path $releaseNotesPath -Value $notes -Encoding utf8
+
+          $bundleDir = Join-Path $env:GITHUB_WORKSPACE $env:TAURI_BUNDLE_DIR
+          $originalExeCandidates = @(Get-ChildItem -Path $bundleDir -File -Filter '*x64-setup.exe')
+
+          if ($originalExeCandidates.Count -ne 1) {
+            throw "x64-setup.exe が 1 つに特定できませんでした。件数: $($originalExeCandidates.Count)"
+          }
+
+          $originalExe = $originalExeCandidates[0]
+          $releaseAssetName = "AviUtl2_Catalog_${appVersion}_x64-setup.exe"
+          $originalSigName = "$($originalExe.Name).sig"
+          $sigPath = Join-Path $bundleDir $originalSigName
+
+          if (-not (Test-Path $sigPath)) {
+            throw "署名ファイルが見つかりません: $sigPath"
+          }
+
+          Copy-Item -Path $originalExe.FullName -Destination (Join-Path $artifactDir $releaseAssetName) -Force
+          Copy-Item -Path $sigPath -Destination (Join-Path $artifactDir $originalSigName) -Force
+
+          "release_asset_name=$releaseAssetName" >> $env:GITHUB_OUTPUT
+          "original_sig_name=$originalSigName" >> $env:GITHUB_OUTPUT
+
+      - name: Upload build outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-files-${{ github.run_id }}
+          path: ${{ runner.temp }}/release-files
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
+
+  publish_release:
+    name: Publish release and updater metadata
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Download build outputs
+        uses: actions/download-artifact@v8
+        with:
+          name: release-files-${{ github.run_id }}
+          path: release-files
+
+      - name: Create or update GitHub Release
+        id: gh_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.build.outputs.tag }}
+          name: ${{ needs.build.outputs.tag }}
+          body_path: release-files/release_notes.md
+          files: |
+            release-files/${{ needs.build.outputs.release_asset_name }}
+          fail_on_unmatched_files: true
+          make_latest: true
+          overwrite_files: true
+
+      - name: Generate and upload latest.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.build.outputs.tag }}
+          ORIGINAL_SIG_NAME: ${{ needs.build.outputs.original_sig_name }}
+          UPDATE_JSON_PATH: ${{ env.UPDATE_JSON_PATH }}
+          INSTALLER_URL: ${{ fromJSON(steps.gh_release.outputs.assets)[0].browser_download_url }}
+        run: |
+          published_at="$(gh release view "$TAG" --json publishedAt --jq '.publishedAt')"
+          if [ -z "$published_at" ]; then
+            echo "GitHub Release の公開日時取得に失敗しました。" >&2
+            exit 1
+          fi
+
+          PUBLISHED_AT="$published_at" python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          tag = os.environ["TAG"]
+          original_sig_name = os.environ["ORIGINAL_SIG_NAME"]
+          published_at = os.environ["PUBLISHED_AT"]
+          installer_url = os.environ["INSTALLER_URL"]
+          output_path = Path("release-files") / os.environ["UPDATE_JSON_PATH"]
+
+          notes = Path("release-files/release_notes.md").read_text(encoding="utf-8").strip()
+          signature = Path(f"release-files/{original_sig_name}").read_text(encoding="utf-8").strip()
+
+          payload = {
+              "version": tag,
+              "notes": notes,
+              "pub_date": published_at,
+              "platforms": {
+                  "windows-x86_64": {
+                      "url": installer_url,
+                      "signature": signature,
+                  }
+              },
+          }
+
+          output_path.write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+          gh release upload "$TAG" "release-files/$UPDATE_JSON_PATH" --clobber
