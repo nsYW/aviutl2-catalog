@@ -1,5 +1,6 @@
 *.md
 !README.md
+!CHANGELOG.md
 !Plugin/update.md
 
 # Rust のビルド成果物

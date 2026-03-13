@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  CHANGELOG_PATH: changelog.md
+  CHANGELOG_PATH: CHANGELOG.md
   UPDATE_JSON_PATH: latest.json
   TAURI_BUNDLE_DIR: src-tauri/target/release/bundle/nsis
 
