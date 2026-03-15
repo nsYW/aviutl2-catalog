@@ -48,6 +48,10 @@ export default function PackageSidebarInfoCard({
   return (
     <div className={cn(surface.cardSection, 'space-y-4')}>
       <div className={cn(layout.rowBetween, text.bodySmMuted)}>
+        <span>ID</span>
+        <span className="text-slate-800 dark:text-slate-200 font-mono select-text">{item.id}</span>
+      </div>
+      <div className={cn(layout.rowBetween, text.bodySmMuted)}>
         <span>作者</span>
         {authorLink ? (
           <Link
