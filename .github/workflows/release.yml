@@ -217,3 +217,21 @@ jobs:
           PY
 
           gh release upload "$TAG" "release-files/$UPDATE_JSON_PATH" --clobber
+
+  trigger_winget:
+    name: Trigger WinGet workflow
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - publish_release
+    if: ${{ needs.publish_release.result == 'success' }}
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch winget workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run winget.yml \
+            --ref "${{ needs.build.outputs.tag }}" \
+            -f tag_name="${{ needs.build.outputs.tag }}"
