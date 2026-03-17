@@ -1,6 +1,8 @@
 import type { To } from 'react-router-dom';
 import type { PackageInstallBusyAction } from '../../../utils/usePackageInstallerActions';
-import type { CarouselImage, PackageItem, PackageLicenseEntry } from '../model/types';
+import type { PackageItem } from '../../../utils/catalogStore';
+import type { HomeRestoreState } from '../../../layouts/app-shell/types';
+import type { CarouselImage, PackageLicenseEntry } from '../model/types';
 
 export interface PackageProgressView {
   ratio: number;
@@ -28,7 +30,7 @@ export interface PackageSidebarSectionProps {
   item: PackageItem;
   listLink: To;
   listLabel: string;
-  listLinkState?: unknown;
+  listLinkState?: HomeRestoreState;
   updated: string;
   latest: string;
   canInstall: boolean;

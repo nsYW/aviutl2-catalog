@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ipc } from '../../../../utils/invokeIpc';
 import { safeLog } from '../../model/helpers';
-import type { CatalogItem, InitSetupStep, PackageItemsMap, PackageVersionsMap } from '../../model/types';
+import type { InitSetupStep, PackageItemsMap, PackageVersionsMap } from '../../model/types';
 
 interface UseInitSetupVersionDetectionParams {
   step: InitSetupStep;
@@ -35,7 +35,7 @@ export default function useInitSetupVersionDetection({
       if (step !== 'packages') return;
       if (versionsDetected) return;
       try {
-        const itemsForDetect = requiredPluginIds.map((id) => packageItems[id]).filter(Boolean) as CatalogItem[];
+        const itemsForDetect = requiredPluginIds.map((id) => packageItems[id]).filter(Boolean);
         if (itemsForDetect.length === 0) return;
         const result = await ipc.detectVersionsMap({
           items: itemsForDetect,

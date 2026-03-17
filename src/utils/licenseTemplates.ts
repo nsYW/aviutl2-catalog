@@ -1,3 +1,4 @@
+import type { Copyright, License } from './catalogSchema';
 import apache20TextRaw from '../assets/licenses/Apache-2.0.txt?raw';
 import bsd2ClauseTextRaw from '../assets/licenses/BSD-2-Clause.txt?raw';
 import bsd3ClauseTextRaw from '../assets/licenses/BSD-3-Clause.txt?raw';
@@ -26,18 +27,6 @@ interface LicenseTypeOption {
   label: string;
 }
 
-interface LicenseCopyrightLike {
-  years?: unknown;
-  holder?: unknown;
-}
-
-interface LicenseLike {
-  type?: unknown;
-  isCustom?: unknown;
-  licenseBody?: unknown;
-  copyrights?: unknown;
-}
-
 export const LICENSE_TEMPLATE_TYPE_VALUES = Object.keys(LICENSE_TEMPLATES) as LicenseTemplateType[];
 const COPYRIGHT_PLACEHOLDER_RE = /<years>|<holder>/i;
 
@@ -55,17 +44,11 @@ function isLicenseTemplateType(value: unknown): value is LicenseTemplateType {
   return typeof value === 'string' && Object.prototype.hasOwnProperty.call(LICENSE_TEMPLATES, value);
 }
 
-function normalizeCopyrightEntries(copyrights: unknown): LicenseCopyrightLike[] {
-  if (!Array.isArray(copyrights)) return [];
-  return copyrights
-    .filter((entry): entry is LicenseCopyrightLike => typeof entry === 'object' && entry !== null)
-    .map((entry) => ({
-      years: entry.years,
-      holder: entry.holder,
-    }));
+function normalizeCopyrightEntries(copyrights: Copyright[]): Copyright[] {
+  return copyrights;
 }
 
-function resolvePrimaryCopyright(entries: LicenseCopyrightLike[]): { years: string; holder: string } {
+function resolvePrimaryCopyright(entries: Copyright[]): { years: string; holder: string } {
   const primary =
     entries.find((entry) => toTrimmedString(entry.years) || toTrimmedString(entry.holder)) || entries[0] || {};
   return {
@@ -91,7 +74,7 @@ export function requiresTemplateCopyrightFields(type: unknown): boolean {
   return COPYRIGHT_PLACEHOLDER_RE.test(LICENSE_TEMPLATES[type]);
 }
 
-export function buildLicenseBody(license: LicenseLike | null | undefined): string {
+export function buildLicenseBody(license: License | null | undefined): string {
   if (!license || typeof license !== 'object') return '';
 
   const customBody = toTrimmedString(license.licenseBody);

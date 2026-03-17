@@ -20,7 +20,7 @@ export async function syncDetectedVersionWithDispatch(
 export async function executeDeleteAction(params: {
   logPrefix: 'installer' | 'uninstall';
   itemId: string;
-  pathValue: unknown;
+  pathValue: string;
   ctx: InstallerMacroContext;
   pathLabel: string;
   stepOperation: StepOperationTarget;

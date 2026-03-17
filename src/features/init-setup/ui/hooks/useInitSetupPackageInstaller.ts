@@ -1,11 +1,13 @@
 import { useCallback } from 'react';
 import { hasInstaller, runInstallerForItem } from '../../../../utils/installer';
+import type { CatalogEntry } from '../../../../utils/catalogSchema';
+import type { InstallProgressPayload } from '../../../../utils/installer/types';
 import { getErrorMessage } from '../../model/helpers';
-import type { CatalogItem, InstallProgress, PackageItemsMap, PackageState } from '../../model/types';
+import type { PackageItemsMap, PackageState } from '../../model/types';
 
 interface UseInitSetupPackageInstallerParams {
   packageItems: PackageItemsMap;
-  ensurePackageItem: (id: string) => Promise<CatalogItem | null>;
+  ensurePackageItem: (id: string) => Promise<CatalogEntry | null>;
   updatePackageState: (
     id: string,
     updater: Partial<PackageState> | ((current: PackageState) => Partial<PackageState>),
@@ -42,20 +44,18 @@ export default function useInitSetupPackageInstaller({
         return false;
       }
 
-      const initialProgress: InstallProgress = {
+      const initialProgress: InstallProgressPayload = {
         ratio: 0,
         percent: 0,
         label: '準備中…',
         phase: 'init',
         step: null,
         stepIndex: null,
-        totalSteps: null,
+        totalSteps: 0,
       };
       updatePackageState(id, () => ({ downloading: true, installed: false, error: '', progress: initialProgress }));
 
-      const handleProgress = (payload: unknown) => {
-        if (!payload || typeof payload !== 'object') return;
-        const progress = payload as InstallProgress;
+      const handleProgress = (progress: InstallProgressPayload) => {
         updatePackageState(id, () => ({
           progress,
           downloading: progress.phase !== 'done' && progress.phase !== 'error',

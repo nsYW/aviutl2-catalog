@@ -1,4 +1,4 @@
-import type { ComponentType, ReactElement } from 'react';
+import type { ComponentType } from 'react';
 import {
   ExternalLink,
   FolderOpen,
@@ -12,10 +12,9 @@ import {
   Settings,
 } from 'lucide-react';
 import aviutl2Icon from '../../../src-tauri/icons/aviutl2.png';
-import type { SidebarButtonVariant, SidebarIconProps } from './components/SidebarButton';
+import type { SidebarButtonVariant, SidebarIconProps, SidebarIconType } from './components/SidebarButton';
 import type { ActivePage } from './types';
 
-type SidebarIconType = ComponentType<SidebarIconProps> | ReactElement<SidebarIconProps>;
 type SidebarRoutePage = Exclude<ActivePage, '' | 'package'>;
 type SidebarRouteMatchMode = 'exact' | 'prefix';
 

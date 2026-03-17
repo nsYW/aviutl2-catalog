@@ -1,16 +1,14 @@
 import { useCallback, useState } from 'react';
-import type { CatalogAction } from './catalogStore';
+import type { CatalogDispatch } from './catalogStore';
 import { runPackageInstallAction, runPackageRemoveAction } from './installer';
 import type { InstallProgressPayload, InstallerRunnableItem } from './installer/types';
 import useExclusiveBusyAction from './useExclusiveBusyAction';
 
 export type PackageInstallBusyAction = 'idle' | 'download' | 'update' | 'remove';
 
-type CatalogDispatch = ((action: CatalogAction) => void) | null | undefined;
-
 export interface UsePackageInstallerActionsParams {
   item: InstallerRunnableItem | undefined;
-  dispatch: CatalogDispatch;
+  dispatch: CatalogDispatch | null | undefined;
   missingInstallerMessage?: string;
 }
 

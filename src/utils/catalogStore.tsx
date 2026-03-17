@@ -199,3 +199,7 @@ export function useCatalogDispatch(): React.Dispatch<CatalogAction> {
   if (!ctx) throw new Error('useCatalogDispatch must be used within CatalogProvider');
   return ctx;
 }
+
+export type PackageItem = CatalogEntryState;
+
+export type CatalogDispatch = (action: CatalogAction) => void;

@@ -1,8 +1,14 @@
-import type { PackageItem } from '../../features/package/model/types';
+import type { PackageItem } from '../../utils/catalogStore';
 import type { PackageInstallBusyAction } from '../../utils/usePackageInstallerActions';
 
+export type PackageCardItem = Pick<
+  PackageItem,
+  'id' | 'name' | 'author' | 'type' | 'tags' | 'summary' | 'images' | 'updatedAt' | 'installed'
+> &
+  Partial<Pick<PackageItem, 'description' | 'isLatest' | 'installedVersion' | 'installer' | 'latest-version'>>;
+
 export interface PackageCardProps {
-  item: PackageItem;
+  item: PackageCardItem;
   isPauseStateLoaded?: boolean;
   isUpdatePaused?: boolean;
   listSearch?: string;
@@ -30,7 +36,7 @@ export interface UsePackageCardActionsResult {
 }
 
 export interface PackageCardViewProps {
-  item: PackageItem;
+  item: PackageCardItem;
   thumbnail: string;
   category: string;
   lastUpdated: string;

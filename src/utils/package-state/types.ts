@@ -9,7 +9,7 @@ export type PackageStateEvent = Record<string, unknown> & {
   type?: string;
   ts?: number;
   package_id?: string;
-  installed?: unknown;
+  installed?: string[];
 };
 
 export type PackageStateEventPayload = PackageStateEvent & {

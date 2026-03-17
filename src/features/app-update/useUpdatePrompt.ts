@@ -14,16 +14,14 @@ export interface UpdatePromptInstallable {
 
 interface UpdateCheckResult extends UpdatePromptInstallable {
   available?: boolean;
-  version?: unknown;
-  body?: unknown;
-  notes?: unknown;
-  pubDate?: unknown;
-  pub_date?: unknown;
-  publishDate?: unknown;
-  publishedAt?: unknown;
-  published_at?: unknown;
-  releaseDate?: unknown;
-  date?: unknown;
+  version?: string;
+  body?: string;
+  notes?: string;
+  pubDate?: string;
+  publishDate?: string;
+  publishedAt?: string;
+  releaseDate?: string;
+  date?: string;
 }
 
 export interface UpdatePromptInfo {
@@ -52,15 +50,7 @@ function toCleanString(value: unknown): string {
 
 function resolvePubDate(update: UpdateCheckResult | null | undefined): { raw: string; label: string } {
   if (!update || typeof update !== 'object') return { raw: '', label: '' };
-  const candidates = [
-    update.pubDate,
-    update.pub_date,
-    update.publishDate,
-    update.publishedAt,
-    update.published_at,
-    update.releaseDate,
-    update.date,
-  ];
+  const candidates = [update.pubDate, update.publishDate, update.publishedAt, update.releaseDate, update.date];
   const raw = candidates.map(toCleanString).find(Boolean) || '';
   if (!raw) return { raw: '', label: '' };
 
@@ -92,7 +82,7 @@ export function useUpdatePrompt(options: UseUpdatePromptOptions = {}): UseUpdate
     (async () => {
       try {
         const update = await tauriUpdater.check();
-        if (!cancelled && update && (update.available ?? true) && typeof update.downloadAndInstall === 'function') {
+        if (!cancelled && update) {
           const notes = toCleanString(update.body);
           const pubDate = resolvePubDate(update);
 

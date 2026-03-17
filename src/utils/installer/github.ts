@@ -11,7 +11,7 @@ type GitHubAsset = {
 };
 
 type GitHubRelease = {
-  assets?: unknown;
+  assets?: GitHubAsset[];
   published_at?: string;
   created_at?: string;
   name?: string;
@@ -63,8 +63,7 @@ async function throwIfPrimaryRateLimited(response: Response, context: string): P
 function pickAssetFromRelease(release: unknown, regex: RegExp): GitHubAsset | null {
   const releaseLike = release as GitHubRelease | null;
   if (!releaseLike || !Array.isArray(releaseLike.assets)) return null;
-  const assets = releaseLike.assets as GitHubAsset[];
-  return assets.find((asset) => regex.test(asset.name || '')) || null;
+  return releaseLike.assets.find((asset) => regex.test(asset.name || '')) || null;
 }
 
 function findLatestRelease(releases: unknown): GitHubRelease | null {

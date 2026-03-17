@@ -1,4 +1,4 @@
-import type { PackageItem } from '../../features/package/model/types';
+import type { PackageItem } from '../../utils/catalogStore';
 
 export type HomeSortOrder = 'popularity_desc' | 'trend_desc' | 'added_desc' | 'updated_desc';
 
@@ -34,7 +34,6 @@ export type ActivePage =
 
 export interface AppDirsPayload {
   aviutl2_data?: string;
-  [key: string]: unknown;
 }
 
 export interface HomeRestoreState {

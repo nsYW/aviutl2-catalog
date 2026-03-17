@@ -1,9 +1,8 @@
 import { useCatalogDispatch } from '../../utils/catalogStore';
 import usePackageInstallerActions from '../../utils/usePackageInstallerActions';
-import type { PackageItem } from '../../features/package/model/types';
-import type { PackageCardProgressView, UsePackageCardActionsResult } from './types';
+import type { PackageCardItem, PackageCardProgressView, UsePackageCardActionsResult } from './types';
 
-export default function usePackageCardActions(item: PackageItem): UsePackageCardActionsResult {
+export default function usePackageCardActions(item: PackageCardItem): UsePackageCardActionsResult {
   const dispatch = useCatalogDispatch();
   const { error, setError, busyAction, isBusy, progress, onDownload, onUpdate, onRemove } = usePackageInstallerActions({
     item,

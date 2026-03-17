@@ -41,7 +41,7 @@ export default function RegisterPreviewSection({
           infoImg: infoImages,
         },
       ],
-      updatedAt,
+      updatedAt: new Date(updatedAt).getTime() || null,
       installed: false,
       isLatest: true,
     }),

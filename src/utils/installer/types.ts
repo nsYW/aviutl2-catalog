@@ -1,4 +1,4 @@
-import type { InstallerAction, InstallerSource } from '../catalogSchema';
+import type { Installer, InstallerAction, InstallerSource } from '../catalogSchema';
 
 export type InstallerMacroContext = {
   tmpDir: string;
@@ -30,8 +30,8 @@ export type InstallerConfigLike = {
 
 export type InstallerRunnableItem = {
   id: string;
-  installer?: unknown;
-  'latest-version'?: unknown;
+  installer?: Installer;
+  'latest-version'?: string;
 };
 
 export type SetDetectedOneAction = {
