@@ -1,8 +1,6 @@
 name: Publish to WinGet
 
 on:
-  release:
-    types: [released]
   workflow_dispatch:
     inputs:
       tag_name:
