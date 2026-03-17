@@ -18,10 +18,8 @@ interface UpdateCheckResult extends UpdatePromptInstallable {
   body?: string;
   notes?: string;
   pubDate?: string;
-  pub_date?: string;
   publishDate?: string;
   publishedAt?: string;
-  published_at?: string;
   releaseDate?: string;
   date?: string;
 }
@@ -52,15 +50,7 @@ function toCleanString(value: unknown): string {
 
 function resolvePubDate(update: UpdateCheckResult | null | undefined): { raw: string; label: string } {
   if (!update || typeof update !== 'object') return { raw: '', label: '' };
-  const candidates = [
-    update.pubDate,
-    update.pub_date,
-    update.publishDate,
-    update.publishedAt,
-    update.published_at,
-    update.releaseDate,
-    update.date,
-  ];
+  const candidates = [update.pubDate, update.publishDate, update.publishedAt, update.releaseDate, update.date];
   const raw = candidates.map(toCleanString).find(Boolean) || '';
   if (!raw) return { raw: '', label: '' };
 
@@ -92,7 +82,7 @@ export function useUpdatePrompt(options: UseUpdatePromptOptions = {}): UseUpdate
     (async () => {
       try {
         const update = await tauriUpdater.check();
-        if (!cancelled && update && (update.available ?? true) && typeof update.downloadAndInstall === 'function') {
+        if (!cancelled && update) {
           const notes = toCleanString(update.body);
           const pubDate = resolvePubDate(update);
 

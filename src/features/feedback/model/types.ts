@@ -1,8 +1,9 @@
-export type FeedbackMode = 'bug' | 'inquiry';
-export type SubmitAction = 'issues' | 'feedback';
-
+import { SubmitEndpointResponse } from '@/lib/submitEndpoint';
 import type { DeviceInfo } from '../../../utils/diagnostics/types';
 export type { DeviceCpuInfo, DeviceGpuInfo, DeviceInfo, DeviceOsInfo } from '../../../utils/diagnostics/types';
+
+export type FeedbackMode = 'bug' | 'inquiry';
+export type SubmitAction = 'issues' | 'feedback';
 
 export interface BugFormState {
   title: string;
@@ -54,15 +55,6 @@ export interface BugSubmitPayload extends FeedbackSubmitPayloadBase {
 
 export interface InquirySubmitPayload extends FeedbackSubmitPayloadBase {
   action: 'feedback';
-}
-
-export interface SubmitEndpointResponse {
-  error?: string;
-  message?: string;
-  detail?: string;
-  pr_url?: string;
-  public_issue_url?: string;
-  url?: string;
 }
 
 export interface ParsedSubmitResponse {

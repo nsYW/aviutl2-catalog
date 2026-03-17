@@ -10,7 +10,7 @@ export interface SidebarIconProps {
   'aria-hidden'?: boolean;
 }
 
-type SidebarIconType = ComponentType<SidebarIconProps> | ReactElement<SidebarIconProps>;
+export type SidebarIconType = ComponentType<SidebarIconProps> | ReactElement<SidebarIconProps>;
 export type SidebarButtonVariant = 'default' | 'ghost';
 
 interface PortalTooltipProps {

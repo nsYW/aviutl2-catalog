@@ -7,7 +7,8 @@ import { catalogEntrySchema, catalogIndexSchema, type CatalogEntry } from '../..
 import { SUBMIT_ACTIONS, buildPackageEntry, getFileExtension, validatePackageForm } from '../../model/form';
 import { isHttpsUrl } from '../../model/helpers';
 import type { RegisterPackageForm } from '../../model/types';
-import type { RegisterSuccessDialogState, SubmitEndpointResponse, SubmitPackagePayload } from '../types';
+import type { RegisterSuccessDialogState, SubmitPackagePayload } from '../types';
+import { SubmitEndpointResponse } from '@/lib/submitEndpoint';
 
 interface UseRegisterSubmitHandlerArgs {
   submitEndpoint: string;
