@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { CatalogAction, CatalogDispatch } from '../utils/catalogStore';
+import type { CatalogDispatch } from '../utils/catalogStore';
 import { loadCatalogData } from '../utils/catalog';
 import { detectInstalledVersionsMap, loadInstalledMap, saveInstalledSnapshot } from '../utils/installed-map';
 import { formatUnknownError } from '../utils/errors';
