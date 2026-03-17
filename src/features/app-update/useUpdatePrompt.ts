@@ -14,16 +14,16 @@ export interface UpdatePromptInstallable {
 
 interface UpdateCheckResult extends UpdatePromptInstallable {
   available?: boolean;
-  version?: unknown;
-  body?: unknown;
-  notes?: unknown;
-  pubDate?: unknown;
-  pub_date?: unknown;
-  publishDate?: unknown;
-  publishedAt?: unknown;
-  published_at?: unknown;
-  releaseDate?: unknown;
-  date?: unknown;
+  version?: string;
+  body?: string;
+  notes?: string;
+  pubDate?: string;
+  pub_date?: string;
+  publishDate?: string;
+  publishedAt?: string;
+  published_at?: string;
+  releaseDate?: string;
+  date?: string;
 }
 
 export interface UpdatePromptInfo {

@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { loadCatalogData } from '../../../../utils/catalog';
 import { safeLog } from '../../model/helpers';
-import type {
-  CatalogItem,
-  PackageItemsMap,
-  PackageState,
-  PackageStatesMap,
-  RequiredPackageRow,
-} from '../../model/types';
+import type { PackageItemsMap, PackageState, PackageStatesMap, RequiredPackageRow } from '../../model/types';
 import { createDefaultPackageState } from './initSetupPackageState';
 
 interface UseInitSetupCatalogStoreParams {
@@ -23,8 +17,8 @@ export default function useInitSetupCatalogStore({ requiredPluginIds, corePackag
 
   const fetchCatalogList = useCallback(async () => {
     try {
-      const result = (await loadCatalogData({ timeoutMs: 10000 })) as { items?: CatalogItem[] };
-      const items = Array.isArray(result?.items) ? result.items : [];
+      const result = await loadCatalogData({ timeoutMs: 10000 });
+      const items = result.items;
       if (items.length === 0) throw new Error('catalog data unavailable');
       return items;
     } catch (catalogError) {

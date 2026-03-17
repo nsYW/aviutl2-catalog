@@ -34,7 +34,6 @@ export type ActivePage =
 
 export interface AppDirsPayload {
   aviutl2_data?: string;
-  [key: string]: unknown;
 }
 
 export interface HomeRestoreState {

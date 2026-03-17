@@ -5,16 +5,16 @@ type NameSortable = {
 };
 
 type FilterableItem = {
-  tags?: unknown;
-  type?: unknown;
+  tags?: string[];
+  type?: string;
 };
 
 type SortableItem = NameSortable & {
   updatedAt?: number | null;
-  popularityScore?: unknown;
-  popularity?: unknown;
-  trend?: unknown;
-  catalogIndex?: unknown;
+  popularityScore?: number;
+  popularity?: number;
+  trend?: number;
+  catalogIndex?: number;
 };
 
 type SearchableItem = {
