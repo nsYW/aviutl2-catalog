@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Copy, Check } from 'lucide-react';
-import { logError } from '../utils/logging';
 import Button from '@/components/ui/Button';
 import { layout, overlay, surface, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';
+import { logError } from '@/utils/logging';
 
 interface ErrorDialogProps {
   open: boolean;

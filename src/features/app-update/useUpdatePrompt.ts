@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import * as tauriDialog from '@tauri-apps/plugin-dialog';
 import * as tauriProcess from '@tauri-apps/plugin-process';
 import * as tauriUpdater from '@tauri-apps/plugin-updater';
-import { logError } from '../../utils/logging';
+import { logError } from '@/utils/logging';
 
 export interface UseUpdatePromptOptions {
   autoCheck?: boolean;

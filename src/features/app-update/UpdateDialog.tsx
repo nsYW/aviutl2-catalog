@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Calendar } from 'lucide-react';
-import { renderMarkdown } from '../../utils/markdown';
+import { renderMarkdown } from '@/utils/markdown';
 import { Alert } from '@/components/ui/Alert';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';

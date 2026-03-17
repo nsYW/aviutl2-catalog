@@ -1,5 +1,5 @@
 import * as windowApi from '@tauri-apps/api/window';
-import { logError } from '../../../utils/logging';
+import { logError } from '@/utils/logging';
 
 async function showMainWindow() {
   const win = windowApi.getCurrentWindow();

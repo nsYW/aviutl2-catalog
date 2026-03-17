@@ -1,7 +1,7 @@
 /**
  * register 関連の型定義
  */
-import type { Installer, Version } from '../../../utils/catalogSchema';
+import type { Installer, Version } from '@/utils/catalogSchema';
 
 export type RegisterDescriptionMode = 'inline' | 'external';
 export type RegisterInstallerSourceType = 'direct' | 'github' | 'GoogleDrive' | 'booth';

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ipc } from '../../../../utils/invokeIpc';
+import { ipc } from '@/utils/invokeIpc';
 import { safeLog } from '../../model/helpers';
 import type { InitSetupStep, PackageItemsMap, PackageVersionsMap } from '../../model/types';
 

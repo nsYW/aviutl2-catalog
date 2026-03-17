@@ -1,18 +1,18 @@
 // アプリケーションのルーティング設定
 import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import AppShell from './layouts/app-shell/AppShell';
-import DeepLinkHandler from './features/deep-link/ui/DeepLinkHandler';
-import { APP_ROUTE_PATHS } from './routePaths';
+import DeepLinkHandler from '@/features/deep-link/ui/DeepLinkHandler';
+import AppShell from '@/layouts/app-shell/AppShell';
+import { APP_ROUTE_PATHS } from '@/routePaths';
 
-const Home = lazy(() => import('./features/home/ui/HomePage'));
-const Links = lazy(() => import('./features/links/ui/LinksPage'));
-const Package = lazy(() => import('./features/package/ui/PackagePage'));
-const Updates = lazy(() => import('./features/updates/ui/UpdatesPage'));
-const Settings = lazy(() => import('./features/settings/ui/SettingsPage'));
-const Register = lazy(() => import('./features/register/ui/RegisterPage'));
-const Feedback = lazy(() => import('./features/feedback/ui/FeedbackPage'));
-const NiconiCommons = lazy(() => import('./features/niconi-commons/ui/NiconiCommonsPage'));
+const Home = lazy(() => import('@/features/home/ui/HomePage'));
+const Links = lazy(() => import('@/features/links/ui/LinksPage'));
+const Package = lazy(() => import('@/features/package/ui/PackagePage'));
+const Updates = lazy(() => import('@/features/updates/ui/UpdatesPage'));
+const Settings = lazy(() => import('@/features/settings/ui/SettingsPage'));
+const Register = lazy(() => import('@/features/register/ui/RegisterPage'));
+const Feedback = lazy(() => import('@/features/feedback/ui/FeedbackPage'));
+const NiconiCommons = lazy(() => import('@/features/niconi-commons/ui/NiconiCommonsPage'));
 
 export default function AppRouter() {
   return (

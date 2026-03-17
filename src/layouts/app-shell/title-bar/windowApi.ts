@@ -1,5 +1,5 @@
 import * as windowApi from '@tauri-apps/api/window';
-import { logError } from '../../../utils/logging';
+import { logError } from '@/utils/logging';
 
 function toErrorText(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;

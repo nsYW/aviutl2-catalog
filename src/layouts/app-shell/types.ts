@@ -1,4 +1,4 @@
-import type { PackageItem } from '../../utils/catalogStore';
+import type { PackageItem } from '@/utils/catalogStore';
 
 export type HomeSortOrder = 'popularity_desc' | 'trend_desc' | 'added_desc' | 'updated_desc';
 

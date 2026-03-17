@@ -5,8 +5,8 @@ import { commaListToArray, isHttpsUrl, normalizeArrayText } from './helpers';
 import { buildInstallerSource, serializeInstallStep, serializeUninstallStep } from './installerRules';
 import { getFileExtension } from './parse';
 import type { RegisterInstallerTestItem, RegisterPackageForm } from './types';
-import type { CatalogEntry, Image, Installer, License, Version } from '../../../utils/catalogSchema';
-import { ipc } from '../../../utils/invokeIpc';
+import type { CatalogEntry, Image, Installer, License, Version } from '@/utils/catalogSchema';
+import { ipc } from '@/utils/invokeIpc';
 
 export function buildInstallerPayload(form: RegisterPackageForm): Installer {
   const source = buildInstallerSource(form.installer);

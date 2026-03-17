@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useHomeContext } from '../../../../layouts/app-shell/AppShell';
-import { installStatusToQueryValue } from '../../../../layouts/app-shell/constants';
+import { useHomeContext } from '@/layouts/app-shell/AppShell';
+import { installStatusToQueryValue } from '@/layouts/app-shell/constants';
 import type { HomeInstallStatus, HomeSortOrder } from '../types';
 
 const HOME_CATEGORY_ALL = 'すべて';

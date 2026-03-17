@@ -11,7 +11,7 @@ import {
 } from '../../model/draft';
 import { cleanupImagePreviews } from '../../model/helpers';
 import { resolveRegisterDraftTestState } from '../../model/registerTestRequirement';
-import type { CatalogEntry } from '../../../../utils/catalogSchema';
+import type { CatalogEntry } from '@/utils/catalogSchema';
 import type { RegisterSuccessDialogState } from '../types';
 import type { SubmitSinglePackageInput, SubmitSinglePackageResult } from './useRegisterSubmitHandler';
 

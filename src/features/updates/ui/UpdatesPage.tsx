@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import ErrorDialog from '../../../components/ErrorDialog';
+import ErrorDialog from '@/components/ErrorDialog';
 import useUpdatesPage from './hooks/useUpdatesPage';
 import { BulkProgressSection, UpdatesHeaderSection, UpdatesTableSection } from './sections';
 import { page, text } from '@/components/ui/_styles';

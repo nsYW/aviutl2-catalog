@@ -1,5 +1,5 @@
 import type { CarouselImage } from './types';
-import type { Image } from '../../../utils/catalogSchema';
+import type { Image } from '@/utils/catalogSchema';
 
 const PACKAGE_LIST_BACK_PARAM = 'back';
 const PACKAGE_DETAIL_SOURCE_PARAM = 'source';

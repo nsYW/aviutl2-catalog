@@ -1,6 +1,6 @@
 import * as tauriWindow from '@tauri-apps/api/window';
-import { formatUnknownError } from '../utils/errors';
-import { logError } from '../utils/logging';
+import { formatUnknownError } from '@/utils/errors';
+import { logError } from '@/utils/logging';
 
 export type AppMode = 'loading' | 'init' | 'main';
 

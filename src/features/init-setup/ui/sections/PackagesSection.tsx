@@ -1,7 +1,7 @@
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { Check, CheckCircle2, Download } from 'lucide-react';
-import ProgressCircle from '../../../../components/ProgressCircle';
+import ProgressCircle from '@/components/ProgressCircle';
 import type { PackagesSectionProps } from '../types';
 import { cn } from '@/lib/cn';
 import { action, layout, state, surface, text } from '@/components/ui/_styles';

@@ -1,7 +1,7 @@
 import { entryToForm } from './parse';
 import { computeStableTextHash } from './helpers';
 import { normalizeInstallStepState, normalizeUninstallStepState } from './installerRules';
-import type { CatalogEntry } from '../../../utils/catalogSchema';
+import type { CatalogEntry } from '@/utils/catalogSchema';
 import type { RegisterPackageForm } from './types';
 
 export type RegisterDraftTestState = 'not_required' | 'ready' | 'blocked';

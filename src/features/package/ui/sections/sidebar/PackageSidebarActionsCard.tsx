@@ -1,7 +1,7 @@
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { CheckCircle2, Download, RefreshCw, Trash2 } from 'lucide-react';
-import ProgressCircle from '../../../../../components/ProgressCircle';
+import ProgressCircle from '@/components/ProgressCircle';
 import type { PackageSidebarSectionProps } from '../../types';
 import { cn } from '@/lib/cn';
 import { layout, surface } from '@/components/ui/_styles';

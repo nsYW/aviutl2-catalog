@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import type { CatalogDispatch } from '../utils/catalogStore';
-import { loadCatalogData } from '../utils/catalog';
-import { detectInstalledVersionsMap, loadInstalledMap, saveInstalledSnapshot } from '../utils/installed-map';
-import { formatUnknownError } from '../utils/errors';
-import { ipc } from '../utils/invokeIpc';
-import { logError } from '../utils/logging';
-import { flushPackageStateQueue, maybeSendPackageStateSnapshot } from '../utils/package-state';
-import { getSettings } from '../utils/settings';
+import { loadCatalogData } from '@/utils/catalog';
+import type { CatalogDispatch } from '@/utils/catalogStore';
+import { formatUnknownError } from '@/utils/errors';
+import { detectInstalledVersionsMap, loadInstalledMap, saveInstalledSnapshot } from '@/utils/installed-map';
+import { ipc } from '@/utils/invokeIpc';
+import { logError } from '@/utils/logging';
+import { flushPackageStateQueue, maybeSendPackageStateSnapshot } from '@/utils/package-state';
+import { getSettings } from '@/utils/settings';
 
 async function logBootstrapError(message: string, error: unknown): Promise<void> {
   try {

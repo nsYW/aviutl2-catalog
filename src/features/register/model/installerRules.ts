@@ -1,4 +1,4 @@
-import type { InstallerAction, InstallerSource } from '../../../utils/catalogSchema';
+import type { InstallerAction, InstallerSource } from '@/utils/catalogSchema';
 import type { RegisterInstallStep, RegisterInstallerState, RegisterUninstallStep } from './types';
 
 type InstallActionRule = {

@@ -1,6 +1,6 @@
 import type { KeyboardEvent, MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { buildPackageDetailHref, type PackageDetailSource } from '../features/package/model/helpers';
+import { buildPackageDetailHref, type PackageDetailSource } from '@/features/package/model/helpers';
 import { cn } from '@/lib/cn';
 
 interface PackageNameLinkProps {

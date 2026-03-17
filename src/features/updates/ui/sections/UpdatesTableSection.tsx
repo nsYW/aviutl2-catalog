@@ -1,6 +1,6 @@
-import ProgressCircle from '../../../../components/ProgressCircle';
-import PackageNameLink from '../../../../components/PackageNameLink';
-import { latestVersionOf } from '../../../../utils/catalog';
+import ProgressCircle from '@/components/ProgressCircle';
+import PackageNameLink from '@/components/PackageNameLink';
+import { latestVersionOf } from '@/utils/catalog';
 import type { UpdatesTableSectionProps } from '../types';
 import { surface, table, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';

@@ -1,4 +1,4 @@
-import { catalogEntrySchema, type CatalogEntry } from '../../../utils/catalogSchema';
+import { catalogEntrySchema, type CatalogEntry } from '@/utils/catalogSchema';
 import { getErrorMessage } from './helpers';
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

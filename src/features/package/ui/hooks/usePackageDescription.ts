@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { isMarkdownFilePath as isMarkdownUrl, resolveMarkdownUrl } from '../../model/helpers';
-import { renderMarkdown } from '../../../../utils/markdown';
+import { renderMarkdown } from '@/utils/markdown';
 
 interface UsePackageDescriptionParams {
   descriptionSource: string;

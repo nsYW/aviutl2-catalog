@@ -6,7 +6,7 @@ import {
   type RegisterDraftRecord,
 } from '../../model/draft';
 import { resolveRegisterDraftTestState } from '../../model/registerTestRequirement';
-import type { CatalogEntry } from '../../../../utils/catalogSchema';
+import type { CatalogEntry } from '@/utils/catalogSchema';
 import type { RegisterPackageForm } from '../../model/types';
 import type { RegisterDraftListItemView } from '../types';
 

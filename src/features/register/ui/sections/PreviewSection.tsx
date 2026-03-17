@@ -4,7 +4,7 @@
 import { useMemo, useRef } from 'react';
 import Button from '@/components/ui/Button';
 import { Moon, Sun } from 'lucide-react';
-import PackageCard from '../../../../components/package-card/PackageCard';
+import PackageCard from '@/components/package-card/PackageCard';
 import type { RegisterPreviewSectionProps } from '../types';
 import { layout, surface, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';

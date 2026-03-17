@@ -1,7 +1,7 @@
 /**
  * カタログデータをフォーム状態へ変換するパーサーモジュール
  */
-import type { CatalogEntry } from '../../../utils/catalogSchema';
+import type { CatalogEntry } from '@/utils/catalogSchema';
 import { arrayToCommaList, buildPreviewUrl, isHttpsUrl, isMarkdownPath } from './helpers';
 import { LICENSE_TEMPLATE_TYPES } from './constants';
 import {

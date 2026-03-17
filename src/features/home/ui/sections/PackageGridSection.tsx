@@ -1,4 +1,4 @@
-import PackageCard from '../../../../components/package-card/PackageCard';
+import PackageCard from '@/components/package-card/PackageCard';
 import type { PackageGridSectionProps } from '../types';
 
 export default function PackageGridSection({

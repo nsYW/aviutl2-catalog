@@ -2,7 +2,7 @@
  * 詳細説明入力の状態とプレビュー生成を扱う hook
  */
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
-import { renderMarkdown } from '../../../../utils/markdown';
+import { renderMarkdown } from '@/utils/markdown';
 import { getDescriptionSourceUrl, isHttpsUrl } from '../../model/helpers';
 import type { RegisterPackageForm } from '../../model/types';
 

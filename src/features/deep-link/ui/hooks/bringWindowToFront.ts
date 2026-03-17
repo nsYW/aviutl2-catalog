@@ -1,5 +1,5 @@
 import * as windowApi from '@tauri-apps/api/window';
-import { logError } from '../../../../utils/logging';
+import { logError } from '@/utils/logging';
 
 export async function bringWindowToFront(): Promise<void> {
   try {

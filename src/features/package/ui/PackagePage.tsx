@@ -1,14 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
 import * as tauriShell from '@tauri-apps/plugin-shell';
 import { useLocation, useParams } from 'react-router-dom';
-import { APP_ROUTE_PATHS } from '../../../routePaths';
-import ErrorDialog from '../../../components/ErrorDialog';
-import { latestVersionOf } from '../../../utils/catalog';
-import { useCatalog, useCatalogDispatch } from '../../../utils/catalogStore';
-import { hasInstaller } from '../../../utils/installer';
-import { buildLicenseBody } from '../../../utils/licenseTemplates';
-import { formatDate } from '../../../utils/text';
-import { HOME_LIST_RESTORE_STATE } from '../../../layouts/app-shell/types';
+import { APP_ROUTE_PATHS } from '@/routePaths';
+import ErrorDialog from '@/components/ErrorDialog';
+import { latestVersionOf } from '@/utils/catalog';
+import { useCatalog, useCatalogDispatch } from '@/utils/catalogStore';
+import { hasInstaller } from '@/utils/installer';
+import { buildLicenseBody } from '@/utils/licenseTemplates';
+import { formatDate } from '@/utils/text';
+import { HOME_LIST_RESTORE_STATE } from '@/layouts/app-shell/types';
 import {
   collectPackageImages,
   readPackageDetailSource,

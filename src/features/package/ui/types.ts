@@ -1,7 +1,7 @@
 import type { To } from 'react-router-dom';
-import type { PackageInstallBusyAction } from '../../../utils/usePackageInstallerActions';
-import type { PackageItem } from '../../../utils/catalogStore';
-import type { HomeRestoreState } from '../../../layouts/app-shell/types';
+import type { PackageInstallBusyAction } from '@/utils/usePackageInstallerActions';
+import type { PackageItem } from '@/utils/catalogStore';
+import type { HomeRestoreState } from '@/layouts/app-shell/types';
 import type { CarouselImage, PackageLicenseEntry } from '../model/types';
 
 export interface PackageProgressView {

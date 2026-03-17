@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import * as tauriDialog from '@tauri-apps/plugin-dialog';
-import { ipc } from '../../../../utils/invokeIpc';
+import { ipc } from '@/utils/invokeIpc';
 import { fetchWindowLabel, getErrorMessage, safeLog } from '../../model/helpers';
 import type { InitSetupStep, InstalledChoice, PickDirKind } from '../../model/types';
 

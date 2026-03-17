@@ -2,10 +2,10 @@ import { useCallback, useState } from 'react';
 import * as tauriDialog from '@tauri-apps/plugin-dialog';
 import * as tauriFs from '@tauri-apps/plugin-fs';
 import type { Dispatch, SetStateAction } from 'react';
-import type { CatalogAction, CatalogEntryState } from '../../../../utils/catalogStore';
-import { detectInstalledVersionsMap, loadInstalledMap, saveInstalledSnapshot } from '../../../../utils/installed-map';
-import { hasInstaller, runInstallerForItem, runUninstallerForItem } from '../../../../utils/installer';
-import { logError } from '../../../../utils/logging';
+import type { CatalogAction, CatalogEntryState } from '@/utils/catalogStore';
+import { detectInstalledVersionsMap, loadInstalledMap, saveInstalledSnapshot } from '@/utils/installed-map';
+import { hasInstaller, runInstallerForItem, runUninstallerForItem } from '@/utils/installer';
+import { logError } from '@/utils/logging';
 import { normalizeInstalledImport, toErrorMessage } from '../../model/helpers';
 
 interface UseSettingsDataManagementParams {

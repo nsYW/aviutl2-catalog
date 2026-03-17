@@ -3,7 +3,7 @@ import Button from '@/components/ui/Button';
 import { buttonVariants } from '@/components/ui/Button';
 import { Calendar, ExternalLink, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { HOME_SEARCH_RESTORE_STATE } from '../../../../../layouts/app-shell/types';
+import { HOME_SEARCH_RESTORE_STATE } from '@/layouts/app-shell/types';
 import { buildPackageListSearch } from '../../../model/helpers';
 import type { PackageSidebarSectionProps } from '../../types';
 import { layout, surface, text } from '@/components/ui/_styles';
