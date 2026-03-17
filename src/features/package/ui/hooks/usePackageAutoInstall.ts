@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { PackageItem } from '../../model/types';
+import type { PackageItem } from '../../../../utils/catalogStore';
 
 interface UsePackageAutoInstallParams {
   item: PackageItem | undefined;

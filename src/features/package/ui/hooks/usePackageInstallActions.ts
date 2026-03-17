@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { CatalogDispatch, PackageItem } from '../../model/types';
+import type { CatalogDispatch, PackageItem } from '../../../../utils/catalogStore';
 import type { UsePackageInstallActionsResult } from '../types';
 import usePackageInstallerActions from '../../../../utils/usePackageInstallerActions';
 

@@ -1,6 +1,7 @@
 import type { To } from 'react-router-dom';
 import type { PackageInstallBusyAction } from '../../../utils/usePackageInstallerActions';
-import type { CarouselImage, PackageItem, PackageLicenseEntry } from '../model/types';
+import type { PackageItem } from '../../../utils/catalogStore';
+import type { CarouselImage, PackageLicenseEntry } from '../model/types';
 
 export interface PackageProgressView {
   ratio: number;

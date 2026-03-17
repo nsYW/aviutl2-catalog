@@ -1,4 +1,5 @@
-import type { CarouselImage, PackageImageGroup } from './types';
+import type { CarouselImage } from './types';
+import type { Image } from '../../../utils/catalogSchema';
 
 const PACKAGE_LIST_BACK_PARAM = 'back';
 const PACKAGE_DETAIL_SOURCE_PARAM = 'source';
@@ -88,7 +89,7 @@ export function readPackageDetailSource(search: string): PackageDetailSource {
   return 'home';
 }
 
-export function collectPackageImages(imageGroups: PackageImageGroup[] | undefined): {
+export function collectPackageImages(imageGroups: Image[] | undefined): {
   heroImage: string;
   carouselImages: CarouselImage[];
 } {

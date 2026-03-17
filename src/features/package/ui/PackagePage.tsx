@@ -15,7 +15,7 @@ import {
   readPackageListSearchFromDetail,
   shouldOpenExternalLink,
 } from '../model/helpers';
-import type { PackageItem, PackageLicense, PackageLicenseEntry } from '../model/types';
+import type { PackageLicenseEntry } from '../model/types';
 import LicenseModal from './components/LicenseModal';
 import usePackageAutoInstall from './hooks/usePackageAutoInstall';
 import usePackageDescription from './hooks/usePackageDescription';
@@ -32,7 +32,7 @@ export default function PackagePage() {
   const { items, loading } = useCatalog();
   const dispatch = useCatalogDispatch();
   const [openLicense, setOpenLicense] = useState<PackageLicenseEntry | null>(null);
-  const packageItems = items as PackageItem[];
+  const packageItems = items;
 
   const listSearch = useMemo(() => readPackageListSearchFromDetail(location.search), [location.search]);
   const detailSource = useMemo(() => readPackageDetailSource(location.search), [location.search]);
@@ -81,14 +81,6 @@ export default function PackagePage() {
       key: `${license.type || 'license'}-${idx}`,
       body: String(buildLicenseBody(license) || ''),
     }));
-    if (!entries.length && item.license) {
-      const fallback: PackageLicense = { type: item.license, isCustom: false, licenseBody: '', copyrights: [] };
-      entries.push({
-        ...fallback,
-        key: 'legacy-license',
-        body: String(buildLicenseBody(fallback) || ''),
-      });
-    }
     return entries;
   }, [item]);
 
@@ -96,7 +88,6 @@ export default function PackagePage() {
 
   const licenseTypesLabel = useMemo(() => {
     const types = Array.isArray(item?.licenses) ? item.licenses.map((license) => license?.type).filter(Boolean) : [];
-    if (!types.length && item?.license) types.push(item.license);
     return types.length ? types.join(', ') : '?';
   }, [item]);
 

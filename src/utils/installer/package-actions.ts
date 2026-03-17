@@ -1,11 +1,9 @@
 import { detectInstalledVersionsMap, loadInstalledMap, removeInstalledId } from '../installed-map';
-import type { CatalogAction } from '../catalogStore';
+import type { CatalogDispatch } from '../catalogStore';
 import { runInstallerForItem } from './install';
 import { hasInstaller } from './shape';
 import type { InstallProgressPayload, InstallerRunnableItem } from './types';
 import { runUninstallerForItem } from './uninstall';
-
-type CatalogDispatch = ((action: CatalogAction) => void) | null | undefined;
 
 function hasUninstallScript(item: InstallerRunnableItem): boolean {
   const installer =
@@ -13,7 +11,10 @@ function hasUninstallScript(item: InstallerRunnableItem): boolean {
   return Array.isArray(installer?.uninstall) && installer.uninstall.length > 0;
 }
 
-async function syncRemovedPackageState(item: InstallerRunnableItem, dispatch: CatalogDispatch): Promise<void> {
+async function syncRemovedPackageState(
+  item: InstallerRunnableItem,
+  dispatch: CatalogDispatch | null | undefined,
+): Promise<void> {
   await removeInstalledId(item.id);
 
   if (dispatch) {
@@ -28,7 +29,7 @@ async function syncRemovedPackageState(item: InstallerRunnableItem, dispatch: Ca
 
 export async function runPackageInstallAction(
   item: InstallerRunnableItem,
-  dispatch: CatalogDispatch,
+  dispatch: CatalogDispatch | null | undefined,
   onProgress?: (progress: InstallProgressPayload) => void,
   missingInstallerMessage: string = 'インストーラーがありません',
 ): Promise<void> {
@@ -36,7 +37,10 @@ export async function runPackageInstallAction(
   await runInstallerForItem(item, dispatch, onProgress);
 }
 
-export async function runPackageRemoveAction(item: InstallerRunnableItem, dispatch: CatalogDispatch): Promise<void> {
+export async function runPackageRemoveAction(
+  item: InstallerRunnableItem,
+  dispatch: CatalogDispatch | null | undefined,
+): Promise<void> {
   if (hasInstaller(item) && hasUninstallScript(item)) {
     await runUninstallerForItem(item, dispatch);
     return;

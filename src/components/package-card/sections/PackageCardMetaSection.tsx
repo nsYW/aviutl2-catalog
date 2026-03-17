@@ -1,12 +1,12 @@
 import { memo } from 'react';
 import { Calendar, User } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
-import type { PackageItem } from '../../../features/package/model/types';
+import type { PackageCardItem } from '../types';
 import { cn } from '@/lib/cn';
 import { text } from '@/components/ui/_styles';
 
 interface PackageCardMetaSectionProps {
-  item: PackageItem;
+  item: PackageCardItem;
   lastUpdated: string;
   tags: string[];
 }

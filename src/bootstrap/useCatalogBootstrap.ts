@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-import type { Dispatch } from 'react';
-import type { CatalogAction } from '../utils/catalogStore';
+import type { CatalogAction, CatalogDispatch } from '../utils/catalogStore';
 import { loadCatalogData } from '../utils/catalog';
 import { detectInstalledVersionsMap, loadInstalledMap, saveInstalledSnapshot } from '../utils/installed-map';
 import { formatUnknownError } from '../utils/errors';
@@ -8,8 +7,6 @@ import { ipc } from '../utils/invokeIpc';
 import { logError } from '../utils/logging';
 import { flushPackageStateQueue, maybeSendPackageStateSnapshot } from '../utils/package-state';
 import { getSettings } from '../utils/settings';
-
-type CatalogDispatch = Dispatch<CatalogAction>;
 
 async function logBootstrapError(message: string, error: unknown): Promise<void> {
   try {

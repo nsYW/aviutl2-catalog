@@ -1,4 +1,4 @@
-import type { PackageItem } from '../../package/model/types';
+import type { PackageItem } from '../../../utils/catalogStore';
 import type { HomeContextValue, HomeInstallStatus, HomeSortOrder } from '../../../layouts/app-shell/types';
 
 export type { HomeContextValue, HomeInstallStatus, HomeSortOrder };
