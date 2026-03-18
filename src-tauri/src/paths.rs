@@ -163,6 +163,7 @@ fn open_init_setup_window(app: &AppHandle) -> std::io::Result<()> {
         let mut builder = WebviewWindowBuilder::new(app, "init-setup", WebviewUrl::App("/".into()))
             .title("セットアップ")
             .inner_size(850.0, 640.0)
+            .center()
             .resizable(true)
             .decorations(false)
             .visible(false);

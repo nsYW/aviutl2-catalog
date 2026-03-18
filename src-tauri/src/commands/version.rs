@@ -170,19 +170,17 @@ fn build_file_hash_cache(app: &tauri::AppHandle, unique_paths: &HashSet<std::pat
         }
     }
 
-    for (path_str, result) in to_hash.into_par_iter().map(|path| {
-        let result = xxh3_128_hex(&path);
-        (path, result)
-    }) {
-        match result {
-            Ok(hex) => {
-                file_hash_cache.insert(path_str, hex);
-            }
+    let hashed_paths = to_hash
+        .into_par_iter()
+        .filter_map(|path| match xxh3_128_hex(&path) {
+            Ok(hex) => Some((path, hex)),
             Err(e) => {
-                tracing::error!("hash error path=\"{}\": {}", path_str.display(), e);
+                tracing::error!("hash error path=\"{}\": {}", path.display(), e);
+                None
             }
-        }
-    }
+        })
+        .collect::<HashMap<_, _>>();
+    file_hash_cache.extend(hashed_paths);
     for (k, hex) in &file_hash_cache {
         if let Some((mtime_ms, size)) = stat_file(k) {
             disk_cache.insert(k.clone(), HashCacheEntry { xxh3_128: hex.clone(), mtime_ms, size });
