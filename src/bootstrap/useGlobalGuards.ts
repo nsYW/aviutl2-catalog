@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { logError } from '../utils/logging';
-import { canOpenExternalLink, openExternalLink } from '../utils/externalLink';
+import { canOpenExternalLink, openExternalLink } from '@/utils/externalLink';
+import { logError } from '@/utils/logging';
 
 function toLogText(error: unknown): string {
   if (error instanceof Error) return error.stack || error.message;

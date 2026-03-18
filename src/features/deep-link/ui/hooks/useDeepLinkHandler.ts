@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import * as deepLink from '@tauri-apps/plugin-deep-link';
 import type { NavigateFunction } from 'react-router-dom';
-import { logError } from '../../../../utils/logging';
+import { logError } from '@/utils/logging';
 import { bringWindowToFront } from './bringWindowToFront';
 import { isAllowedInternalPath, parseDeepLink } from '../../model/deepLinkParser';
 

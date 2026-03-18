@@ -10,7 +10,7 @@ import {
 import { basename, generateKey, getErrorMessage } from '../../model/helpers';
 import type { Au2pkgImportSummary } from '../../model/au2pkg';
 import type { RegisterInstallStep, RegisterUninstallStep } from '../../model/types';
-import { ipc } from '../../../../utils/invokeIpc';
+import { ipc } from '@/utils/invokeIpc';
 
 interface UseRegisterPackageFileImportArgs {
   replaceInstallSteps: (steps: RegisterInstallStep[]) => void;

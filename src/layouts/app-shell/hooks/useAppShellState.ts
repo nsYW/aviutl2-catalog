@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as tauriShell from '@tauri-apps/plugin-shell';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useCatalog } from '../../../utils/catalogStore';
-import { ipc } from '../../../utils/invokeIpc';
-import usePausedPackageUpdates from '../../../utils/usePausedPackageUpdates';
-import { filterByTagsAndType, getSorter, matchQuery, ORDERED_PACKAGE_TYPES } from '../../../utils/query';
+import { useCatalog } from '@/utils/catalogStore';
+import { ipc } from '@/utils/invokeIpc';
+import usePausedPackageUpdates from '@/utils/usePausedPackageUpdates';
+import { filterByTagsAndType, getSorter, matchQuery, ORDERED_PACKAGE_TYPES } from '@/utils/query';
 import { installStatusFromQueryValue, sortOrderFromQuery, sortParamsFromOrder } from '../constants';
 import {
   createSidebarRouteActionHandlers,

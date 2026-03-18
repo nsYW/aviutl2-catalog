@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { hasInstaller, runInstallerForItem } from '../../../../utils/installer';
-import type { CatalogEntry } from '../../../../utils/catalogSchema';
-import type { InstallProgressPayload } from '../../../../utils/installer/types';
+import { hasInstaller, runInstallerForItem } from '@/utils/installer';
+import type { CatalogEntry } from '@/utils/catalogSchema';
+import type { InstallProgressPayload } from '@/utils/installer/types';
 import { getErrorMessage } from '../../model/helpers';
 import type { PackageItemsMap, PackageState } from '../../model/types';
 

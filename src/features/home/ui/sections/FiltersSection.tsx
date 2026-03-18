@@ -17,7 +17,7 @@ import {
   INSTALL_STATUS_OPTIONS,
   SORT_OPTIONS,
   SORT_OPTION_LABELS,
-} from '../../../../layouts/app-shell/constants';
+} from '@/layouts/app-shell/constants';
 import { cn } from '@/lib/cn';
 import { layout, state, surface } from '@/components/ui/_styles';
 

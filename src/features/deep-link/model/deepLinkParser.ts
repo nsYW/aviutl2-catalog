@@ -1,5 +1,5 @@
 import type { DeepLinkAction } from './types';
-import { APP_ROUTE_PATHS, PACKAGE_DETAIL_PATH_PREFIX } from '../../../routePaths';
+import { APP_ROUTE_PATHS, PACKAGE_DETAIL_PATH_PREFIX } from '@/routePaths';
 
 const DEEP_LINK_SCHEME = 'aviutl2-catalog';
 const ALLOWED_STATIC_PATHS = new Set<string>(

@@ -2,7 +2,7 @@
  * register UI 層で共有する型定義
  */
 import type { FormEvent, MouseEventHandler, PointerEvent } from 'react';
-import type { CatalogEntry } from '../../../utils/catalogSchema';
+import type { CatalogEntry } from '@/utils/catalogSchema';
 import type { Au2pkgImportSummary } from '../model/au2pkg';
 import type { RegisterDraftTestState } from '../model/registerTestRequirement';
 import type {

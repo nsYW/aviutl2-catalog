@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { buildPackageDetailHref } from '../../features/package/model/helpers';
-import { hasInstaller } from '../../utils/installer';
-import { formatDate } from '../../utils/text';
+import { buildPackageDetailHref } from '@/features/package/model/helpers';
+import { hasInstaller } from '@/utils/installer';
+import { formatDate } from '@/utils/text';
 import ErrorDialog from '../ErrorDialog';
 import { pickThumbnail } from './helpers';
 import usePackageCardActions from './usePackageCardActions';

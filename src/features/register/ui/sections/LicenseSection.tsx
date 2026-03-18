@@ -5,11 +5,7 @@ import { memo, useEffect, useState } from 'react';
 import type { MouseEvent } from 'react';
 import Button from '@/components/ui/Button';
 import { Check, ChevronDown, Copy } from 'lucide-react';
-import {
-  LICENSE_TYPE_OPTIONS,
-  buildLicenseBody,
-  requiresTemplateCopyrightFields,
-} from '../../../../utils/licenseTemplates';
+import { LICENSE_TYPE_OPTIONS, buildLicenseBody, requiresTemplateCopyrightFields } from '@/utils/licenseTemplates';
 import { createEmptyLicense } from '../../model/form';
 import type { PackageLicenseSectionProps } from '../types';
 import ActionDropdown from '../components/ActionDropdown';

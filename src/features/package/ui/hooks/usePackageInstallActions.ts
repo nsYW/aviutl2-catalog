@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import type { CatalogDispatch, PackageItem } from '../../../../utils/catalogStore';
+import type { CatalogDispatch, PackageItem } from '@/utils/catalogStore';
 import type { UsePackageInstallActionsResult } from '../types';
-import usePackageInstallerActions from '../../../../utils/usePackageInstallerActions';
+import usePackageInstallerActions from '@/utils/usePackageInstallerActions';
 
 interface UsePackageInstallActionsParams {
   item: PackageItem | undefined;

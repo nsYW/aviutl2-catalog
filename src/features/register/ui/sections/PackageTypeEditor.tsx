@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react';
 import SelectableChipInput from '../components/SelectableChipInput';
-import { PRIMARY_PACKAGE_TYPES } from '../../../../utils/query';
+import { PRIMARY_PACKAGE_TYPES } from '@/utils/query';
 
 interface PackageTypeEditorProps {
   value: string;

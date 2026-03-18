@@ -1,7 +1,7 @@
 /**
  * Draft persistence utilities for register form
  */
-import type { CatalogEntry } from '../../../utils/catalogSchema';
+import type { CatalogEntry } from '@/utils/catalogSchema';
 import { basename, commaListToArray, computeStableTextHash, generateKey, normalizeArrayText } from './helpers';
 import { normalizeInstallStepState, normalizeUninstallStepState } from './installerRules';
 import { entryToForm, getFileExtension } from './parse';

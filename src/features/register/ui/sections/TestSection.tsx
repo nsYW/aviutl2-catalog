@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { AlertCircle, Download, Trash2 } from 'lucide-react';
-import ProgressCircle from '../../../../components/ProgressCircle';
+import ProgressCircle from '@/components/ProgressCircle';
 import type { RegisterTestOperation, RegisterTestSectionProps } from '../types';
 import { layout, surface, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';

@@ -1,12 +1,12 @@
 import type { Copyright, License } from './catalogSchema';
-import apache20TextRaw from '../assets/licenses/Apache-2.0.txt?raw';
-import bsd2ClauseTextRaw from '../assets/licenses/BSD-2-Clause.txt?raw';
-import bsd3ClauseTextRaw from '../assets/licenses/BSD-3-Clause.txt?raw';
-import cc0TextRaw from '../assets/licenses/CC0-1.0.txt?raw';
-import gpl20TextRaw from '../assets/licenses/GPL-2.0.txt?raw';
-import gpl30TextRaw from '../assets/licenses/GPL-3.0.txt?raw';
-import mitTextRaw from '../assets/licenses/MIT.txt?raw';
-import unlicenseTextRaw from '../assets/licenses/Unlicense.txt?raw';
+import apache20TextRaw from '@/assets/licenses/Apache-2.0.txt?raw';
+import bsd2ClauseTextRaw from '@/assets/licenses/BSD-2-Clause.txt?raw';
+import bsd3ClauseTextRaw from '@/assets/licenses/BSD-3-Clause.txt?raw';
+import cc0TextRaw from '@/assets/licenses/CC0-1.0.txt?raw';
+import gpl20TextRaw from '@/assets/licenses/GPL-2.0.txt?raw';
+import gpl30TextRaw from '@/assets/licenses/GPL-3.0.txt?raw';
+import mitTextRaw from '@/assets/licenses/MIT.txt?raw';
+import unlicenseTextRaw from '@/assets/licenses/Unlicense.txt?raw';
 
 export const LICENSE_TEMPLATES = {
   MIT: mitTextRaw.trim(),

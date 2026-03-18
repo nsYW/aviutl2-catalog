@@ -10,7 +10,7 @@ import {
   type RegisterDraftTestKind,
 } from '../../model/draft';
 import { computeRegisterRelevantHash } from '../../model/registerTestRequirement';
-import type { CatalogEntry } from '../../../../utils/catalogSchema';
+import type { CatalogEntry } from '@/utils/catalogSchema';
 import type { RegisterPackageForm } from '../../model/types';
 import useRegisterDraftPersistence from './useRegisterDraftPersistence';
 import useRegisterDraftRestore from './useRegisterDraftRestore';

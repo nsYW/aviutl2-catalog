@@ -1,5 +1,5 @@
-import { useUpdatePrompt } from '../../../app-update/useUpdatePrompt';
 import { getErrorMessage } from '../../model/helpers';
+import { useUpdatePrompt } from '@/features/app-update/useUpdatePrompt';
 import useInitSetupBulkInstall from './useInitSetupBulkInstall';
 import useInitSetupConfig from './useInitSetupConfig';
 import useInitSetupFlow from './useInitSetupFlow';

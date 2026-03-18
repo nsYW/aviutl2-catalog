@@ -1,7 +1,7 @@
 /**
  * パッケージ登録で共有する定数群のモジュール
  */
-import { LICENSE_TEMPLATE_TYPE_VALUES } from '../../../utils/licenseTemplates';
+import { LICENSE_TEMPLATE_TYPE_VALUES } from '@/utils/licenseTemplates';
 import { installActionRules, uninstallActionRules } from './installerRules';
 import type { RegisterInstallerOption } from './types';
 

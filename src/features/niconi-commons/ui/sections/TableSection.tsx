@@ -1,5 +1,5 @@
-import PackageNameLink from '../../../../components/PackageNameLink';
-import Checkbox from '../../../../components/ui/Checkbox';
+import PackageNameLink from '@/components/PackageNameLink';
+import Checkbox from '@/components/ui/Checkbox';
 import type { TableSectionProps } from '../types';
 import { layout, state, surface, table, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';

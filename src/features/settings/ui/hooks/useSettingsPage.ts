@@ -1,10 +1,10 @@
 import { type ChangeEvent, useCallback, useState } from 'react';
 import * as tauriDialog from '@tauri-apps/plugin-dialog';
-import { useCatalog, useCatalogDispatch } from '../../../../utils/catalogStore';
-import { ipc } from '../../../../utils/invokeIpc';
-import { detectInstalledVersionsMap } from '../../../../utils/installed-map';
-import { logError } from '../../../../utils/logging';
-import { resetPackageStateLocalState } from '../../../../utils/package-state';
+import { useCatalog, useCatalogDispatch } from '@/utils/catalogStore';
+import { ipc } from '@/utils/invokeIpc';
+import { detectInstalledVersionsMap } from '@/utils/installed-map';
+import { logError } from '@/utils/logging';
+import { resetPackageStateLocalState } from '@/utils/package-state';
 import { applyTheme, toErrorMessage } from '../../model/helpers';
 import type { SettingsFormState } from '../../model/types';
 import useSettingsDataManagement from './useSettingsDataManagement';

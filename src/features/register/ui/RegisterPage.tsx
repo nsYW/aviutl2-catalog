@@ -2,7 +2,7 @@
  * パッケージ登録画面のメインコンポーネント
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { getSettings } from '../../../utils/settings';
+import { getSettings } from '@/utils/settings';
 import { saveRegisterDraftFromCatalogEntry } from '../model/draft';
 import { PACKAGE_GUIDE_FALLBACK_URL, createEmptyPackageForm } from '../model/form';
 import { getErrorMessage } from '../model/helpers';

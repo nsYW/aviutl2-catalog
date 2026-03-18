@@ -1,5 +1,5 @@
-import type { CatalogEntry } from '../../../utils/catalogSchema';
-import type { InstallProgressPayload } from '../../../utils/installer/types';
+import type { CatalogEntry } from '@/utils/catalogSchema';
+import type { InstallProgressPayload } from '@/utils/installer/types';
 
 export type InitSetupStep = 'intro' | 'installStatus' | 'details' | 'packages' | 'done';
 

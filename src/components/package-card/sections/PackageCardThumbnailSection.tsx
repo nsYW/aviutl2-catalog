@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { AppWindow, FileCode2, FileInput, FileOutput, Package, Puzzle, SlidersHorizontal } from 'lucide-react';
 import { placeholderPatternStyle } from '../helpers';
-import { getPrimaryPackageTypeMeta } from '../../../utils/query';
+import { getPrimaryPackageTypeMeta } from '@/utils/query';
 import { layout, media } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';
 

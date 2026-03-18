@@ -1,4 +1,4 @@
-import type { License } from '../../../utils/catalogSchema';
+import type { License } from '@/utils/catalogSchema';
 
 export interface CarouselImage {
   src: string;

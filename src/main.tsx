@@ -1,22 +1,21 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import AppRouter from './Router';
-import TitleBar from './layouts/app-shell/title-bar/TitleBar';
-import UpdateDialog from './features/app-update/UpdateDialog';
-import { CatalogProvider, useCatalogDispatch, initCatalog } from './utils/catalogStore';
-import { useUpdatePrompt } from './features/app-update/useUpdatePrompt';
-import InitSetupPage from './features/init-setup/ui/InitSetupPage';
-import { useGlobalGuards } from './bootstrap/useGlobalGuards';
-import { useCatalogBootstrap } from './bootstrap/useCatalogBootstrap';
-import { applyBootThemeInitClass, detectWindowLabel, scheduleMainWindowReveal, type AppMode } from './bootstrap/window';
+import AppRouter from '@/Router';
+import { useCatalogBootstrap } from '@/bootstrap/useCatalogBootstrap';
+import { useGlobalGuards } from '@/bootstrap/useGlobalGuards';
+import { applyBootThemeInitClass, detectWindowLabel, scheduleMainWindowReveal, type AppMode } from '@/bootstrap/window';
+import UpdateDialog from '@/features/app-update/UpdateDialog';
+import { useUpdatePrompt } from '@/features/app-update/useUpdatePrompt';
+import InitSetupPage from '@/features/init-setup/ui/InitSetupPage';
+import TitleBar from '@/layouts/app-shell/title-bar/TitleBar';
+import '@/styles/index.css';
+import { CatalogProvider, useCatalogDispatch, initCatalog } from '@/utils/catalogStore';
 // eslint-disable-next-line import/no-unassigned-import
 import 'markdown-it-github-alerts/styles/github-colors-light.css';
 // eslint-disable-next-line import/no-unassigned-import
 import 'markdown-it-github-alerts/styles/github-colors-dark-media.css';
 // eslint-disable-next-line import/no-unassigned-import
 import 'markdown-it-github-alerts/styles/github-base.css';
-// eslint-disable-next-line import/no-unassigned-import
-import './styles/index.css';
 
 applyBootThemeInitClass();
 scheduleMainWindowReveal();

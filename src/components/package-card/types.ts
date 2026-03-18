@@ -1,5 +1,5 @@
-import type { PackageItem } from '../../utils/catalogStore';
-import type { PackageInstallBusyAction } from '../../utils/usePackageInstallerActions';
+import type { PackageItem } from '@/utils/catalogStore';
+import type { PackageInstallBusyAction } from '@/utils/usePackageInstallerActions';
 
 export type PackageCardItem = Pick<
   PackageItem,

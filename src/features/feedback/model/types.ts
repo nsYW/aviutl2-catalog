@@ -1,6 +1,6 @@
 import { SubmitEndpointResponse } from '@/lib/submitEndpoint';
-import type { DeviceInfo } from '../../../utils/diagnostics/types';
-export type { DeviceCpuInfo, DeviceGpuInfo, DeviceInfo, DeviceOsInfo } from '../../../utils/diagnostics/types';
+import type { DeviceInfo } from '@/utils/diagnostics/types';
+export type { DeviceCpuInfo, DeviceGpuInfo, DeviceInfo, DeviceOsInfo } from '@/utils/diagnostics/types';
 
 export type FeedbackMode = 'bug' | 'inquiry';
 export type SubmitAction = 'issues' | 'feedback';

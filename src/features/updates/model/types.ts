@@ -1,4 +1,4 @@
-import type { CatalogEntryState } from '../../../utils/catalogStore';
+import type { CatalogEntryState } from '@/utils/catalogStore';
 
 export type UpdatesItem = CatalogEntryState;
 

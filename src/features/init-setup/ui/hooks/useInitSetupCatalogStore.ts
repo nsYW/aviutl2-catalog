@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { loadCatalogData } from '../../../../utils/catalog';
+import { loadCatalogData } from '@/utils/catalog';
 import { safeLog } from '../../model/helpers';
 import type { PackageItemsMap, PackageState, PackageStatesMap, RequiredPackageRow } from '../../model/types';
 import { createDefaultPackageState } from './initSetupPackageState';

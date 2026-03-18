@@ -5,7 +5,7 @@ import { isHttpsUrl } from './helpers';
 import { getInstallStepIssue, getInstallerSourceIssue, getUninstallStepIssue } from './installerRules';
 import { getFileExtension } from './parse';
 import { ID_PATTERN, INSTALL_ACTIONS, SPECIAL_INSTALL_ACTIONS, UNINSTALL_ACTIONS } from './constants';
-import { requiresTemplateCopyrightFields } from '../../../utils/licenseTemplates';
+import { requiresTemplateCopyrightFields } from '@/utils/licenseTemplates';
 import type { RegisterPackageForm } from './types';
 
 function getInstallerSourceMessage(form: RegisterPackageForm, mode: 'test' | 'submit'): string {

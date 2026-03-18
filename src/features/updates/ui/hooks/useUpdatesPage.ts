@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useCatalog, useCatalogDispatch } from '../../../../utils/catalogStore';
-import { hasInstaller, runInstallerForItem } from '../../../../utils/installer';
-import { logError } from '../../../../utils/logging';
-import usePausedPackageUpdates from '../../../../utils/usePausedPackageUpdates';
+import { useCatalog, useCatalogDispatch } from '@/utils/catalogStore';
+import { hasInstaller, runInstallerForItem } from '@/utils/installer';
+import { logError } from '@/utils/logging';
+import usePausedPackageUpdates from '@/utils/usePausedPackageUpdates';
 import { toErrorMessage, toProgressLabel, toProgressRatio } from '../../model/helpers';
 import type {
   BulkUpdateProgress,

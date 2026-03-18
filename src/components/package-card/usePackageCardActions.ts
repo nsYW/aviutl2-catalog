@@ -1,5 +1,5 @@
-import { useCatalogDispatch } from '../../utils/catalogStore';
-import usePackageInstallerActions from '../../utils/usePackageInstallerActions';
+import { useCatalogDispatch } from '@/utils/catalogStore';
+import usePackageInstallerActions from '@/utils/usePackageInstallerActions';
 import type { PackageCardItem, PackageCardProgressView, UsePackageCardActionsResult } from './types';
 
 export default function usePackageCardActions(item: PackageCardItem): UsePackageCardActionsResult {
