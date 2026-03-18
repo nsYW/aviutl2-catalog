@@ -1,6 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
+use rayon::prelude::*;
 use serde::Deserialize;
 use tauri::Manager;
 use xxhash_rust::xxh3::xxh3_128;
@@ -169,10 +170,13 @@ fn build_file_hash_cache(app: &tauri::AppHandle, unique_paths: &HashSet<std::pat
         }
     }
 
-    for path_str in &to_hash {
-        match xxh3_128_hex(path_str) {
+    for (path_str, result) in to_hash.into_par_iter().map(|path| {
+        let result = xxh3_128_hex(&path);
+        (path, result)
+    }) {
+        match result {
             Ok(hex) => {
-                file_hash_cache.insert(path_str.clone(), hex);
+                file_hash_cache.insert(path_str, hex);
             }
             Err(e) => {
                 tracing::error!("hash error path=\"{}\": {}", path_str.display(), e);
