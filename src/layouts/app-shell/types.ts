@@ -8,6 +8,7 @@ export interface HomeSortOption {
 }
 
 export type HomeInstallStatus = 'all' | 'installed' | 'not_installed';
+export type HomeDeprecationStatus = 'all' | 'deprecated' | 'active';
 export type SortKey = 'popularity' | 'newest' | 'trend' | 'added';
 export type SortDir = 'desc' | 'asc';
 export type UrlOverrideValue = string | string[] | null | undefined;
@@ -19,6 +20,7 @@ export interface ParsedHomeQuery {
   type: string;
   tags: string[];
   installStatus: HomeInstallStatus;
+  deprecationStatus: HomeDeprecationStatus;
 }
 
 export type ActivePage =
@@ -59,6 +61,7 @@ export interface HomeContextValue {
   allTags: string[];
   selectedTags: string[];
   installStatus: HomeInstallStatus;
+  deprecationStatus: HomeDeprecationStatus;
   toggleTag: (tag: string) => void;
   updateUrl: (overrides: Record<string, UrlOverrideValue>) => void;
 }

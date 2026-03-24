@@ -132,6 +132,12 @@ export const catalogEntrySchema = z.object({
 
   installer: installerSchema,
   version: z.array(versionSchema),
+
+  deprecation: z
+    .object({
+      message: z.string(),
+    })
+    .optional(),
 });
 export type CatalogEntry = z.infer<typeof catalogEntrySchema>;
 

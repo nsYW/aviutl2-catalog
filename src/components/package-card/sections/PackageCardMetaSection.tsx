@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Calendar, User } from 'lucide-react';
+import { Calendar, TriangleAlert, User } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import type { PackageCardItem } from '../types';
 import { cn } from '@/lib/cn';
@@ -16,9 +16,15 @@ function PackageCardMetaSection({ item, lastUpdated, tags }: PackageCardMetaSect
     <>
       <div className="mb-1">
         <h3
-          className="font-bold text-xl text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate pr-2 tracking-tight"
+          className={cn(
+            'font-bold text-xl text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate pr-2 tracking-tight',
+            item.deprecation
+              ? 'text-yellow-600 dark:text-yellow-400 group-hover:text-yellow-700 dark:group-hover:text-yellow-300'
+              : '',
+          )}
           title={item.name}
         >
+          {item.deprecation && <TriangleAlert className="inline text-yellow-600 dark:text-yellow-400 mr-1" />}
           {item.name}
         </h3>
 

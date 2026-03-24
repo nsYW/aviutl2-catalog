@@ -1,4 +1,5 @@
 import {
+  AlertTriangle,
   ArrowDownToLine,
   ArrowUpDown,
   CheckCircle2,
@@ -13,6 +14,8 @@ import {
 import Button from '@/components/ui/Button';
 import type { FiltersSectionProps } from '../types';
 import {
+  DEPRECATION_STATUS_LABELS,
+  DEPRECATION_STATUS_OPTIONS,
   INSTALL_STATUS_LABELS,
   INSTALL_STATUS_OPTIONS,
   SORT_OPTIONS,
@@ -40,22 +43,56 @@ function renderInstallStatusIcon(status: FiltersSectionProps['installStatus'], t
   return <ArrowDownToLine size={16} className="text-slate-600 dark:text-slate-300" />;
 }
 
+function renderDeprecationStatusIcon(
+  status: FiltersSectionProps['deprecationStatus'],
+  tone: 'accent' | 'neutral' = 'neutral',
+) {
+  if (status === 'deprecated') {
+    return (
+      <AlertTriangle
+        size={16}
+        className={tone === 'accent' ? 'text-amber-600 dark:text-amber-300' : 'text-slate-600 dark:text-slate-300'}
+      />
+    );
+  }
+
+  if (status === 'active') {
+    return (
+      <CheckCircle2
+        size={16}
+        className={
+          tone === 'accent'
+            ? 'text-slate-700 dark:text-slate-200 fill-slate-700/10 dark:fill-slate-200/10'
+            : 'text-slate-600 dark:text-slate-300 fill-slate-600/10 dark:fill-slate-300/10'
+        }
+      />
+    );
+  }
+
+  return <Filter size={16} className={tone === 'accent' ? 'text-cyan-700 dark:text-cyan-200' : 'text-slate-600 dark:text-slate-300'} />;
+}
+
 export default function FiltersSection({
   categories,
   selectedCategory,
   filteredCount,
   installStatus,
+  deprecationStatus,
   selectedTags,
   sortedSelectedTags,
   sortedAllTags,
   isFilterExpanded,
   isInstallMenuOpen,
+  isDeprecationMenuOpen,
   isSortMenuOpen,
   sortOrder,
   onCategoryChange,
   onToggleInstallMenu,
   onCloseInstallMenu,
   onSelectInstallStatus,
+  onToggleDeprecationMenu,
+  onCloseDeprecationMenu,
+  onSelectDeprecationStatus,
   onToggleFilterExpanded,
   onToggleSortMenu,
   onCloseSortMenu,
@@ -78,6 +115,20 @@ export default function FiltersSection({
   const dropdownItemIdleClass = 'text-slate-600 dark:text-slate-300';
   const installButtonTextClass =
     installStatus === 'installed' ? 'text-emerald-600 dark:text-emerald-300' : neutralControlTextClass;
+  const deprecationButtonLabel = DEPRECATION_STATUS_LABELS[deprecationStatus];
+  const deprecationButtonVariant = 'secondary';
+  const deprecationButtonClass =
+    deprecationStatus === 'deprecated'
+      ? 'border-amber-200 bg-amber-50 hover:bg-amber-100 dark:border-amber-800/60 dark:bg-amber-950/30 dark:hover:bg-amber-950/45'
+      : deprecationStatus === 'all'
+        ? 'border-cyan-200 bg-cyan-50 hover:bg-cyan-100 dark:border-cyan-800/60 dark:bg-cyan-950/30 dark:hover:bg-cyan-950/45'
+        : 'border-slate-200 bg-slate-50 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700';
+  const deprecationButtonTextClass =
+    deprecationStatus === 'deprecated'
+      ? 'text-amber-700 dark:text-amber-300'
+      : deprecationStatus === 'all'
+        ? 'text-cyan-700 dark:text-cyan-200'
+        : neutralControlTextClass;
   const selectedSortLabel = SORT_OPTION_LABELS[sortOrder];
 
   return (
@@ -164,6 +215,48 @@ export default function FiltersSection({
                       >
                         <span className="flex items-center gap-2">
                           {renderInstallStatusIcon(option.value)}
+                          <span>{option.label}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+            </div>
+
+            <div className="relative">
+              <Button
+                onClick={onToggleDeprecationMenu}
+                variant={deprecationButtonVariant}
+                size="actionSm"
+                className={cn('whitespace-nowrap cursor-pointer', deprecationButtonClass)}
+                type="button"
+              >
+                {renderDeprecationStatusIcon(deprecationStatus, deprecationStatus === 'all' ? 'neutral' : 'accent')}
+                <span className={cn('text-sm font-medium', deprecationButtonTextClass)}>{deprecationButtonLabel}</span>
+                <ChevronDown size={14} />
+              </Button>
+              {isDeprecationMenuOpen ? (
+                <>
+                  <button
+                    type="button"
+                    aria-label="廃止状態メニューを閉じる"
+                    className="fixed inset-0 z-10"
+                    onClick={onCloseDeprecationMenu}
+                  />
+                  <div className={dropdownPanelClass}>
+                    {DEPRECATION_STATUS_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => onSelectDeprecationStatus(option.value)}
+                        className={cn(
+                          dropdownItemBaseClass,
+                          deprecationStatus === option.value ? dropdownItemSelectedClass : dropdownItemIdleClass,
+                        )}
+                        type="button"
+                      >
+                        <span className="flex items-center gap-2">
+                          {renderDeprecationStatusIcon(option.value)}
                           <span>{option.label}</span>
                         </span>
                       </button>
