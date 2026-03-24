@@ -1,4 +1,5 @@
-import { memo } from 'react';
+import { memo, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { Calendar, TriangleAlert, User } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import type { PackageCardItem } from '../types';
@@ -11,7 +12,61 @@ interface PackageCardMetaSectionProps {
   tags: string[];
 }
 
+function handlePopoverTriggerClick(event: MouseEvent<HTMLButtonElement>) {
+  event.preventDefault();
+  event.stopPropagation();
+}
+
+interface PortalTooltipProps {
+  text: string;
+  rect: DOMRect | null;
+}
+
+function PortalTooltip({ text: tooltipText, rect }: PortalTooltipProps) {
+  const top = rect ? rect.bottom + 8 : 0;
+  const left = rect ? rect.left : 0;
+  const tooltipStyle = useMemo(
+    () => ({
+      top: `${top}px`,
+      left: `${left}px`,
+    }),
+    [top, left],
+  );
+  if (!rect || !tooltipText) return null;
+
+  return createPortal(
+    <div
+      role="tooltip"
+      className="fixed z-[9999] w-64 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium leading-relaxed text-slate-700 shadow-lg dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+      style={tooltipStyle}
+    >
+      <strong className="text-yellow-600 dark:text-yellow-400">非推奨：</strong>
+      {tooltipText}
+    </div>,
+    document.body,
+  );
+}
+
 function PackageCardMetaSection({ item, lastUpdated, tags }: PackageCardMetaSectionProps) {
+  const deprecationButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [hoverRect, setHoverRect] = useState<DOMRect | null>(null);
+
+  useEffect(() => {
+    if (!hoverRect) return;
+
+    const updateRect = () => {
+      setHoverRect(deprecationButtonRef.current?.getBoundingClientRect() ?? null);
+    };
+
+    updateRect();
+    window.addEventListener('scroll', updateRect, true);
+    window.addEventListener('resize', updateRect);
+    return () => {
+      window.removeEventListener('scroll', updateRect, true);
+      window.removeEventListener('resize', updateRect);
+    };
+  }, [hoverRect]);
+
   return (
     <>
       <div className="mb-1">
@@ -24,7 +79,27 @@ function PackageCardMetaSection({ item, lastUpdated, tags }: PackageCardMetaSect
           )}
           title={item.name}
         >
-          {item.deprecation && <TriangleAlert className="inline text-yellow-600 dark:text-yellow-400 mr-1" />}
+          {item.deprecation ? (
+            <span className="relative mr-1 inline-flex pointer-events-auto align-middle">
+              <button
+                ref={deprecationButtonRef}
+                type="button"
+                aria-label="非推奨の詳細を表示"
+                className="inline-flex cursor-help rounded-sm text-yellow-600 transition-colors hover:text-yellow-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50 dark:text-yellow-400 dark:hover:text-yellow-300"
+                onClick={(event) => {
+                  handlePopoverTriggerClick(event);
+                  setHoverRect(deprecationButtonRef.current?.getBoundingClientRect() ?? null);
+                }}
+                onMouseEnter={() => setHoverRect(deprecationButtonRef.current?.getBoundingClientRect() ?? null)}
+                onMouseLeave={() => setHoverRect(null)}
+                onFocus={() => setHoverRect(deprecationButtonRef.current?.getBoundingClientRect() ?? null)}
+                onBlur={() => setHoverRect(null)}
+              >
+                <TriangleAlert />
+              </button>
+              <PortalTooltip text={item.deprecation.message} rect={hoverRect} />
+            </span>
+          ) : null}
           {item.name}
         </h3>
 

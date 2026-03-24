@@ -69,7 +69,12 @@ function renderDeprecationStatusIcon(
     );
   }
 
-  return <Filter size={16} className={tone === 'accent' ? 'text-cyan-700 dark:text-cyan-200' : 'text-slate-600 dark:text-slate-300'} />;
+  return (
+    <Filter
+      size={16}
+      className={tone === 'accent' ? 'text-cyan-700 dark:text-cyan-200' : 'text-slate-600 dark:text-slate-300'}
+    />
+  );
 }
 
 export default function FiltersSection({
@@ -122,7 +127,7 @@ export default function FiltersSection({
       ? 'border-amber-200 bg-amber-50 hover:bg-amber-100 dark:border-amber-800/60 dark:bg-amber-950/30 dark:hover:bg-amber-950/45'
       : deprecationStatus === 'all'
         ? 'border-cyan-200 bg-cyan-50 hover:bg-cyan-100 dark:border-cyan-800/60 dark:bg-cyan-950/30 dark:hover:bg-cyan-950/45'
-        : 'border-slate-200 bg-slate-50 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700';
+        : neutralControlTextClass;
   const deprecationButtonTextClass =
     deprecationStatus === 'deprecated'
       ? 'text-amber-700 dark:text-amber-300'
