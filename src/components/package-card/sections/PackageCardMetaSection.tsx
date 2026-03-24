@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { memo, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, TriangleAlert, User } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
@@ -56,22 +56,6 @@ function PortalTooltip({ text: tooltipText, rect }: PortalTooltipProps) {
 function PackageCardMetaSection({ item, lastUpdated, tags }: PackageCardMetaSectionProps) {
   const deprecationButtonRef = useRef<HTMLButtonElement | null>(null);
   const [hoverRect, setHoverRect] = useState<DOMRect | null>(null);
-
-  useEffect(() => {
-    if (!hoverRect) return;
-
-    const updateRect = () => {
-      setHoverRect(deprecationButtonRef.current?.getBoundingClientRect() ?? null);
-    };
-
-    updateRect();
-    window.addEventListener('scroll', updateRect, true);
-    window.addEventListener('resize', updateRect);
-    return () => {
-      window.removeEventListener('scroll', updateRect, true);
-      window.removeEventListener('resize', updateRect);
-    };
-  }, [hoverRect]);
 
   return (
     <>
