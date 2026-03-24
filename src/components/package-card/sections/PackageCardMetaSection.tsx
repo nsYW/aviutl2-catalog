@@ -32,12 +32,12 @@ function PortalTooltip({ text: tooltipText, rect }: PortalTooltipProps) {
     }),
     [top, left],
   );
-  if (!rect || !tooltipText) return null;
+  if (!rect) return null;
 
   return createPortal(
     <div
       role="tooltip"
-      className="fixed z-[9999] w-64 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium leading-relaxed text-slate-700 shadow-lg dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+      className="fixed z-[9999] rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium leading-relaxed text-slate-700 shadow-lg dark:border-slate-600 dark:bg-slate-800 dark:text-white"
       style={tooltipStyle}
     >
       {tooltipText ? (
