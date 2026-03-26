@@ -25,7 +25,7 @@ export const INSTALL_STATUS_OPTIONS: readonly { value: HomeInstallStatus; label:
 export const DEPRECATION_STATUS_OPTIONS: readonly { value: HomeDeprecationStatus; label: string }[] = [
   { value: 'active', label: '非推奨を除外' },
   { value: 'deprecated', label: '非推奨のみ' },
-  { value: 'all', label: 'すべて表示' },
+  { value: 'all', label: 'すべて' },
 ];
 export const SORT_OPTION_LABELS = toLabelRecord<HomeSortOrder>(SORT_OPTIONS);
 export const INSTALL_STATUS_LABELS = toLabelRecord<HomeInstallStatus>(INSTALL_STATUS_OPTIONS);

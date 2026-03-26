@@ -51,7 +51,7 @@ function renderDeprecationStatusIcon(
     return (
       <AlertTriangle
         size={16}
-        className={tone === 'accent' ? 'text-amber-600 dark:text-amber-300' : 'text-slate-600 dark:text-slate-300'}
+        className={tone === 'accent' ? 'text-yellow-600 dark:text-yellow-300' : 'text-slate-600 dark:text-slate-300'}
       />
     );
   }
@@ -70,9 +70,13 @@ function renderDeprecationStatusIcon(
   }
 
   return (
-    <Filter
+    <AlertTriangle
       size={16}
-      className={tone === 'accent' ? 'text-cyan-700 dark:text-cyan-200' : 'text-slate-600 dark:text-slate-300'}
+      className={
+        tone === 'accent'
+          ? 'text-slate-700 dark:text-slate-200 fill-slate-700/10 dark:fill-slate-200/10'
+          : 'text-slate-600 dark:text-slate-300 fill-slate-600/10 dark:fill-slate-300/10'
+      }
     />
   );
 }
@@ -124,16 +128,10 @@ export default function FiltersSection({
   const deprecationButtonVariant = 'secondary';
   const deprecationButtonClass =
     deprecationStatus === 'deprecated'
-      ? 'border-amber-200 bg-amber-50 hover:bg-amber-100 dark:border-amber-800/60 dark:bg-amber-950/30 dark:hover:bg-amber-950/45'
-      : deprecationStatus === 'all'
-        ? 'border-cyan-200 bg-cyan-50 hover:bg-cyan-100 dark:border-cyan-800/60 dark:bg-cyan-950/30 dark:hover:bg-cyan-950/45'
-        : neutralControlTextClass;
+      ? 'border-yellow-200 bg-yellow-50 hover:bg-yellow-100 dark:border-yellow-800/60 dark:bg-yellow-950/30 dark:hover:bg-yellow-950/45'
+      : neutralControlTextClass;
   const deprecationButtonTextClass =
-    deprecationStatus === 'deprecated'
-      ? 'text-amber-700 dark:text-amber-300'
-      : deprecationStatus === 'all'
-        ? 'text-cyan-700 dark:text-cyan-200'
-        : neutralControlTextClass;
+    deprecationStatus === 'deprecated' ? 'text-yellow-600 dark:text-yellow-300' : neutralControlTextClass;
   const selectedSortLabel = SORT_OPTION_LABELS[sortOrder];
 
   return (
@@ -237,7 +235,7 @@ export default function FiltersSection({
                 className={cn('whitespace-nowrap cursor-pointer', deprecationButtonClass)}
                 type="button"
               >
-                {renderDeprecationStatusIcon(deprecationStatus, deprecationStatus === 'all' ? 'neutral' : 'accent')}
+                {renderDeprecationStatusIcon(deprecationStatus, 'accent')}
                 <span className={cn('text-sm font-medium', deprecationButtonTextClass)}>{deprecationButtonLabel}</span>
                 <ChevronDown size={14} />
               </Button>
