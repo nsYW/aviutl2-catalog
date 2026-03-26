@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import ImageCarousel from '../components/ImageCarousel';
 import type { PackageContentSectionProps } from '../types';
 import { surface, text } from '@/components/ui/_styles';
+import { TriangleAlert } from 'lucide-react';
 
 const sectionTitleClass = 'text-lg font-bold mb-2';
 
@@ -50,6 +51,26 @@ export default function PackageContentSection({
       <section className={surface.cardSection}>
         <h2 className={sectionTitleClass}>概要</h2>
         <p className="select-text text-base leading-7 text-slate-600 dark:text-slate-300">{item.summary || '?'}</p>
+        {item.deprecation ? (
+          <>
+            <h3 className="text-sm font-bold text-yellow-600 dark:text-yellow-300 mt-4 mb-2 justify-center">
+              <TriangleAlert className="inline text-yellow-600 dark:text-yellow-300 mr-1" />
+              非推奨
+            </h3>
+            {item.deprecation.message ? (
+              <>
+                <p className="text-sm text-yellow-600 dark:text-yellow-300">
+                  このパッケージは以下の理由で非推奨となっています。
+                </p>
+                <blockquote className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-500 dark:border-yellow-500 text-sm text-yellow-600 dark:text-yellow-300 rounded">
+                  {item.deprecation.message}
+                </blockquote>
+              </>
+            ) : (
+              <p className="text-sm text-yellow-600 dark:text-yellow-300">このパッケージは非推奨となっています。</p>
+            )}
+          </>
+        ) : null}
       </section>
 
       {item.description ? (

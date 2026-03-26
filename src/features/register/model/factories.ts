@@ -77,6 +77,8 @@ export function createEmptyPackageForm(): RegisterPackageForm {
     name: '',
     author: '',
     originalAuthor: '',
+    deprecationEnabled: false,
+    deprecationMessage: '',
     type: '',
     summary: '',
     niconiCommonsId: '',

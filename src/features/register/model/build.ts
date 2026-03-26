@@ -113,6 +113,8 @@ export function buildPackageEntry(
   const useExternalDescription = descriptionMode === 'external' && isHttpsUrl(externalDescriptionUrl);
   const niconiCommonsId = String(form.niconiCommonsId || '').trim();
   const originalAuthor = String(form.originalAuthor || '').trim();
+  const deprecationEnabled = form.deprecationEnabled;
+  const deprecationMessage = deprecationEnabled ? String(form.deprecationMessage || '').trim() : '';
   const entry: CatalogEntry = {
     id,
     name: form.name.trim(),
@@ -121,6 +123,7 @@ export function buildPackageEntry(
     description: useExternalDescription ? externalDescriptionUrl : `./md/${id}.md`,
     author: form.author.trim(),
     ...(originalAuthor ? { originalAuthor } : {}),
+    ...(deprecationEnabled ? { deprecation: { message: deprecationMessage } } : {}),
     repoURL: form.repoURL.trim(),
     'latest-version': computeLatestVersion(form),
     popularity: toFiniteNumber(inherited.popularity, 0),
