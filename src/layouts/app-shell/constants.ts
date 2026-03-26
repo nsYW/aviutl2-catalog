@@ -1,4 +1,11 @@
-import type { HomeInstallStatus, HomeSortOption, HomeSortOrder, SortDir, SortKey } from './types';
+import type {
+  HomeDeprecationStatus,
+  HomeInstallStatus,
+  HomeSortOption,
+  HomeSortOrder,
+  SortDir,
+  SortKey,
+} from './types';
 
 function toLabelRecord<T extends string>(options: readonly { value: T; label: string }[]): Record<T, string> {
   return Object.fromEntries(options.map((option) => [option.value, option.label])) as Record<T, string>;
@@ -15,12 +22,23 @@ export const INSTALL_STATUS_OPTIONS: readonly { value: HomeInstallStatus; label:
   { value: 'installed', label: 'インストール済み' },
   { value: 'not_installed', label: '未インストール' },
 ];
+export const DEPRECATION_STATUS_OPTIONS: readonly { value: HomeDeprecationStatus; label: string }[] = [
+  { value: 'active', label: '非推奨を除外' },
+  { value: 'deprecated', label: '非推奨のみ' },
+  { value: 'all', label: 'すべて' },
+];
 export const SORT_OPTION_LABELS = toLabelRecord<HomeSortOrder>(SORT_OPTIONS);
 export const INSTALL_STATUS_LABELS = toLabelRecord<HomeInstallStatus>(INSTALL_STATUS_OPTIONS);
+export const DEPRECATION_STATUS_LABELS = toLabelRecord<HomeDeprecationStatus>(DEPRECATION_STATUS_OPTIONS);
 const INSTALL_STATUS_QUERY_VALUES: Record<HomeInstallStatus, string> = {
   all: '',
   installed: '1',
   not_installed: '0',
+};
+const DEPRECATION_STATUS_QUERY_VALUES: Record<HomeDeprecationStatus, string> = {
+  all: '0',
+  deprecated: '1',
+  active: '',
 };
 
 export function sortOrderFromQuery(sortKey: string): HomeSortOrder {
@@ -39,6 +57,16 @@ export function installStatusFromQueryValue(value: string | null): HomeInstallSt
 
 export function installStatusToQueryValue(status: HomeInstallStatus): string {
   return INSTALL_STATUS_QUERY_VALUES[status];
+}
+
+export function deprecationStatusFromQueryValue(value: string | null): HomeDeprecationStatus {
+  if (value === '1') return 'deprecated';
+  if (value === '0') return 'all';
+  return 'active';
+}
+
+export function deprecationStatusToQueryValue(status: HomeDeprecationStatus): string {
+  return DEPRECATION_STATUS_QUERY_VALUES[status];
 }
 
 export function sortParamsFromOrder(order: HomeSortOrder): { sortKey: SortKey; dir: SortDir } {

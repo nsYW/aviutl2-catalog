@@ -122,6 +122,36 @@ export default function RegisterMetaSection({
         </div>
 
         <TagEditor initialTags={initialTags} suggestions={tagCandidates} onChange={onTagsChange} />
+
+        <div className="space-y-3 border-t border-slate-200 pt-6 dark:border-slate-800">
+          <label className="flex items-center gap-3">
+            <input
+              id="package-deprecation-enabled"
+              name="deprecationEnabled"
+              type="checkbox"
+              checked={packageForm.deprecationEnabled}
+              onChange={(e) => onUpdatePackageField('deprecationEnabled', e.target.checked)}
+              className="h-4 w-4"
+            />
+            <span className={text.labelSm}>非推奨として表示する</span>
+          </label>
+          <div className="space-y-2">
+            <label className={text.labelSm} htmlFor="package-deprecation-message">
+              非推奨メッセージ
+            </label>
+            <p className={text.mutedXs}>
+              何らかの理由で非推奨としたい場合に、ここに理由や代替パッケージなどの情報を入力してください。
+            </p>
+            <input
+              id="package-deprecation-message"
+              name="deprecationMessage"
+              value={packageForm.deprecationMessage}
+              onChange={(e) => onUpdatePackageField('deprecationMessage', e.target.value)}
+              placeholder="代替パッケージや移行先がある場合に入力"
+              disabled={!packageForm.deprecationEnabled}
+            />
+          </div>
+        </div>
       </div>
     </section>
   );

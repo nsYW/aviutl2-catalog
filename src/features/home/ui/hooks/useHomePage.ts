@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useHomeContext } from '@/layouts/app-shell/AppShell';
-import { installStatusToQueryValue } from '@/layouts/app-shell/constants';
-import type { HomeInstallStatus, HomeSortOrder } from '../types';
+import { deprecationStatusToQueryValue, installStatusToQueryValue } from '@/layouts/app-shell/constants';
+import type { HomeDeprecationStatus, HomeInstallStatus, HomeSortOrder } from '../types';
 
 const HOME_CATEGORY_ALL = 'すべて';
 
@@ -25,11 +25,13 @@ export default function useHomePage() {
     pausedPackageUpdateIdSet,
     toggleTag,
     installStatus,
+    deprecationStatus,
     sortOrder,
     setSortOrder,
   } = useHomeContext();
 
   const [isInstallMenuOpen, setIsInstallMenuOpen] = useState(false);
+  const [isDeprecationMenuOpen, setIsDeprecationMenuOpen] = useState(false);
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
@@ -68,6 +70,22 @@ export default function useHomePage() {
     setIsFilterExpanded((prev) => !prev);
   }, []);
 
+  const toggleDeprecationMenu = useCallback(() => {
+    setIsDeprecationMenuOpen((prev) => !prev);
+  }, []);
+
+  const closeDeprecationMenu = useCallback(() => {
+    setIsDeprecationMenuOpen(false);
+  }, []);
+
+  const selectDeprecationStatus = useCallback(
+    (status: HomeDeprecationStatus) => {
+      updateUrl({ deprecated: deprecationStatusToQueryValue(status) });
+      setIsDeprecationMenuOpen(false);
+    },
+    [updateUrl],
+  );
+
   const toggleSortMenu = useCallback(() => {
     setIsSortMenuOpen((prev) => !prev);
   }, []);
@@ -96,11 +114,13 @@ export default function useHomePage() {
     pausedPackageUpdateIdSet,
     saveHomeScrollPosition,
     installStatus,
+    deprecationStatus,
     selectedTags,
     sortedSelectedTags,
     sortedAllTags,
     listSearch,
     isInstallMenuOpen,
+    isDeprecationMenuOpen,
     isSortMenuOpen,
     isFilterExpanded,
     sortOrder,
@@ -108,6 +128,9 @@ export default function useHomePage() {
     toggleInstallMenu,
     closeInstallMenu,
     selectInstallStatus,
+    toggleDeprecationMenu,
+    closeDeprecationMenu,
+    selectDeprecationStatus,
     toggleFilterExpanded,
     toggleSortMenu,
     closeSortMenu,

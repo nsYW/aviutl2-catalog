@@ -83,6 +83,8 @@ export interface RegisterPackageForm {
   name: string;
   author: string;
   originalAuthor: string;
+  deprecationEnabled: boolean;
+  deprecationMessage: string;
   type: string;
   summary: string;
   niconiCommonsId: string;

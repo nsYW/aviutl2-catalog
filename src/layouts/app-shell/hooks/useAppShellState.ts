@@ -5,7 +5,12 @@ import { useCatalog } from '@/utils/catalogStore';
 import { ipc } from '@/utils/invokeIpc';
 import usePausedPackageUpdates from '@/utils/usePausedPackageUpdates';
 import { filterByTagsAndType, getSorter, matchQuery, ORDERED_PACKAGE_TYPES } from '@/utils/query';
-import { installStatusFromQueryValue, sortOrderFromQuery, sortParamsFromOrder } from '../constants';
+import {
+  deprecationStatusFromQueryValue,
+  installStatusFromQueryValue,
+  sortOrderFromQuery,
+  sortParamsFromOrder,
+} from '../constants';
 import {
   createSidebarRouteActionHandlers,
   resolveAppShellActivePage,
@@ -63,10 +68,12 @@ export default function useAppShellState() {
     const type = params.get('type') || '';
     const tags = (params.get('tags') || '').split(',').filter(Boolean);
     const installStatus = installStatusFromQueryValue(params.get('installed'));
-    return { q, sortKey, dir, type, tags, installStatus };
+    const deprecationStatus = deprecationStatusFromQueryValue(params.get('deprecated'));
+    return { q, sortKey, dir, type, tags, installStatus, deprecationStatus };
   }, [location.search]);
 
   const installStatus = parseQuery.installStatus;
+  const deprecationStatus = parseQuery.deprecationStatus;
   const selectedCategory = parseQuery.type || 'すべて';
   const selectedTags = parseQuery.tags;
   const sortOrder = sortOrderFromQuery(parseQuery.sortKey);
@@ -186,11 +193,30 @@ export default function useAppShellState() {
         : installStatus === 'not_installed'
           ? filteredByTags.filter((item: { installed?: boolean }) => !item.installed)
           : filteredByTags;
+    const filteredByDeprecation =
+      deprecationStatus === 'deprecated'
+        ? filteredByInstalled.filter((item: { deprecation?: unknown }) => Boolean(item.deprecation))
+        : deprecationStatus === 'active'
+          ? filteredByInstalled.filter((item: { deprecation?: unknown }) => !item.deprecation)
+          : filteredByInstalled;
     const sorter = getSorter(parseQuery.sortKey, parseQuery.dir);
-    return filteredByInstalled.toSorted(sorter);
-  }, [installStatus, items, parseQuery.dir, parseQuery.q, parseQuery.sortKey, selectedCategory, selectedTags]);
+    return filteredByDeprecation.toSorted(sorter);
+  }, [
+    deprecationStatus,
+    installStatus,
+    items,
+    parseQuery.dir,
+    parseQuery.q,
+    parseQuery.sortKey,
+    selectedCategory,
+    selectedTags,
+  ]);
 
-  const isFilterActive = installStatus !== 'all' || selectedCategory !== 'すべて' || selectedTags.length > 0;
+  const isFilterActive =
+    installStatus !== 'all' ||
+    deprecationStatus !== 'active' ||
+    selectedCategory !== 'すべて' ||
+    selectedTags.length > 0;
   const updateAvailableCount = useMemo(
     () =>
       pausedPackageUpdatesLoaded
@@ -212,7 +238,7 @@ export default function useAppShellState() {
   const clearFilters = useCallback(() => {
     pendingDraftSearchSyncRef.current = '';
     setDraftSearchQuery('');
-    updateUrl({ q: '', type: '', tags: [], installed: '' });
+    updateUrl({ q: '', type: '', tags: [], installed: '', deprecated: '' });
   }, [updateUrl]);
 
   const setSortOrder = useCallback(
@@ -292,6 +318,7 @@ export default function useAppShellState() {
       allTags: allTags || [],
       selectedTags,
       installStatus,
+      deprecationStatus,
       toggleTag,
       updateUrl,
     }),
@@ -299,6 +326,7 @@ export default function useAppShellState() {
       allTags,
       categories,
       clearFilters,
+      deprecationStatus,
       installStatus,
       filteredPackages,
       isFilterActive,
