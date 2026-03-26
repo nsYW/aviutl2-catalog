@@ -35,10 +35,9 @@ export default function RegisterPreviewSection({
       type: packageForm.type || '種類',
       tags: currentTags,
       summary: packageForm.summary || '概要がここに表示されます',
-      deprecation:
-        packageForm.deprecationEnabled && packageForm.deprecationMessage
-          ? { message: packageForm.deprecationMessage }
-          : undefined,
+      deprecation: packageForm.deprecationEnabled
+        ? { message: String(packageForm.deprecationMessage || '').trim() }
+        : undefined,
       images: [
         {
           thumbnail: thumbnailPreview,
