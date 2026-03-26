@@ -265,15 +265,23 @@ export default function useRegisterTestState({
     uninstallerTestTokenRef.current = token;
     uninstallerTestBusyRef.current = true;
     setUninstallerTestRunning(true);
+    let hasNonSkipOperation = false;
     try {
       await runUninstallerForItem(
         testItem,
         null,
         (operation: Partial<RegisterTestOperationPayload> | null | undefined) => {
           if (uninstallerTestTokenRef.current !== token) return;
-          pushUninstallerOperation(operation);
+          const normalized = normalizeOperation(operation);
+          if (normalized.status !== 'skip') {
+            hasNonSkipOperation = true;
+          }
+          pushUninstallerOperation(normalized);
         },
       );
+      if (!hasNonSkipOperation) {
+        throw new Error('削除対象が見つからないため、テストを完了できませんでした。');
+      }
       if (uninstallerTestTokenRef.current === token) {
         setUninstallerTestDone(true);
         onTestPassed?.('uninstaller');
