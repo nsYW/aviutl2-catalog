@@ -39,6 +39,43 @@ export interface FiltersSectionProps {
   onClearTags: () => void;
 }
 
+export type HomeSearchBarProps = Pick<FiltersSectionProps, 'searchQuery' | 'onSearchQueryChange'>;
+
+export type HomeQuickFiltersRowProps = Pick<
+  FiltersSectionProps,
+  | 'installStatus'
+  | 'deprecationStatus'
+  | 'selectedTags'
+  | 'isFilterExpanded'
+  | 'isInstallMenuOpen'
+  | 'isDeprecationMenuOpen'
+  | 'onToggleInstallMenu'
+  | 'onCloseInstallMenu'
+  | 'onSelectInstallStatus'
+  | 'onToggleDeprecationMenu'
+  | 'onCloseDeprecationMenu'
+  | 'onSelectDeprecationStatus'
+  | 'onToggleFilterExpanded'
+>;
+
+export type HomeCategorySortRowProps = Pick<
+  FiltersSectionProps,
+  | 'categories'
+  | 'selectedCategory'
+  | 'filteredCount'
+  | 'isSortMenuOpen'
+  | 'sortOrder'
+  | 'onCategoryChange'
+  | 'onToggleSortMenu'
+  | 'onCloseSortMenu'
+  | 'onSelectSortOrder'
+>;
+
+export type HomeTagFiltersProps = Pick<
+  FiltersSectionProps,
+  'selectedTags' | 'sortedSelectedTags' | 'sortedAllTags' | 'isFilterExpanded' | 'onToggleTag' | 'onClearTags'
+>;
+
 export interface PackageGridSectionProps {
   filteredPackages: PackageItem[];
   pausedPackageUpdatesLoaded: boolean;
