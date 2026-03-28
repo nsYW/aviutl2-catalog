@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import type { PackageItem } from '@/utils/catalogStore';
 
 export type HomeSortOrder = 'popularity_desc' | 'trend_desc' | 'added_desc' | 'updated_desc';
@@ -48,7 +49,10 @@ export const HOME_LIST_RESTORE_STATE: HomeRestoreState = { restoreSearchFromQuer
 
 export interface HomeContextValue {
   filteredPackages: PackageItem[];
+  scrollContainerRef: RefObject<HTMLDivElement | null>;
   saveHomeScrollPosition: () => void;
+  searchQuery: string;
+  setSearchQuery: (next: string) => void;
   selectedCategory: string;
   clearFilters: () => void;
   isFilterActive: boolean;

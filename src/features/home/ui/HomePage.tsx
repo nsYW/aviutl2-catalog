@@ -6,8 +6,9 @@ export default function HomePage() {
   const filteredCount = state.filteredPackages.length;
 
   return (
-    <div className="flex flex-col min-h-full select-none">
+    <div className="flex h-full min-h-0 flex-col select-none">
       <FiltersSection
+        searchQuery={state.searchQuery}
         categories={state.categories}
         selectedCategory={state.selectedCategory}
         filteredCount={filteredCount}
@@ -21,6 +22,7 @@ export default function HomePage() {
         isDeprecationMenuOpen={state.isDeprecationMenuOpen}
         isSortMenuOpen={state.isSortMenuOpen}
         sortOrder={state.sortOrder}
+        onSearchQueryChange={state.setSearchQuery}
         onCategoryChange={state.setCategory}
         onToggleInstallMenu={state.toggleInstallMenu}
         onCloseInstallMenu={state.closeInstallMenu}
@@ -36,17 +38,22 @@ export default function HomePage() {
         onClearTags={state.clearTags}
       />
 
-      {filteredCount > 0 ? (
-        <PackageGridSection
-          filteredPackages={state.filteredPackages}
-          pausedPackageUpdatesLoaded={state.pausedPackageUpdatesLoaded}
-          pausedPackageUpdateIds={state.pausedPackageUpdateIdSet}
-          listSearch={state.listSearch}
-          onBeforeOpenDetail={state.saveHomeScrollPosition}
-        />
-      ) : (
-        <EmptyStateSection onClearConditions={state.clearConditions} />
-      )}
+      <div
+        ref={state.scrollContainerRef}
+        className="min-h-0 flex-1 overflow-y-auto px-6 pt-6 pb-6 scroll-smooth [scrollbar-gutter:stable]"
+      >
+        {filteredCount > 0 ? (
+          <PackageGridSection
+            filteredPackages={state.filteredPackages}
+            pausedPackageUpdatesLoaded={state.pausedPackageUpdatesLoaded}
+            pausedPackageUpdateIds={state.pausedPackageUpdateIdSet}
+            listSearch={state.listSearch}
+            onBeforeOpenDetail={state.saveHomeScrollPosition}
+          />
+        ) : (
+          <EmptyStateSection onClearConditions={state.clearConditions} />
+        )}
+      </div>
     </div>
   );
 }

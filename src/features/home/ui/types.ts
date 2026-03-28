@@ -9,6 +9,7 @@ import type {
 export type { HomeContextValue, HomeDeprecationStatus, HomeInstallStatus, HomeSortOrder };
 
 export interface FiltersSectionProps {
+  searchQuery: string;
   categories: string[];
   selectedCategory: string;
   filteredCount: number;
@@ -22,6 +23,7 @@ export interface FiltersSectionProps {
   isDeprecationMenuOpen: boolean;
   isSortMenuOpen: boolean;
   sortOrder: HomeSortOrder;
+  onSearchQueryChange: (next: string) => void;
   onCategoryChange: (category: string) => void;
   onToggleInstallMenu: () => void;
   onCloseInstallMenu: () => void;

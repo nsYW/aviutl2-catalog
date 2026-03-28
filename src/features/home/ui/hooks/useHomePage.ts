@@ -14,8 +14,11 @@ export default function useHomePage() {
   const location = useLocation();
   const {
     filteredPackages,
+    scrollContainerRef,
     clearFilters,
     saveHomeScrollPosition,
+    searchQuery,
+    setSearchQuery,
     selectedCategory,
     updateUrl,
     categories,
@@ -108,7 +111,10 @@ export default function useHomePage() {
 
   return {
     filteredPackages,
+    scrollContainerRef,
     categories,
+    searchQuery,
+    setSearchQuery,
     selectedCategory,
     pausedPackageUpdatesLoaded,
     pausedPackageUpdateIdSet,

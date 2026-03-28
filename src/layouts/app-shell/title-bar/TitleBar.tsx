@@ -27,7 +27,7 @@ export default function TitleBar() {
 
   return (
     <div
-      className="flex h-8 w-full flex-none items-stretch justify-between bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200 pl-2 pr-0 select-none"
+      className="flex h-8 w-full flex-none items-stretch justify-between border-b border-slate-200 bg-slate-100 pl-2 pr-0 text-slate-700 select-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
       data-tauri-drag-region
       style={dragRegionStyle}
       onPointerDown={startDragIfAllowed}
