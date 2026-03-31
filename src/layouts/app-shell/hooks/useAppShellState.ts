@@ -35,6 +35,16 @@ function toSortKey(rawSortKey: string | null): SortKey {
   return 'popularity';
 }
 
+function readStoredHomeSortOrder(search: string): HomeSortOrder | null {
+  if (new URLSearchParams(search).has('sort')) return null;
+
+  const value = window.localStorage.getItem('home-sort-order');
+  if (value === 'trend_desc' || value === 'added_desc' || value === 'updated_desc') {
+    return value;
+  }
+  return null;
+}
+
 function readHomeRestoreState(value: unknown): HomeRestoreState | null {
   if (!value || typeof value !== 'object') return null;
   const restoreSearchFromQuery = (value as { restoreSearchFromQuery?: unknown }).restoreSearchFromQuery === true;
@@ -59,12 +69,18 @@ export default function useAppShellState() {
   const previousIsHomeRef = useRef(false);
   const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { isLoaded: pausedPackageUpdatesLoaded, pausedPackageIdSet } = usePausedPackageUpdates();
+  const isHome = location.pathname === '/';
+  const storedHomeSortOrder = useMemo(
+    () => (isHome ? readStoredHomeSortOrder(location.search) : null),
+    [isHome, location.search],
+  );
 
   const parseQuery = useMemo<ParsedHomeQuery>(() => {
     const params = new URLSearchParams(location.search);
+    const initialSortKey = storedHomeSortOrder ? sortParamsFromOrder(storedHomeSortOrder).sortKey : null;
     const q = params.get('q') || '';
-    const sortKey = toSortKey(params.get('sort'));
-    const dir = sortKey === 'newest' ? 'desc' : params.get('dir') === 'asc' ? 'asc' : 'desc';
+    const sortKey = initialSortKey ?? toSortKey(params.get('sort'));
+    const dir = initialSortKey ? 'desc' : sortKey === 'newest' ? 'desc' : params.get('dir') === 'asc' ? 'asc' : 'desc';
     const type = params.get('type') || '';
     const tags = (params.get('tags') || '').split(',').filter(Boolean);
     const installStatus = installStatusFromQueryValue(params.get('installed'));
@@ -77,7 +93,6 @@ export default function useAppShellState() {
   const selectedCategory = parseQuery.type || 'すべて';
   const selectedTags = parseQuery.tags;
   const sortOrder = sortOrderFromQuery(parseQuery.sortKey);
-  const isHome = location.pathname === '/';
   const homeRestoreState = useMemo(
     () => (isHome ? readHomeRestoreState(location.state) : null),
     [isHome, location.state],
@@ -181,6 +196,12 @@ export default function useAppShellState() {
     return () => window.cancelAnimationFrame(frameId);
   }, [homeRestoreState?.restoreScroll, isHome, location.pathname]);
 
+  useLayoutEffect(() => {
+    if (!storedHomeSortOrder) return;
+    const { sortKey, dir } = sortParamsFromOrder(storedHomeSortOrder);
+    updateUrl({ sort: sortKey, dir });
+  }, [storedHomeSortOrder, updateUrl]);
+
   const categories = useMemo(() => ['すべて', ...ORDERED_PACKAGE_TYPES], []);
 
   const filteredPackages = useMemo(() => {
@@ -243,6 +264,8 @@ export default function useAppShellState() {
 
   const setSortOrder = useCallback(
     (order: HomeSortOrder) => {
+      if (order === 'popularity_desc') window.localStorage.removeItem('home-sort-order');
+      else window.localStorage.setItem('home-sort-order', order);
       const { sortKey, dir } = sortParamsFromOrder(order);
       updateUrl({ sort: sortKey, dir });
     },
