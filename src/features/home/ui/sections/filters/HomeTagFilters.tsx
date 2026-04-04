@@ -1,4 +1,5 @@
 import { Tags, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { layout } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';
 import type { HomeTagFiltersProps } from '../../types';
@@ -11,11 +12,13 @@ export default function HomeTagFilters({
   onToggleTag,
   onClearTags,
 }: HomeTagFiltersProps) {
+  const { t } = useTranslation('home');
+
   return (
     <>
       {!isFilterExpanded && selectedTags.length > 0 ? (
         <div className={cn(layout.wrapItemsGap2, 'mt-4 animate-in slide-in-from-top-1')}>
-          <span className="text-sm font-medium text-slate-400">選択中:</span>
+          <span className="text-sm font-medium text-slate-400">{t('filters.selected')}</span>
           {sortedSelectedTags.map((tag) => (
             <button
               key={tag}
@@ -35,7 +38,7 @@ export default function HomeTagFilters({
             className="ml-2 cursor-pointer text-sm text-slate-400 underline decoration-slate-300 underline-offset-2 hover:text-slate-600 dark:hover:text-slate-300"
             type="button"
           >
-            すべてクリア
+            {t('filters.clearAll')}
           </button>
         </div>
       ) : null}
@@ -45,7 +48,7 @@ export default function HomeTagFilters({
           <div className={cn(layout.rowBetween, 'mb-3')}>
             <div className={cn(layout.inlineGap1_5, 'text-slate-500 dark:text-slate-400')}>
               <Tags size={14} />
-              <span className="text-sm font-bold uppercase tracking-wider">すべてのタグ</span>
+              <span className="text-sm font-bold uppercase tracking-wider">{t('filters.allTags')}</span>
             </div>
             {selectedTags.length > 0 ? (
               <button
@@ -53,7 +56,7 @@ export default function HomeTagFilters({
                 className="cursor-pointer text-sm font-medium text-red-500 hover:text-red-600"
                 type="button"
               >
-                選択をクリア
+                {t('filters.clearSelection')}
               </button>
             ) : null}
           </div>

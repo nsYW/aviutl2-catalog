@@ -1,10 +1,17 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as tauriShell from '@tauri-apps/plugin-shell';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCatalog } from '@/utils/catalogStore';
 import { ipc } from '@/utils/invokeIpc';
 import usePausedPackageUpdates from '@/utils/usePausedPackageUpdates';
-import { filterByTagsAndType, getSorter, matchQuery, ORDERED_PACKAGE_TYPES } from '@/utils/query';
+import {
+  filterByTagsAndType,
+  getSorter,
+  matchQuery,
+  ORDERED_PACKAGE_TYPE_KEYS,
+  packageTypeKeyFromQueryValue,
+} from '@/utils/query';
 import {
   deprecationStatusFromQueryValue,
   installStatusFromQueryValue,
@@ -57,6 +64,7 @@ function readHomeRestoreState(value: unknown): HomeRestoreState | null {
 }
 
 export default function useAppShellState() {
+  const { t } = useTranslation('home');
   const location = useLocation();
   const navigate = useNavigate();
   const { items, allTags } = useCatalog();
@@ -81,7 +89,7 @@ export default function useAppShellState() {
     const q = params.get('q') || '';
     const sortKey = initialSortKey ?? toSortKey(params.get('sort'));
     const dir = initialSortKey ? 'desc' : sortKey === 'newest' ? 'desc' : params.get('dir') === 'asc' ? 'asc' : 'desc';
-    const type = params.get('type') || '';
+    const type = packageTypeKeyFromQueryValue(params.get('type'));
     const tags = (params.get('tags') || '').split(',').filter(Boolean);
     const installStatus = installStatusFromQueryValue(params.get('installed'));
     const deprecationStatus = deprecationStatusFromQueryValue(params.get('deprecated'));
@@ -90,7 +98,7 @@ export default function useAppShellState() {
 
   const installStatus = parseQuery.installStatus;
   const deprecationStatus = parseQuery.deprecationStatus;
-  const selectedCategory = parseQuery.type || 'すべて';
+  const selectedCategory = parseQuery.type;
   const selectedTags = parseQuery.tags;
   const sortOrder = sortOrderFromQuery(parseQuery.sortKey);
   const homeRestoreState = useMemo(
@@ -202,11 +210,11 @@ export default function useAppShellState() {
     updateUrl({ sort: sortKey, dir });
   }, [storedHomeSortOrder, updateUrl]);
 
-  const categories = useMemo(() => ['すべて', ...ORDERED_PACKAGE_TYPES], []);
+  const categories = ORDERED_PACKAGE_TYPE_KEYS;
 
   const filteredPackages = useMemo(() => {
     const base = parseQuery.q ? items.filter((item) => matchQuery(item, parseQuery.q)) : items;
-    const category = selectedCategory === 'すべて' ? '' : selectedCategory;
+    const category = selectedCategory === 'all' ? '' : selectedCategory;
     const filteredByTags = filterByTagsAndType(base, selectedTags, category ? [category] : []);
     const filteredByInstalled =
       installStatus === 'installed'
@@ -234,10 +242,7 @@ export default function useAppShellState() {
   ]);
 
   const isFilterActive =
-    installStatus !== 'all' ||
-    deprecationStatus !== 'active' ||
-    selectedCategory !== 'すべて' ||
-    selectedTags.length > 0;
+    installStatus !== 'all' || deprecationStatus !== 'active' || selectedCategory !== 'all' || selectedTags.length > 0;
   const updateAvailableCount = useMemo(
     () =>
       pausedPackageUpdatesLoaded
@@ -277,24 +282,24 @@ export default function useAppShellState() {
       const dirs = await ipc.getAppDirs();
       const target = dirs && typeof dirs.aviutl2_data === 'string' ? dirs.aviutl2_data.trim() : '';
       if (!target) {
-        setError('データフォルダの場所を取得できませんでした。設定画面で AviUtl2 のフォルダを確認してください。');
+        setError(t('errors.dataDirUnavailable'));
         return;
       }
       const command = tauriShell.Command.create('explorer', [target]);
       await command.execute();
       return;
     } catch {
-      setError('データフォルダを開けませんでした。設定を確認してください。');
+      setError(t('errors.dataDirOpenFailed'));
     }
-  }, []);
+  }, [t]);
 
   const launchAviUtl2 = useCallback(async () => {
     try {
       await ipc.launchAviutl2();
     } catch (launchError) {
-      setError(typeof launchError === 'string' ? launchError : 'AviUtl2 の起動に失敗しました。');
+      setError(typeof launchError === 'string' ? launchError : t('errors.launchFailed'));
     }
-  }, []);
+  }, [t]);
 
   const toggleSidebar = useCallback(() => setSidebarCollapsed((prev) => !prev), []);
   const routeActionHandlers = useMemo(() => createSidebarRouteActionHandlers(navigate), [navigate]);

@@ -1,15 +1,16 @@
+import { i18n } from '@/i18n';
 import { installerActionSchema, installerSourceSchema } from '../catalogSchema';
 import type { InstallerAction, InstallerSource } from '../catalogSchema';
 import type { InstallerConfigLike, TestOperationKind } from './types';
 
-const TEST_OPERATION_LABELS: Record<string, string> = {
-  download: 'ダウンロード',
-  extract: '展開',
-  extract_sfx: 'SFX展開',
-  copy: 'コピー',
-  delete: '削除',
-  run: '実行',
-  run_auo_setup: '実行',
+const TEST_OPERATION_LABEL_KEYS: Record<string, string> = {
+  download: 'register:installer.actions.download',
+  extract: 'register:tests.kind.extract',
+  extract_sfx: 'register:tests.kind.extract_sfx',
+  copy: 'register:installer.actions.copy',
+  delete: 'register:installer.actions.delete',
+  run: 'register:tests.kind.run',
+  run_auo_setup: 'register:tests.kind.run',
 };
 
 export function hasInstaller(item: unknown): boolean {
@@ -35,7 +36,9 @@ export function toTestOperationKind(action: unknown): TestOperationKind {
 
 export function toTestOperationLabel(action: unknown): string {
   const value = String(action || '');
-  return TEST_OPERATION_LABELS[value] || value || '処理';
+  return TEST_OPERATION_LABEL_KEYS[value]
+    ? i18n.t(TEST_OPERATION_LABEL_KEYS[value])
+    : value || i18n.t('common:status.processing');
 }
 
 export function emitTestOperation(

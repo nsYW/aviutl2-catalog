@@ -1,0 +1,59 @@
+{
+  "actions": {
+    "latest": "Up to date",
+    "installed": "Installed",
+    "paused": "Paused",
+    "update": "Update",
+    "removing": "Removing...",
+    "remove": "Remove",
+    "install": "Install",
+    "missingInstaller": "Installation is not implemented"
+  },
+  "card": {
+    "openDetails": "Open details for {{name}}"
+  },
+  "carousel": {
+    "region": "Screenshot carousel",
+    "previous": "Previous image",
+    "next": "Next image",
+    "slide": "Slide {{current}}/{{total}}"
+  },
+  "content": {
+    "screenshots": "Screenshots",
+    "deprecated": "Deprecated",
+    "deprecatedReason": "This package is deprecated for the following reason.",
+    "deprecatedSimple": "This package is deprecated.",
+    "descriptionLoading": "Loading the description...",
+    "dependencies": "Dependencies"
+  },
+  "descriptionErrors": {
+    "loadFailed": "Failed to load the description."
+  },
+  "errors": {
+    "actionFailed": "{{action}} failed\n\n{{detail}}"
+  },
+  "header": {
+    "uncategorized": "Uncategorized"
+  },
+  "licenseModal": {
+    "title": "License: {{type}}",
+    "bodyMissing": "License text is not available."
+  },
+  "list": {
+    "backToList": "Back to {{label}}"
+  },
+  "meta": {
+    "deprecatedAria": "Show deprecation details",
+    "deprecatedPrefix": "Deprecated: "
+  },
+  "page": {
+    "notFound": "Package not found."
+  },
+  "sidebar": {
+    "updatedAt": "Updated",
+    "latestVersion": "Latest version",
+    "currentVersion": "Current version",
+    "licenseUnknown": "Unknown",
+    "openLicenseAria": "Open license text for {{type}}"
+  }
+}

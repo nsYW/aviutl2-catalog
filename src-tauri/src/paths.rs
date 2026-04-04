@@ -17,6 +17,27 @@ fn pathbuf_to_string(path: &Path) -> String {
     path.to_string_lossy().into_owned()
 }
 
+pub fn is_english_locale(locale: &str) -> bool {
+    locale.trim().to_ascii_lowercase().starts_with("en")
+}
+
+pub fn current_ui_locale() -> String {
+    let Some(app_dirs) = APP_DIR.get().map(|cell| cell.load_full()) else {
+        return String::from("ja");
+    };
+    let settings_path = app_dirs.catalog_config_dir.join("settings.json");
+    let locale = Settings::load_from_file(&settings_path).locale.trim().to_string();
+    if locale.is_empty() { String::from("ja") } else { locale }
+}
+
+pub fn localized_message_for(locale: &str, ja: &str, en: &str) -> String {
+    if is_english_locale(locale) { en.to_string() } else { ja.to_string() }
+}
+
+pub fn localized_message(ja: &str, en: &str) -> String {
+    localized_message_for(&current_ui_locale(), ja, en)
+}
+
 // settings.jsonから読み込む項目
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
@@ -24,6 +45,7 @@ pub struct Settings {
     pub aviutl2_root: PathBuf,                   // AviUtl2 のルートディレクトリ
     pub is_portable_mode: bool,                  // ポータブルモードかどうか
     pub theme: String,                           // テーマ
+    pub locale: String,                          // UI ロケール
     pub package_state_opt_out: bool,             // 匿名統計の送信を無効化
     pub package_updates_paused_ids: Vec<String>, // 一時停止中のパッケージID一覧(UpdateCheckerの更新で使用予定)
     pub app_version: String,                     // 本アプリのバージョン(UpdateCheckerの更新で使用)
@@ -201,8 +223,12 @@ fn open_main_window(app: &AppHandle) -> Result<(), String> {
         return Ok(());
     }
 
-    let mut builder =
-        WebviewWindowBuilder::new(app, "main", WebviewUrl::App("/".into())).title("AviUtl2 カタログ").inner_size(950.0, 760.0).resizable(true).decorations(false).visible(false);
+    let mut builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("/".into()))
+        .title(localized_message("AviUtl2 カタログ", "AviUtl2 Catalog"))
+        .inner_size(950.0, 760.0)
+        .resizable(true)
+        .decorations(false)
+        .visible(false);
 
     #[cfg(target_os = "windows")]
     {
@@ -256,14 +282,23 @@ pub async fn complete_initial_setup(app: AppHandle) -> Result<(), String> {
 
 // aviutl2_rootを保存し、APP_DIRを更新
 #[tauri::command]
-pub async fn update_settings(app: AppHandle, aviutl2_root: String, is_portable_mode: bool, theme: String, package_state_opt_out: bool) -> Result<(), String> {
+pub async fn update_settings(
+    app: AppHandle,
+    aviutl2_root: String,
+    is_portable_mode: bool,
+    theme: String,
+    locale: String,
+    package_state_opt_out: bool,
+) -> Result<(), String> {
+    let locale = locale.trim().to_string();
+    let missing_root_message = localized_message_for(&locale, "AviUtl2 のフォルダを選択してください。", "Please select the AviUtl2 folder.");
     let trimmed = aviutl2_root.trim();
     if trimmed.is_empty() {
-        return Err(String::from("AviUtl2 のフォルダを選択してください。"));
+        return Err(missing_root_message.clone());
     }
     let root_path = resolve_aviutl_root(trimmed);
     if root_path.as_os_str().is_empty() {
-        return Err(String::from("AviUtl2 のフォルダを選択してください。"));
+        return Err(missing_root_message);
     }
     let catalog_config_dir = app.path().app_config_dir().map_err(|e| e.to_string())?;
     fs::create_dir_all(&catalog_config_dir).map_err(|e| e.to_string())?;
@@ -273,6 +308,7 @@ pub async fn update_settings(app: AppHandle, aviutl2_root: String, is_portable_m
     settings.aviutl2_root = root_path;
     settings.is_portable_mode = is_portable_mode;
     settings.theme = theme.to_string();
+    settings.locale = locale;
     settings.package_state_opt_out = package_state_opt_out;
     finalize_settings(&app, &mut settings, &settings_path, &catalog_config_dir).map_err(|e| e.to_string())
 }
@@ -281,7 +317,7 @@ pub async fn update_settings(app: AppHandle, aviutl2_root: String, is_portable_m
 pub async fn set_package_update_paused(app: AppHandle, package_id: String, paused: bool) -> Result<Vec<String>, String> {
     let package_id = package_id.trim();
     if package_id.is_empty() {
-        return Err(String::from("パッケージIDが空です。"));
+        return Err(localized_message("パッケージIDが空です。", "Package ID is empty."));
     }
 
     let catalog_config_dir = app.path().app_config_dir().map_err(|e| e.to_string())?;
@@ -327,5 +363,9 @@ fn resolve_aviutl_root(raw: &str) -> PathBuf {
 #[tauri::command]
 pub fn resolve_aviutl2_root(raw: String) -> Result<String, String> {
     let resolved = resolve_aviutl_root(&raw);
-    if resolved.as_os_str().is_empty() { Err(String::from("AviUtl2 のフォルダを選択してください。")) } else { Ok(pathbuf_to_string(&resolved)) }
+    if resolved.as_os_str().is_empty() {
+        Err(localized_message("AviUtl2 のフォルダを選択してください。", "Please select the AviUtl2 folder."))
+    } else {
+        Ok(pathbuf_to_string(&resolved))
+    }
 }

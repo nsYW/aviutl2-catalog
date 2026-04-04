@@ -1,5 +1,6 @@
 import ProgressCircle from '@/components/ProgressCircle';
 import PackageNameLink from '@/components/PackageNameLink';
+import { useTranslation } from 'react-i18next';
 import { latestVersionOf } from '@/utils/catalog';
 import type { UpdatesTableSectionProps } from '../types';
 import { surface, table, text } from '@/components/ui/_styles';
@@ -17,6 +18,8 @@ export default function UpdatesTableSection({
   onUpdate,
   onTogglePause,
 }: UpdatesTableSectionProps) {
+  const { t } = useTranslation(['updates', 'common']);
+
   return (
     <div className={surface.panel}>
       {items.length === 0 ? (
@@ -32,11 +35,11 @@ export default function UpdatesTableSection({
                 'grid-cols-[minmax(0,2.5fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_8rem]',
               )}
             >
-              <span>パッケージ</span>
-              <span>作者</span>
-              <span>種類</span>
-              <span>更新前</span>
-              <span>更新後</span>
+              <span>{t('table.package')}</span>
+              <span>{t('common:labels.author')}</span>
+              <span>{t('common:labels.type')}</span>
+              <span>{t('table.before')}</span>
+              <span>{t('table.after')}</span>
               <span className="text-right"></span>
             </div>
             <div className={surface.divideMuted}>
@@ -70,7 +73,7 @@ export default function UpdatesTableSection({
                             value={progress.ratio}
                             size={24}
                             strokeWidth={3}
-                            ariaLabel={`${item.name} の更新進捗`}
+                            ariaLabel={t('table.progressAria', { name: item.name })}
                           />
                         </div>
                       ) : (
@@ -82,7 +85,7 @@ export default function UpdatesTableSection({
                               disabled={bulkUpdating || pauseBusy}
                               type="button"
                             >
-                              {pauseBusy ? '保存中…' : '再開'}
+                              {pauseBusy ? t('table.saving') : t('table.resume')}
                             </button>
                           ) : (
                             <>
@@ -92,7 +95,7 @@ export default function UpdatesTableSection({
                                 disabled={bulkUpdating || pauseBusy}
                                 type="button"
                               >
-                                {pauseBusy ? '保存中…' : '一時停止'}
+                                {pauseBusy ? t('table.saving') : t('table.pause')}
                               </button>
                               <button
                                 className={table.actionButtonSubtle}
@@ -100,7 +103,7 @@ export default function UpdatesTableSection({
                                 disabled={bulkUpdating || pauseBusy}
                                 type="button"
                               >
-                                更新
+                                {t('table.update')}
                               </button>
                             </>
                           )}

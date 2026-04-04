@@ -1,0 +1,97 @@
+{
+  "page": {
+    "title": "Settings",
+    "description": "Configure and customize the application"
+  },
+  "sections": {
+    "app": "App settings",
+    "dataManagement": "Data management",
+    "appInfo": "App info"
+  },
+  "app": {
+    "aviutl2Root": {
+      "label": "AviUtl2 folder",
+      "description": "Select the folder that contains aviutl2.exe.",
+      "placeholder": "Folder containing aviutl2.exe",
+      "dialogTitle": "AviUtl2 root folder"
+    },
+    "language": {
+      "label": "Display language",
+      "description": "Choose the language used for the app UI.",
+      "options": {
+        "ja": "Japanese",
+        "en": "English"
+      }
+    },
+    "portableMode": {
+      "title": "Portable mode",
+      "recommendedOff": "Recommended: Off",
+      "description": "Store plugins and scripts in the data folder next to aviutl2.exe."
+    },
+    "theme": {
+      "title": "Dark mode"
+    },
+    "packageState": {
+      "title": "Send anonymous usage statistics",
+      "description": "To improve app recommendations, anonymously send installed and uninstalled package IDs along with the currently installed package IDs."
+    },
+    "save": "Save settings",
+    "saved": "Saved"
+  },
+  "dataManagement": {
+    "packages": "Export / import package list",
+    "export": "Export",
+    "import": "Import",
+    "status": {
+      "pickExport": "Choosing an export destination...",
+      "exporting": "Creating the export...",
+      "prepareImport": "Preparing the import...",
+      "pickImport": "Choosing an import file...",
+      "readingImport": "Reading the import file...",
+      "detecting": "Detecting installed packages...",
+      "installing": "Installing... ({{current}}/{{total}}) {{label}}",
+      "removing": "Removing... ({{current}}/{{total}}) {{label}}",
+      "refreshing": "Refreshing installed package state..."
+    },
+    "dialogs": {
+      "exportTitle": "Export package list",
+      "importFileTitle": "Choose import file",
+      "importResultTitle": "Import result"
+    },
+    "messages": {
+      "exportSaved": "The export was saved.",
+      "importConfirm": "Packages will be installed or removed to match the import file.\nDo you want to continue?"
+    },
+    "summary": {
+      "installed": "Installed: {{installed}}/{{total}}",
+      "removed": "Removed: {{removed}}/{{total}}",
+      "unknownIds": "Unknown IDs: {{ids}}",
+      "skippedInstall": "Could not install: {{ids}}",
+      "skippedRemove": "Could not remove: {{ids}}",
+      "failedInstall": "Install failures: {{ids}}",
+      "failedRemove": "Remove failures: {{ids}}"
+    },
+    "errors": {
+      "exportFailed": "Failed to export. Check permissions and the destination.",
+      "importFailed": "Failed to import.",
+      "invalidImportFormat": "The import file format is invalid.",
+      "invalidJson": "Could not parse the import file JSON.",
+      "emptyImport": "The import file is empty.",
+      "catalogMissing": "Catalog data is not loaded."
+    }
+  },
+  "appInfo": {
+    "version": "Version",
+    "license": "License",
+    "licenseBody": "This software is provided under the MIT License. See LICENSE.txt for the full text."
+  },
+  "messages": {
+    "saveSuccess": "Settings saved."
+  },
+  "errors": {
+    "directoryPickFailed": "Failed to select a directory.",
+    "aviutl2Required": "Please select the AviUtl2 folder.",
+    "languageApplyFailed": "The settings were saved, but the display language could not be applied immediately.",
+    "saveFailed": "Failed to save settings. Check permissions and the path."
+  }
+}

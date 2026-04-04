@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   getRegisterDraft,
   getRegisterDraftById,
@@ -36,6 +37,7 @@ export default function useRegisterDraftRestore({
   activeDraftIdRef,
   reloadDraftPackages,
 }: UseRegisterDraftRestoreArgs) {
+  const { t } = useTranslation('register');
   const draftRestoreTokenRef = useRef(0);
   const skipNextSelectedRestoreIdRef = useRef('');
 
@@ -98,14 +100,14 @@ export default function useRegisterDraftRestore({
       const draft = getRegisterDraftById(draftId);
       if (!draft) {
         reloadDraftPackages();
-        setError('対象の一時保存が見つかりませんでした。');
+        setError(t('errors.draftNotFound'));
         return;
       }
       skipNextSelectedRestoreIdRef.current = draft.packageId;
       setSelectedPackageId(draft.packageId);
       await applyDraftRecord(draft);
     },
-    [applyDraftRecord, reloadDraftPackages, setError, setSelectedPackageId],
+    [applyDraftRecord, reloadDraftPackages, setError, setSelectedPackageId, t],
   );
 
   const restoreDraftForPackage = useCallback(

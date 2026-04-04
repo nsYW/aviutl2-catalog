@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import * as tauriDialog from '@tauri-apps/plugin-dialog';
+import { useTranslation } from 'react-i18next';
+import { getCurrentUiLocale, i18n } from '@/i18n';
 import { ipc } from '@/utils/invokeIpc';
 import { fetchWindowLabel, getErrorMessage, safeLog } from '../../model/helpers';
 import type { InitSetupStep, InstalledChoice, PickDirKind } from '../../model/types';
 
 export default function useInitSetupFlow() {
+  const { t } = useTranslation('initSetup');
   const [step, setStep] = useState<InitSetupStep>('intro');
   const [installed, setInstalled] = useState<InstalledChoice>(null);
   const [aviutlRoot, setAviutlRoot] = useState('');
@@ -61,7 +64,7 @@ export default function useInitSetupFlow() {
 
   const persistAviutlSettings = useCallback(async (rootPath: string, portableMode: boolean) => {
     const normalized = rootPath.trim();
-    if (!normalized) throw new Error('AviUtl2 のフォルダを入力してください。');
+    if (!normalized) throw new Error(t('errors.aviutlRootRequired'));
     let resolved = normalized;
     try {
       const candidate = await ipc.resolveAviutl2Root({ raw: normalized });
@@ -74,6 +77,7 @@ export default function useInitSetupFlow() {
         aviutl2Root: resolved,
         isPortableMode: Boolean(portableMode),
         theme: 'dark',
+        locale: getCurrentUiLocale(i18n),
         packageStateOptOut: false,
       });
     } catch (updateErrorInner) {
@@ -96,19 +100,22 @@ export default function useInitSetupFlow() {
     setError('');
   }, []);
 
-  const pickDir = useCallback(async (kind: PickDirKind) => {
-    try {
-      const title = kind === 'install' ? 'インストール先を選択' : 'AviUtl2 フォルダを選択';
-      const path = await tauriDialog.open({ directory: true, multiple: false, title });
-      if (!path || Array.isArray(path)) return;
-      const value = String(path);
-      if (kind === 'install') setInstallDir(value);
-      else setAviutlRoot(value);
-      setError('');
-    } catch {
-      setError('フォルダ選択に失敗しました。');
-    }
-  }, []);
+  const pickDir = useCallback(
+    async (kind: PickDirKind) => {
+      try {
+        const title = kind === 'install' ? t('errors.pickInstallDir') : t('errors.pickExistingDir');
+        const path = await tauriDialog.open({ directory: true, multiple: false, title });
+        if (!path || Array.isArray(path)) return;
+        const value = String(path);
+        if (kind === 'install') setInstallDir(value);
+        else setAviutlRoot(value);
+        setError('');
+      } catch {
+        setError(t('errors.pickDirFailed'));
+      }
+    },
+    [t],
+  );
 
   const finalizeSetup = useCallback(async () => {
     setBusy(true);
@@ -116,11 +123,11 @@ export default function useInitSetupFlow() {
     try {
       await ipc.completeInitialSetup();
     } catch (finalizeError) {
-      setError(getErrorMessage(finalizeError) || '初期設定に失敗しました。');
+      setError(getErrorMessage(finalizeError) || t('errors.finalizeFailed'));
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [t]);
 
   return {
     step,

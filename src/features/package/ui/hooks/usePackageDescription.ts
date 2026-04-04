@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { isMarkdownFilePath as isMarkdownUrl, resolveMarkdownUrl } from '../../model/helpers';
 import { renderMarkdown } from '@/utils/markdown';
 
@@ -11,6 +12,7 @@ export default function usePackageDescription({
   descriptionSource: descriptionUrlOrMarkdown,
   baseUrl,
 }: UsePackageDescriptionParams) {
+  const { t } = useTranslation('package');
   const [descriptionHtml, setDescriptionHtml] = useState(() =>
     isMarkdownUrl(descriptionUrlOrMarkdown) ? '' : renderMarkdown(descriptionUrlOrMarkdown),
   );
@@ -61,8 +63,9 @@ export default function usePackageDescription({
       } catch {
         if (controller.signal.aborted) return;
         if (!cancelled) {
-          setDescriptionHtml(renderMarkdown('詳細説明を読み込めませんでした。'));
-          setDescriptionError('詳細説明を読み込めませんでした。');
+          const message = t('descriptionErrors.loadFailed');
+          setDescriptionHtml(renderMarkdown(message));
+          setDescriptionError(message);
         }
       } finally {
         if (!cancelled) {
@@ -81,7 +84,7 @@ export default function usePackageDescription({
       cancelled = true;
       controller.abort();
     };
-  }, [descriptionUrlOrMarkdown, baseUrl]);
+  }, [baseUrl, descriptionUrlOrMarkdown, t]);
 
   return {
     descriptionHtml,

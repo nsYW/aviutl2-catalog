@@ -2,6 +2,7 @@
  * 詳細説明エリアの表示コンポーネント
  */
 import { useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -22,6 +23,7 @@ export default function RegisterDescriptionSection({
   onUpdatePackageField,
   onSetDescriptionTab,
 }: RegisterDescriptionSectionProps) {
+  const { t } = useTranslation(['register', 'common']);
   const previewMarkup = useMemo(() => ({ __html: descriptionPreviewHtml }), [descriptionPreviewHtml]);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
@@ -44,11 +46,11 @@ export default function RegisterDescriptionSection({
   return (
     <section className={surface.cardSection}>
       <div className={layout.rowBetweenWrapGap2}>
-        <h2 className={text.titleLg}>説明</h2>
+        <h2 className={text.titleLg}>{t('common:labels.description')}</h2>
       </div>
       <div className="space-y-2">
         <label className={text.labelSm} htmlFor="package-summary">
-          概要 <span className="text-red-500">*</span>
+          {t('common:labels.summary')} <span className="text-red-500">*</span>
         </label>
         <input
           id="package-summary"
@@ -56,7 +58,7 @@ export default function RegisterDescriptionSection({
           value={packageForm.summary}
           onChange={(e) => onUpdatePackageField('summary', e.target.value)}
           required
-          placeholder="パッケージの概要 (35文字以内)"
+          placeholder={t('description.summaryPlaceholder')}
         />
         <div className="flex justify-end">
           <span
@@ -68,7 +70,7 @@ export default function RegisterDescriptionSection({
       </div>
       <div className={layout.rowBetweenWrapGap2}>
         <label htmlFor={isExternalDescription ? 'description-url' : 'description-textarea'} className={text.labelSm}>
-          詳細説明 <span className="text-red-500">*</span>
+          {t('common:labels.description')} <span className="text-red-500">*</span>
         </label>
         <div className={layout.wrapItemsGap2}>
           <div className={action.segmentedGroupFlush}>
@@ -83,7 +85,7 @@ export default function RegisterDescriptionSection({
               )}
               onClick={() => onUpdatePackageField('descriptionMode', 'inline')}
             >
-              アプリ内入力
+              {t('description.modeInline')}
             </Button>
             <Button
               variant="plain"
@@ -96,10 +98,10 @@ export default function RegisterDescriptionSection({
               )}
               onClick={() => onUpdatePackageField('descriptionMode', 'external')}
             >
-              外部MDリンク
+              {t('description.modeExternal')}
             </Button>
           </div>
-          <span className={text.mutedXs}>Markdown形式</span>
+          <span className={text.mutedXs}>{t('description.markdown')}</span>
         </div>
       </div>
       <div className={surface.panelOverflow}>
@@ -120,7 +122,7 @@ export default function RegisterDescriptionSection({
             )}
             onClick={() => onSetDescriptionTab('edit')}
           >
-            {isExternalDescription ? '外部リンク指定' : '編集'}
+            {isExternalDescription ? t('description.tabExternalEdit') : t('description.tabEdit')}
           </Button>
           <Button
             variant="plain"
@@ -135,7 +137,7 @@ export default function RegisterDescriptionSection({
             )}
             onClick={() => onSetDescriptionTab('preview')}
           >
-            プレビュー
+            {t('common:actions.preview')}
           </Button>
         </div>
         <div className="p-0">
@@ -148,25 +150,23 @@ export default function RegisterDescriptionSection({
                   type="url"
                   value={packageForm.descriptionUrl}
                   onChange={(e) => onUpdatePackageField('descriptionUrl', e.target.value)}
-                  placeholder="https://example.com/description.md"
+                  placeholder={t('description.externalUrlPlaceholder')}
                 />
-                {!hasExternalDescriptionUrl && <p className={text.mutedXs}>MarkdownのURLを入力してください。</p>}
-                <p className={text.mutedXs}>
-                  GitHub上のMDを登録される場合はhttps://raw.githubusercontent.com/から始まるリンクになっているか注意してください。
-                </p>
+                {!hasExternalDescriptionUrl && <p className={text.mutedXs}>{t('description.externalUrlHint')}</p>}
+                <p className={text.mutedXs}>{t('description.externalRawHint')}</p>
                 {descriptionLoading && (
-                  <p className="text-xs text-slate-400 dark:text-slate-500">リンク先を読み込み中…</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{t('description.externalLoading')}</p>
                 )}
                 {isExternalDescriptionLoaded && !descriptionLoading && (
                   <div className={cn(layout.inlineGap1, 'text-xs text-emerald-600 dark:text-emerald-400')}>
                     <CheckCircle2 size={14} />
-                    Markdown読み込み済み
+                    {t('description.externalLoaded')}
                   </div>
                 )}
                 {hasExternalDescriptionUrl && externalDescriptionStatus === 'error' && !descriptionLoading && (
                   <div className={cn(layout.inlineGap1, 'text-xs text-red-500 dark:text-red-400')}>
                     <AlertCircle size={14} />
-                    Markdownを読み込めませんでした
+                    {t('description.externalError')}
                   </div>
                 )}
               </div>
@@ -177,7 +177,7 @@ export default function RegisterDescriptionSection({
                 value={packageForm.descriptionText}
                 onChange={(e) => onUpdatePackageField('descriptionText', e.target.value)}
                 required
-                placeholder="パッケージの詳細情報を入力してください。Markdown形式で記入できます。どこから呼び出せるか（メニュー位置など）や、UIの説明もあわせて記入していただけると助かります。外部サイトの画像も貼り付けることができます。"
+                placeholder={t('description.bodyPlaceholder')}
               />
             )
           ) : (

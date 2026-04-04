@@ -1,3 +1,4 @@
+import { i18n } from '@/i18n';
 import type { InstallerAction } from '../catalogSchema';
 import { formatUnknownError } from '../errors';
 import { addInstalledId } from '../installed-map';
@@ -75,7 +76,7 @@ export async function runInstallerForItem(
             onOperation({
               kind: stepOperation.kind,
               status: 'error',
-              summary: `${toTestOperationLabel(stepAction)} 失敗`,
+              summary: i18n.t('register:tests.operationFailed', { action: toTestOperationLabel(stepAction) }),
               detail: err.message || String(err),
               fromPath: stepOperation.fromPath,
               toPath: stepOperation.toPath,

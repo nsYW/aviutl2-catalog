@@ -2,6 +2,7 @@
  * パッケージ登録画面のメインコンポーネント
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getSettings } from '@/utils/settings';
 import { saveRegisterDraftFromCatalogEntry } from '../model/draft';
 import { PACKAGE_GUIDE_FALLBACK_URL, createEmptyPackageForm } from '../model/form';
@@ -23,6 +24,7 @@ import RegisterFormLayout from './layouts/RegisterFormLayout';
 import { RegisterJsonImportDialog, RegisterSuccessDialog } from './sections';
 
 export default function Register() {
+  const { t } = useTranslation(['register', 'common']);
   const submitEndpoint = (import.meta.env.VITE_SUBMIT_ENDPOINT || '').trim();
   const packageGuideUrl = (import.meta.env.VITE_PACKAGE_GUIDE_URL || PACKAGE_GUIDE_FALLBACK_URL).trim();
 
@@ -215,7 +217,7 @@ export default function Register() {
     try {
       const { changedItems } = catalog.applyCatalogJsonPatch(jsonDialogText);
       if (changedItems.length === 0) {
-        setJsonDialogError('変更がありませんでした。');
+        setJsonDialogError(t('page.jsonNoChanges'));
         return;
       }
 
@@ -244,11 +246,15 @@ export default function Register() {
     draftState.reloadDraftPackages,
     jsonDialogText,
     packageSender,
+    t,
   ]);
 
   const successPrimaryText = successDialog.packageName
-    ? `${successDialog.packageAction || '送信完了'}: ${successDialog.packageName}`
-    : successDialog.message || '送信が完了しました。';
+    ? t('page.successPrimary', {
+        action: successDialog.packageAction || t('common:submit.completeTitle'),
+        name: successDialog.packageName,
+      })
+    : successDialog.message || t('common:submit.successDefault');
   const successSupportText = successDialog.packageName && successDialog.message ? successDialog.message : '';
   const handlePackageSenderChange = useCallback(
     (value: string) => {
@@ -487,7 +493,9 @@ export default function Register() {
       submitting,
       pendingSubmitCount: draftState.pendingSubmitCount,
       blockedSubmitCount: draftState.blockedSubmitCount,
-      submittingLabel: batchSubmit.submitProgressText ? `送信中… (${batchSubmit.submitProgressText})` : '送信中…',
+      submittingLabel: batchSubmit.submitProgressText
+        ? `${t('submitBar.submitting')} (${batchSubmit.submitProgressText})`
+        : t('submitBar.submitting'),
       onOpenJsonImport: openJsonDialog,
       onPackageSenderChange: handlePackageSenderChange,
     }),

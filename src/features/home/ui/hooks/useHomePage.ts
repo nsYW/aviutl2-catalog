@@ -1,16 +1,19 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { useHomeContext } from '@/layouts/app-shell/AppShell';
 import { deprecationStatusToQueryValue, installStatusToQueryValue } from '@/layouts/app-shell/constants';
+import type { PackageTypeFilterKey } from '@/utils/query';
 import type { HomeDeprecationStatus, HomeInstallStatus, HomeSortOrder } from '../types';
 
-const HOME_CATEGORY_ALL = 'すべて';
+const HOME_CATEGORY_ALL: PackageTypeFilterKey = 'all';
 
-function sortTags(tags: string[] | null | undefined): string[] {
-  return (tags || []).toSorted((a, b) => a.localeCompare(b, 'ja', { sensitivity: 'base' }));
+function sortTags(tags: string[] | null | undefined, locale: string): string[] {
+  return (tags || []).toSorted((a, b) => a.localeCompare(b, locale, { sensitivity: 'base' }));
 }
 
 export default function useHomePage() {
+  const { i18n } = useTranslation();
   const location = useLocation();
   const {
     filteredPackages,
@@ -38,8 +41,8 @@ export default function useHomePage() {
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
-  const sortedAllTags = useMemo(() => sortTags(allTags), [allTags]);
-  const sortedSelectedTags = useMemo(() => sortTags(selectedTags), [selectedTags]);
+  const sortedAllTags = useMemo(() => sortTags(allTags, i18n.language), [allTags, i18n.language]);
+  const sortedSelectedTags = useMemo(() => sortTags(selectedTags, i18n.language), [i18n.language, selectedTags]);
   const listSearch = useMemo(() => {
     const params = new URLSearchParams(location.search);
     const next = params.toString();
@@ -47,7 +50,7 @@ export default function useHomePage() {
   }, [location.search]);
 
   const setCategory = useCallback(
-    (category: string) => {
+    (category: PackageTypeFilterKey) => {
       updateUrl({ type: category === HOME_CATEGORY_ALL ? '' : category });
     },
     [updateUrl],

@@ -2,9 +2,10 @@ import { useMemo } from 'react';
 import Button from '@/components/ui/Button';
 import { buttonVariants } from '@/components/ui/Button';
 import { Calendar, ExternalLink, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { HOME_SEARCH_RESTORE_STATE } from '@/layouts/app-shell/types';
-import { buildPackageListSearch } from '../../../model/helpers';
+import { buildPackageListSearch, resolvePackageTypeLabel } from '../../../model/helpers';
 import type { PackageSidebarSectionProps } from '../../types';
 import { layout, surface, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';
@@ -26,6 +27,8 @@ export default function PackageSidebarInfoCard({
   licenseTypesLabel,
   onOpenLicense,
 }: PackageSidebarInfoCardProps) {
+  const { t } = useTranslation('package');
+  const packageTypeLabel = resolvePackageTypeLabel(item.type, t, '?');
   const authorLink = useMemo(() => {
     const author = String(item.author || '').trim();
     if (!author) return null;
@@ -35,24 +38,24 @@ export default function PackageSidebarInfoCard({
 
   const tagLinks = useMemo(
     () =>
-      (item.tags || []).map((tag) => ({
-        tag,
-        to: (() => {
-          const search = buildPackageListSearch('', { q: '', tags: [tag] });
-          return search ? `/${search}` : '/';
-        })(),
-      })),
+      (item.tags || []).map((tag) => {
+        const search = buildPackageListSearch('', { q: '', tags: [tag] });
+        return {
+          tag,
+          to: search ? `/${search}` : '/',
+        };
+      }),
     [item.tags],
   );
 
   return (
     <div className={cn(surface.cardSection, 'space-y-4')}>
       <div className={cn(layout.rowBetween, text.bodySmMuted)}>
-        <span>ID</span>
+        <span>{t('common:labels.id')}</span>
         <span className="text-slate-800 dark:text-slate-200 font-mono select-text">{item.id}</span>
       </div>
       <div className={cn(layout.rowBetween, text.bodySmMuted)}>
-        <span>作者</span>
+        <span>{t('common:labels.author')}</span>
         {authorLink ? (
           <Link
             to={authorLink}
@@ -72,35 +75,35 @@ export default function PackageSidebarInfoCard({
         )}
       </div>
       <div className={cn(layout.rowBetween, text.bodySmMuted)}>
-        <span>種類</span>
-        <span className="text-slate-800 dark:text-slate-200">{item.type || '?'}</span>
+        <span>{t('common:labels.type')}</span>
+        <span className="text-slate-800 dark:text-slate-200">{packageTypeLabel}</span>
       </div>
       <div className={cn(layout.rowBetween, text.bodySmMuted)}>
-        <span>更新日</span>
+        <span>{t('sidebar.updatedAt')}</span>
         <span className={cn(layout.inlineGap2, 'text-slate-800 dark:text-slate-200')}>
           <Calendar size={14} />
           {updated}
         </span>
       </div>
       <div className={cn(layout.rowBetween, text.bodySmMuted)}>
-        <span>最新バージョン</span>
+        <span>{t('sidebar.latestVersion')}</span>
         <span className="text-slate-800 dark:text-slate-200">{latest}</span>
       </div>
       {item.installedVersion ? (
         <div className={cn(layout.rowBetween, text.bodySmMuted)}>
-          <span>現在のバージョン</span>
+          <span>{t('sidebar.currentVersion')}</span>
           <span className="text-slate-800 dark:text-slate-200">{item.installedVersion}</span>
         </div>
       ) : null}
       {item.niconiCommonsId ? (
         <div className={cn(layout.rowBetween, text.bodySmMuted)}>
-          <span>ニコニコモンズID</span>
+          <span>{t('common:labels.niconiCommonsId')}</span>
           <span className="text-slate-800 dark:text-slate-200 font-mono select-text">{item.niconiCommonsId}</span>
         </div>
       ) : null}
       {item.tags?.length ? (
         <div className="space-y-2">
-          <span className={text.bodySmMuted}>タグ</span>
+          <span className={text.bodySmMuted}>{t('common:labels.tags')}</span>
           <div className={layout.wrapGap2}>
             {tagLinks.map(({ tag, to }) => (
               <Link
@@ -116,7 +119,7 @@ export default function PackageSidebarInfoCard({
         </div>
       ) : null}
       <div className="space-y-2">
-        <span className={text.bodySmMuted}>ライセンス</span>
+        <span className={text.bodySmMuted}>{t('common:labels.licenses')}</span>
         <div className={layout.wrapGap2}>
           {renderableLicenses.length ? (
             renderableLicenses.map((license) => (
@@ -127,9 +130,9 @@ export default function PackageSidebarInfoCard({
                 key={license.key}
                 className={detailMetaChipClassName}
                 onClick={() => onOpenLicense(license)}
-                aria-label={`ライセンス ${license.type || '不明'} の本文を表示`}
+                aria-label={t('sidebar.openLicenseAria', { type: license.type || t('sidebar.licenseUnknown') })}
               >
-                {license.type || '不明'}
+                {license.type || t('sidebar.licenseUnknown')}
               </Button>
             ))
           ) : (

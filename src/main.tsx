@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { I18nextProvider } from 'react-i18next';
 import AppRouter from '@/Router';
 import { useCatalogBootstrap } from '@/bootstrap/useCatalogBootstrap';
 import { useGlobalGuards } from '@/bootstrap/useGlobalGuards';
@@ -7,9 +8,11 @@ import { applyBootThemeInitClass, detectWindowLabel, scheduleMainWindowReveal, t
 import UpdateDialog from '@/features/app-update/UpdateDialog';
 import { useUpdatePrompt } from '@/features/app-update/useUpdatePrompt';
 import InitSetupPage from '@/features/init-setup/ui/InitSetupPage';
+import { i18n, initializeI18n } from '@/i18n';
 import TitleBar from '@/layouts/app-shell/title-bar/TitleBar';
-import '@/styles/index.css';
 import { CatalogProvider, useCatalogDispatch, initCatalog } from '@/utils/catalogStore';
+// eslint-disable-next-line import/no-unassigned-import
+import '@/styles/index.css';
 // eslint-disable-next-line import/no-unassigned-import
 import 'markdown-it-github-alerts/styles/github-colors-light.css';
 // eslint-disable-next-line import/no-unassigned-import
@@ -85,4 +88,11 @@ if (!rootElement) {
   throw new Error('Root element "#root" was not found.');
 }
 const root = createRoot(rootElement);
-root.render(<RootApp />);
+
+void initializeI18n().finally(() => {
+  root.render(
+    <I18nextProvider i18n={i18n}>
+      <RootApp />
+    </I18nextProvider>,
+  );
+});

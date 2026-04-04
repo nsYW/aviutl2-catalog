@@ -1,3 +1,4 @@
+import { i18n } from '@/i18n';
 import type { InstallerAction } from '../catalogSchema';
 import { formatUnknownError } from '../errors';
 import { detectInstalledVersionsMap } from '../installed-map';
@@ -47,8 +48,8 @@ export async function executeDeleteAction(params: {
     emitTestOperation(onOperation, {
       kind: stepOperation.kind,
       status: 'skip',
-      summary: '削除スキップ',
-      detail: '対象が見つからないためスキップ',
+      summary: i18n.t('register:tests.deleteSkipped'),
+      detail: i18n.t('register:tests.deleteSkippedDetail'),
       targetPath: stepOperation.targetPath,
     });
   } catch (e: unknown) {

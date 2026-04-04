@@ -1,0 +1,21 @@
+{
+  "navigation": {
+    "home": "パッケージ一覧",
+    "updates": "アップデートセンター",
+    "links": "リンク集",
+    "niconiCommons": "ニコニコモンズ",
+    "register": "パッケージ登録",
+    "feedback": "フィードバック",
+    "settings": "設定"
+  },
+  "sections": {
+    "mainMenu": "メインメニュー",
+    "shortcuts": "ショートカット"
+  },
+  "items": {
+    "launchAviutl2": "AviUtl2を起動",
+    "openDataDir": "データフォルダを開く",
+    "openSidebar": "サイドバーを開く",
+    "closeSidebar": "サイドバーを閉じる"
+  }
+}

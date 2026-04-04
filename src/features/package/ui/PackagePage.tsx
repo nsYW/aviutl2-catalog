@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as tauriShell from '@tauri-apps/plugin-shell';
 import { useLocation, useParams } from 'react-router-dom';
 import { APP_ROUTE_PATHS } from '@/routePaths';
@@ -7,7 +8,6 @@ import { latestVersionOf } from '@/utils/catalog';
 import { useCatalog, useCatalogDispatch } from '@/utils/catalogStore';
 import { hasInstaller } from '@/utils/installer';
 import { buildLicenseBody } from '@/utils/licenseTemplates';
-import { formatDate } from '@/utils/text';
 import { HOME_LIST_RESTORE_STATE } from '@/layouts/app-shell/types';
 import {
   collectPackageImages,
@@ -26,7 +26,23 @@ import { cn } from '@/lib/cn';
 
 const MARKDOWN_BASE_URL = 'https://raw.githubusercontent.com/Neosku/aviutl2-catalog-data/main/md/';
 
+function resolvePackageListState(search: string) {
+  const listSearch = readPackageListSearchFromDetail(search);
+  const detailSource = readPackageDetailSource(search);
+  const listLink =
+    detailSource === 'updates'
+      ? APP_ROUTE_PATHS.updates
+      : detailSource === 'niconi-commons'
+        ? APP_ROUTE_PATHS.niconiCommons
+        : listSearch
+          ? { pathname: '/', search: listSearch }
+          : APP_ROUTE_PATHS.home;
+
+  return { detailSource, listLink };
+}
+
 export default function PackagePage() {
+  const { t, i18n } = useTranslation(['package', 'common', 'nav']);
   const { id } = useParams();
   const location = useLocation();
   const { items, loading } = useCatalog();
@@ -34,19 +50,13 @@ export default function PackagePage() {
   const [openLicense, setOpenLicense] = useState<PackageLicenseEntry | null>(null);
   const packageItems = items;
 
-  const listSearch = useMemo(() => readPackageListSearchFromDetail(location.search), [location.search]);
-  const detailSource = useMemo(() => readPackageDetailSource(location.search), [location.search]);
-  const listLink = useMemo(() => {
-    if (detailSource === 'updates') return APP_ROUTE_PATHS.updates;
-    if (detailSource === 'niconi-commons') return APP_ROUTE_PATHS.niconiCommons;
-    return listSearch ? { pathname: '/', search: listSearch } : APP_ROUTE_PATHS.home;
-  }, [detailSource, listSearch]);
+  const { detailSource, listLink } = useMemo(() => resolvePackageListState(location.search), [location.search]);
   const listLabel =
     detailSource === 'updates'
-      ? 'アップデートセンター'
+      ? t('nav:navigation.updates')
       : detailSource === 'niconi-commons'
-        ? 'ニコニコモンズ'
-        : 'パッケージ一覧';
+        ? t('nav:navigation.niconiCommons')
+        : t('nav:navigation.home');
   const listLinkState = detailSource === 'home' ? HOME_LIST_RESTORE_STATE : undefined;
 
   const item = useMemo(() => packageItems.find((entry) => entry.id === id), [id, packageItems]);
@@ -102,18 +112,20 @@ export default function PackagePage() {
     if (loading || items.length === 0) {
       return (
         <div className={page.container3xl}>
-          <div className="p-6 text-slate-500 dark:text-slate-400">読み込み中…</div>
+          <div className="p-6 text-slate-500 dark:text-slate-400">{t('common:router.loading')}</div>
         </div>
       );
     }
     return (
       <div className={page.container3xl}>
-        <div className="error">パッケージが見つかりませんでした。</div>
+        <div className="error">{t('page.notFound')}</div>
       </div>
     );
   }
 
-  const updated = item.updatedAt ? formatDate(item.updatedAt).replace(/-/g, '/') : '?';
+  const updated = item.updatedAt
+    ? new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium' }).format(new Date(item.updatedAt))
+    : '?';
   const latest = latestVersionOf(item) || '?';
 
   return (

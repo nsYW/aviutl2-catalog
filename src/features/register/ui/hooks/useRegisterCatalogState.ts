@@ -2,6 +2,7 @@
  * カタログ読込・検索・選択状態を管理する hook
  */
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCatalog } from '@/utils/catalogStore';
 import { applyCatalogJsonPatch as applyCatalogJsonPatchModel } from '../../model/catalogPatch';
 import { createEmptyPackageForm, entryToForm } from '../../model/form';
@@ -40,6 +41,7 @@ export default function useRegisterCatalogState({
   setError,
   onUserEdit,
 }: UseRegisterCatalogStateArgs) {
+  const { t, i18n } = useTranslation('register');
   const [catalogItems, setCatalogItems] = useState<CatalogEntry[]>([]);
   const [catalogLoadState, setCatalogLoadState] = useState<'idle' | 'loading' | 'loaded' | 'error'>('idle');
   const [catalogBaseUrl, setCatalogBaseUrl] = useState('');
@@ -53,8 +55,8 @@ export default function useRegisterCatalogState({
   const tagCandidates = useMemo(() => {
     const source = Array.isArray(allTags) ? allTags : [];
     const set = new Set<string>(source.map((tag) => String(tag || '')));
-    return Array.from(set).toSorted((a, b) => a.localeCompare(b, 'ja'));
-  }, [allTags]);
+    return Array.from(set).toSorted((a, b) => a.localeCompare(b, i18n.language));
+  }, [allTags, i18n.language]);
 
   const handleTagsChange = useCallback(
     (list: string[]) => {
@@ -81,7 +83,7 @@ export default function useRegisterCatalogState({
       const json = await res.json();
       const rawList = extractCatalogArray(json);
       if (!Array.isArray(rawList)) {
-        throw new Error('index.json の形式が不正です。');
+        throw new Error(t('errors.catalogInvalid'));
       }
       const list = catalogIndexSchema.parse(rawList);
       setCatalogItems(list);
@@ -105,10 +107,10 @@ export default function useRegisterCatalogState({
       }
       setCatalogLoadState('loaded');
     } catch (e: unknown) {
-      setError(`index.json の取得に失敗しました: ${getErrorMessage(e)}`);
+      setError(t('errors.catalogFetch', { detail: getErrorMessage(e) }));
       setCatalogLoadState('error');
     }
-  }, [catalogLoadState, setError, setPackageForm]);
+  }, [catalogLoadState, setError, setPackageForm, t]);
 
   useEffect(() => {
     loadCatalog();

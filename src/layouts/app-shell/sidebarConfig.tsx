@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import type { ParseKeys } from 'i18next';
 import {
   ExternalLink,
   FolderOpen,
@@ -42,15 +43,18 @@ interface SidebarRenderContext {
   activePage: ActivePage;
   isSidebarCollapsed: boolean;
   updateAvailableCount: number;
+  t: (key: SidebarTranslationKey) => string;
 }
+
+export type SidebarTranslationKey = ParseKeys<'nav'>;
 
 type SidebarItemLabelDefinition =
   | {
-      label: string;
+      labelKey: SidebarTranslationKey;
       getLabel?: never;
     }
   | {
-      label?: never;
+      labelKey?: never;
       getLabel: (context: SidebarRenderContext) => string;
     };
 
@@ -85,7 +89,7 @@ type SidebarRouteItemDefinition = SidebarItemDefinition & {
 
 export interface SidebarSectionDefinition {
   id: 'main-menu' | 'shortcuts' | 'app';
-  label?: string;
+  label?: SidebarTranslationKey;
   className?: string;
   labelClassName?: string;
   hideDivider?: boolean;
@@ -115,7 +119,7 @@ const niconiCommonsIcon = (
 
 const homeSidebarItem = {
   id: 'home',
-  label: 'パッケージ一覧',
+  labelKey: 'navigation.home',
   icon: PackageSearch,
   page: 'home',
   path: '/',
@@ -125,7 +129,7 @@ const homeSidebarItem = {
 
 const updatesSidebarItem = {
   id: 'updates',
-  label: 'アップデートセンター',
+  labelKey: 'navigation.updates',
   icon: RefreshCw,
   page: 'updates',
   path: '/updates',
@@ -135,7 +139,7 @@ const updatesSidebarItem = {
 
 const linksSidebarItem = {
   id: 'links',
-  label: 'リンク集',
+  labelKey: 'navigation.links',
   icon: Link,
   page: 'links',
   path: '/links',
@@ -145,7 +149,7 @@ const linksSidebarItem = {
 
 const niconiCommonsSidebarItem = {
   id: 'niconi-commons',
-  label: 'ニコニコモンズ',
+  labelKey: 'navigation.niconiCommons',
   icon: niconiCommonsIcon,
   page: 'niconi-commons',
   path: '/niconi-commons',
@@ -155,7 +159,7 @@ const niconiCommonsSidebarItem = {
 
 const registerSidebarItem = {
   id: 'register',
-  label: 'パッケージ登録',
+  labelKey: 'navigation.register',
   icon: PlusCircle,
   page: 'register',
   path: '/register',
@@ -165,7 +169,7 @@ const registerSidebarItem = {
 
 const feedbackSidebarItem = {
   id: 'feedback',
-  label: 'フィードバック',
+  labelKey: 'navigation.feedback',
   icon: MessagesSquare,
   page: 'feedback',
   path: '/feedback',
@@ -175,7 +179,7 @@ const feedbackSidebarItem = {
 
 const settingsSidebarItem = {
   id: 'settings',
-  label: '設定',
+  labelKey: 'navigation.settings',
   icon: Settings,
   page: 'settings',
   path: '/settings',
@@ -198,27 +202,27 @@ type SidebarRouteActionId = (typeof SIDEBAR_ROUTE_ITEMS)[number]['id'];
 export const SIDEBAR_SECTIONS: readonly SidebarSectionDefinition[] = [
   {
     id: 'main-menu',
-    label: 'メインメニュー',
+    label: 'sections.mainMenu',
     labelClassName: 'mb-1',
     hideDivider: true,
     items: [homeSidebarItem, updatesSidebarItem, linksSidebarItem, niconiCommonsSidebarItem, registerSidebarItem],
   },
   {
     id: 'shortcuts',
-    label: 'ショートカット',
+    label: 'sections.shortcuts',
     className: 'pt-2',
     labelClassName: 'mt-2 mb-1',
     items: [
       {
         id: 'launch-aviutl2',
-        label: 'AviUtl2を起動',
+        labelKey: 'items.launchAviutl2',
         icon: AviUtlIcon,
         shortcut: { code: 'KeyA', label: 'Alt+A' },
         rightIcon: ExternalLink,
       },
       {
         id: 'open-data-dir',
-        label: 'データフォルダを開く',
+        labelKey: 'items.openDataDir',
         icon: FolderOpen,
         shortcut: { code: 'KeyD', label: 'Alt+D' },
         rightIcon: ExternalLink,
@@ -233,7 +237,8 @@ export const SIDEBAR_SECTIONS: readonly SidebarSectionDefinition[] = [
       settingsSidebarItem,
       {
         id: 'toggle-sidebar',
-        getLabel: ({ isSidebarCollapsed }) => (isSidebarCollapsed ? 'サイドバーを開く' : 'サイドバーを閉じる'),
+        getLabel: ({ isSidebarCollapsed, t }) =>
+          isSidebarCollapsed ? t('items.openSidebar') : t('items.closeSidebar'),
         getIcon: ({ isSidebarCollapsed }) => (isSidebarCollapsed ? PanelLeftOpen : PanelLeftClose),
         variant: 'ghost',
         shortcut: { code: 'KeyB', label: 'Alt+B' },
@@ -278,7 +283,7 @@ export function resolveSidebarItem(
 ): ResolvedSidebarItemDefinition {
   return {
     id: item.id,
-    label: item.getLabel ? item.getLabel(context) : item.label,
+    label: item.getLabel ? item.getLabel(context) : context.t(item.labelKey),
     icon: item.getIcon ? item.getIcon(context) : item.icon,
     variant: item.variant ?? 'default',
     isActive: item.page ? context.activePage === item.page : false,

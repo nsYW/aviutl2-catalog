@@ -1,0 +1,21 @@
+{
+  "navigation": {
+    "home": "Package list",
+    "updates": "Update center",
+    "links": "Links",
+    "niconiCommons": "Niconi Commons",
+    "register": "Package registration",
+    "feedback": "Feedback",
+    "settings": "Settings"
+  },
+  "sections": {
+    "mainMenu": "Main menu",
+    "shortcuts": "Shortcuts"
+  },
+  "items": {
+    "launchAviutl2": "Launch AviUtl2",
+    "openDataDir": "Open data folder",
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar"
+  }
+}

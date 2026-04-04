@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCatalog, useCatalogDispatch } from '@/utils/catalogStore';
 import { hasInstaller, runInstallerForItem } from '@/utils/installer';
 import { logError } from '@/utils/logging';
@@ -84,14 +85,15 @@ function setRuntimeItemProgress(id: string, progress: ItemUpdateProgress | null)
 }
 
 export default function useUpdatesPage() {
+  const { t } = useTranslation(['updates', 'common']);
   const { items } = useCatalog();
   const dispatch = useCatalogDispatch();
-
-  const initialSnapshot = useMemo(() => snapshotRuntimeState(), []);
-  const [bulkUpdating, setBulkUpdating] = useState(initialSnapshot.bulkUpdating);
-  const [bulkProgress, setBulkProgress] = useState<BulkUpdateProgress | null>(initialSnapshot.bulkProgress);
-  const [error, setErrorState] = useState(initialSnapshot.error);
-  const [itemProgress, setItemProgress] = useState<ItemUpdateProgressMap>(initialSnapshot.itemProgress);
+  const [bulkUpdating, setBulkUpdating] = useState(() => runtimeState.bulkUpdating);
+  const [bulkProgress, setBulkProgress] = useState<BulkUpdateProgress | null>(() =>
+    runtimeState.bulkProgress ? { ...runtimeState.bulkProgress } : null,
+  );
+  const [error, setErrorState] = useState(() => runtimeState.error);
+  const [itemProgress, setItemProgress] = useState<ItemUpdateProgressMap>(() => ({ ...runtimeState.itemProgress }));
   const {
     isLoaded: pausedPackageUpdatesLoaded,
     pausedPackageIdSet,
@@ -135,7 +137,7 @@ export default function useUpdatesPage() {
     patchRuntimeState({
       bulkUpdating: true,
       error: '',
-      bulkProgress: { ratio: 0, status: '準備中…', current: 0, total: bulkUpdatableItems.length },
+      bulkProgress: { ratio: 0, status: t('common:status.preparing'), current: 0, total: bulkUpdatableItems.length },
     });
 
     const targets = bulkUpdatableItems.slice();
@@ -149,7 +151,7 @@ export default function useUpdatesPage() {
           bulkProgress: {
             ratio: 0,
             itemName: item.name,
-            status: '準備中…',
+            status: t('common:status.preparing'),
             current: i + 1,
             total,
           },
@@ -171,7 +173,7 @@ export default function useUpdatesPage() {
             bulkProgress: {
               ratio: 1,
               itemName: item.name,
-              status: '完了',
+              status: t('common:status.done'),
               current: i + 1,
               total,
             },
@@ -186,7 +188,7 @@ export default function useUpdatesPage() {
             bulkProgress: {
               ratio: 1,
               itemName: item.name,
-              status: 'エラー',
+              status: t('runtime.error'),
               current: i + 1,
               total,
             },
@@ -197,7 +199,7 @@ export default function useUpdatesPage() {
       if (failed.length > 0) {
         const sample = failed[0];
         patchRuntimeState({
-          error: `${failed.length}件のプラグインで更新に失敗しました（例: ${sample.item.name}: ${sample.msg}）`,
+          error: t('errors.bulkFailed', { count: failed.length, name: sample.item.name, detail: sample.msg }),
         });
       }
     } finally {
@@ -216,7 +218,7 @@ export default function useUpdatesPage() {
       if (runtimeLocks.bulkUpdating || runtimeLocks.itemUpdatingIds.has(item.id)) return;
       runtimeLocks.itemUpdatingIds.add(item.id);
       patchRuntimeState({ error: '' });
-      setRuntimeItemProgress(item.id, { ratio: 0, label: '準備中…' });
+      setRuntimeItemProgress(item.id, { ratio: 0, label: t('common:status.preparing') });
 
       try {
         await runInstallerForItem(item, dispatch, (progress: InstallerProgressPayload | null | undefined) => {
@@ -227,7 +229,7 @@ export default function useUpdatesPage() {
         });
       } catch (itemError) {
         patchRuntimeState({
-          error: `更新に失敗しました\n\n${toErrorMessage(itemError)}`,
+          error: t('errors.updateFailed', { detail: toErrorMessage(itemError) }),
         });
       } finally {
         runtimeLocks.itemUpdatingIds.delete(item.id);
@@ -248,11 +250,11 @@ export default function useUpdatesPage() {
         await togglePause(id, paused);
       } catch (pauseError) {
         patchRuntimeState({
-          error: `更新の一時停止設定を保存できませんでした\n\n${toErrorMessage(pauseError)}`,
+          error: t('errors.pauseSaveFailed', { detail: toErrorMessage(pauseError) }),
         });
       }
     },
-    [pausedPackageUpdatesLoaded, togglePause],
+    [pausedPackageUpdatesLoaded, t, togglePause],
   );
 
   const bulkPercent = Math.round((bulkProgress?.ratio ?? 0) * 100);

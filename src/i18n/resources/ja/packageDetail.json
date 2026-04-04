@@ -1,0 +1,59 @@
+{
+  "actions": {
+    "latest": "最新",
+    "installed": "導入済",
+    "paused": "停止中",
+    "update": "更新",
+    "removing": "削除中…",
+    "remove": "削除",
+    "install": "インストール",
+    "missingInstaller": "インストールが未実装です"
+  },
+  "card": {
+    "openDetails": "{{name}} の詳細を開く"
+  },
+  "carousel": {
+    "region": "スクリーンショットカルーセル",
+    "previous": "前の画像へ",
+    "next": "次の画像へ",
+    "slide": "スライド {{current}}/{{total}}"
+  },
+  "content": {
+    "screenshots": "スクリーンショット",
+    "deprecated": "非推奨",
+    "deprecatedReason": "このパッケージは以下の理由で非推奨となっています。",
+    "deprecatedSimple": "このパッケージは非推奨となっています。",
+    "descriptionLoading": "詳細説明を読み込み中です…",
+    "dependencies": "依存関係"
+  },
+  "descriptionErrors": {
+    "loadFailed": "詳細説明を読み込めませんでした。"
+  },
+  "errors": {
+    "actionFailed": "{{action}}に失敗しました\n\n{{detail}}"
+  },
+  "header": {
+    "uncategorized": "未分類"
+  },
+  "licenseModal": {
+    "title": "ライセンス: {{type}}",
+    "bodyMissing": "ライセンス本文がありません。"
+  },
+  "list": {
+    "backToList": "{{label}}に戻る"
+  },
+  "meta": {
+    "deprecatedAria": "非推奨の詳細を表示",
+    "deprecatedPrefix": "非推奨："
+  },
+  "page": {
+    "notFound": "パッケージが見つかりませんでした。"
+  },
+  "sidebar": {
+    "updatedAt": "更新日",
+    "latestVersion": "最新バージョン",
+    "currentVersion": "現在のバージョン",
+    "licenseUnknown": "不明",
+    "openLicenseAria": "ライセンス {{type}} の本文を表示"
+  }
+}

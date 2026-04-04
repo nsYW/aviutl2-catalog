@@ -1,8 +1,12 @@
 import type { CarouselImage } from './types';
 import type { Image } from '@/utils/catalogSchema';
+import type { PackageTypeTranslationKey } from '@/utils/query';
+import { packageTypeKeyFromRaw, packageTypeKeyToTranslationKey } from '@/utils/query';
 
 const PACKAGE_LIST_BACK_PARAM = 'back';
 const PACKAGE_DETAIL_SOURCE_PARAM = 'source';
+type PackageTypeLabelKey = `common:packageTypes.${PackageTypeTranslationKey}`;
+type PackageTypeTranslator = (key: PackageTypeLabelKey, options?: { defaultValue?: string }) => string;
 
 export type PackageDetailSource = 'home' | 'updates' | 'niconi-commons';
 
@@ -18,9 +22,6 @@ export function isMarkdownFilePath(path: string): boolean {
 export function resolveMarkdownUrl(path: string, baseUrl: string): string {
   const trimmed = String(path || '').trim();
   if (!trimmed) throw new Error('Empty markdown path');
-  try {
-    return new URL(trimmed).toString();
-  } catch {}
   try {
     return new URL(trimmed, baseUrl).toString();
   } catch {}
@@ -108,4 +109,18 @@ export function collectPackageImages(imageGroups: Image[] | undefined): {
   }
 
   return { heroImage, carouselImages };
+}
+
+export function resolvePackageTypeLabel(
+  rawType: unknown,
+  t: PackageTypeTranslator,
+  uncategorizedLabel: string,
+): string {
+  const normalizedType = typeof rawType === 'string' ? rawType.trim() : '';
+  if (!normalizedType) return uncategorizedLabel;
+
+  const typeKey = packageTypeKeyFromRaw(normalizedType);
+  if (typeKey === 'other') return normalizedType;
+
+  return t(`common:packageTypes.${packageTypeKeyToTranslationKey(typeKey)}`, { defaultValue: normalizedType });
 }

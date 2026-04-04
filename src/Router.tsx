@@ -1,6 +1,8 @@
 // アプリケーションのルーティング設定
 import { Suspense, lazy } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import RouterFallback from '@/components/RouterFallback';
 import DeepLinkHandler from '@/features/deep-link/ui/DeepLinkHandler';
 import AppShell from '@/layouts/app-shell/AppShell';
 import { APP_ROUTE_PATHS } from '@/routePaths';
@@ -15,10 +17,12 @@ const Feedback = lazy(() => import('@/features/feedback/ui/FeedbackPage'));
 const NiconiCommons = lazy(() => import('@/features/niconi-commons/ui/NiconiCommonsPage'));
 
 export default function AppRouter() {
+  const { t } = useTranslation('common');
+
   return (
     <BrowserRouter>
       <DeepLinkHandler />
-      <Suspense fallback={<div className="p-6">読み込み中…</div>}>
+      <Suspense fallback={<div className="p-6">{t('router.loading')}</div>}>
         <Routes>
           <Route element={<AppShell />}>
             <Route path={APP_ROUTE_PATHS.home} element={<Home />} />
@@ -29,6 +33,7 @@ export default function AppRouter() {
             <Route path={APP_ROUTE_PATHS.feedback} element={<Feedback />} />
             <Route path={APP_ROUTE_PATHS.niconiCommons} element={<NiconiCommons />} />
             <Route path={APP_ROUTE_PATHS.packageDetail} element={<Package />} />
+            <Route path="*" element={<RouterFallback />} />
           </Route>
         </Routes>
       </Suspense>

@@ -11,6 +11,27 @@ import type {
   RegisterVersionFile,
 } from './types';
 
+function getTodayInTokyoISO(): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: 'Asia/Tokyo',
+  }).formatToParts(new Date());
+
+  let year = '';
+  let month = '';
+  let day = '';
+
+  for (const part of parts) {
+    if (part.type === 'year') year = part.value;
+    if (part.type === 'month') month = part.value;
+    if (part.type === 'day') day = part.value;
+  }
+
+  return `${year}-${month}-${day}`;
+}
+
 export function createEmptyInstaller(): RegisterInstallerState {
   return {
     sourceType: 'direct',
@@ -35,19 +56,10 @@ export function createEmptyVersionFile(): RegisterVersionFile {
 }
 
 export function createEmptyVersion(): RegisterVersion {
-  const now = new Date();
-  const today = new Intl.DateTimeFormat('ja-JP', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    timeZone: 'Asia/Tokyo',
-  })
-    .format(now)
-    .replace(/\//g, '-');
   return {
     key: generateKey(),
     version: '',
-    release_date: today,
+    release_date: getTodayInTokyoISO(),
     files: [createEmptyVersionFile()],
   };
 }

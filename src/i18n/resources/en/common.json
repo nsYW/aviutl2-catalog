@@ -1,0 +1,104 @@
+{
+  "appName": "AviUtl2 Catalog",
+  "router": {
+    "loading": "Loading...",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you requested does not exist or has moved.",
+    "goHome": "Back to package list"
+  },
+  "actions": {
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "browse": "Browse",
+    "submit": "Submit",
+    "preview": "Preview",
+    "openPublicPage": "Open public page"
+  },
+  "labels": {
+    "id": "ID",
+    "type": "Type",
+    "author": "Author",
+    "tags": "Tags",
+    "licenses": "Licenses",
+    "summary": "Summary",
+    "description": "Description",
+    "niconiCommonsId": "Niconi Commons ID",
+    "noMatches": "No matches",
+    "senderNickname": "Sender nickname",
+    "targetPath": "Target path"
+  },
+  "progress": {
+    "percent": "Progress {{percent}}%"
+  },
+  "status": {
+    "preparing": "Preparing...",
+    "processing": "Processing...",
+    "done": "Done",
+    "error": "An error occurred"
+  },
+  "installerActions": {
+    "download": "Downloading",
+    "extract": "Extracting",
+    "copy": "Copying",
+    "delete": "Removing",
+    "run": "Running"
+  },
+  "packageTypes": {
+    "core": "Core",
+    "mod": "MOD",
+    "inputPlugin": "Input plugin",
+    "outputPlugin": "Output plugin",
+    "generalPlugin": "General plugin",
+    "filterPlugin": "Filter plugin",
+    "script": "Script",
+    "other": "Other"
+  },
+  "errors": {
+    "unknown": "Unknown error",
+    "submitFailed": "Submission failed. Check your network connection and configuration.",
+    "submitEndpointRequired": "VITE_SUBMIT_ENDPOINT is not configured.",
+    "submitEndpointHttps": "VITE_SUBMIT_ENDPOINT must start with https://."
+  },
+  "submit": {
+    "successDefault": "Submission completed.",
+    "completeTitle": "Submitted"
+  },
+  "process": {
+    "checkFailed": "Could not check whether AviUtl2 is running: {{detail}}",
+    "running": "AviUtl2 is running.\nClose the app before installing or uninstalling packages."
+  },
+  "github": {
+    "rateLimit": "GitHub API primary rate limit reached. Retry after {{resetAt}}."
+  },
+  "markdownAlerts": {
+    "note": "Note",
+    "tip": "Tip",
+    "important": "Important",
+    "warning": "Warning",
+    "caution": "Caution"
+  },
+  "errorDialog": {
+    "eyebrow": "Error",
+    "defaultTitle": "Something went wrong",
+    "copy": "Copy error message",
+    "copied": "Copied",
+    "closeAria": "Close error dialog"
+  },
+  "updateDialog": {
+    "eyebrow": "Update",
+    "title": "A new version is available",
+    "publishedOn": "Published {{date}}",
+    "notesUnavailable": "Release notes are unavailable.",
+    "later": "Later",
+    "updating": "Updating...",
+    "updateNow": "Update now",
+    "appliedMessage": "The update was applied. Please restart the app.",
+    "failed": "The update failed. Check your network connection and permissions."
+  },
+  "windowControls": {
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "restore": "Restore"
+  }
+}

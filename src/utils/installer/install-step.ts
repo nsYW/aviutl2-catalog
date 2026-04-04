@@ -1,3 +1,4 @@
+import { i18n } from '@/i18n';
 import type { InstallerAction, InstallerSource } from '../catalogSchema';
 import { assertNever } from '../errors';
 import { logInfo } from '../logging';
@@ -110,7 +111,7 @@ export async function executeInstallStep(params: ExecuteInstallStepParams): Prom
       emitTestOperation(onOperation, {
         kind: 'extract_sfx',
         status: 'done',
-        summary: 'extract_sfx を実行しました',
+        summary: i18n.t('register:tests.extractSfxDone'),
         detail: '',
       });
       break;
@@ -129,7 +130,7 @@ export async function executeInstallStep(params: ExecuteInstallStepParams): Prom
         kind: stepOperation.kind,
         status: 'done',
         summary: stepOperation.summary,
-        detail: `一致件数: ${count}件`,
+        detail: i18n.t('register:tests.matchedCount', { count }),
         fromPath: stepOperation.fromPath,
         toPath: stepOperation.toPath,
       });
@@ -163,7 +164,7 @@ export async function executeInstallStep(params: ExecuteInstallStepParams): Prom
       emitTestOperation(onOperation, {
         kind: 'run',
         status: 'done',
-        summary: 'run_auo_setup を実行しました',
+        summary: i18n.t('register:tests.runAuoSetupDone'),
         detail: '',
       });
       break;

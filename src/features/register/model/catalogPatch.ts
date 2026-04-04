@@ -1,4 +1,5 @@
 import { catalogEntrySchema, type CatalogEntry } from '@/utils/catalogSchema';
+import { i18n } from '@/i18n';
 import { getErrorMessage } from './helpers';
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -110,7 +111,7 @@ function isDeepEqual(left: unknown, right: unknown): boolean {
 function extractCatalogPatchList(json: unknown): CatalogPatch[] {
   const rawList = extractCatalogArray(json);
   if (!Array.isArray(rawList)) {
-    throw new Error('入力形式が不正です。');
+    throw new Error(i18n.t('register:errors.jsonInvalidInput'));
   }
   const list = rawList
     .filter((item): item is Record<string, unknown> => isPlainObject(item))
@@ -121,7 +122,7 @@ function extractCatalogPatchList(json: unknown): CatalogPatch[] {
     })
     .filter((item): item is CatalogPatch => item !== null);
   if (list.length === 0) {
-    throw new Error('上書き対象の要素がありません。');
+    throw new Error(i18n.t('register:errors.jsonNoTargets'));
   }
   return list;
 }
@@ -161,7 +162,7 @@ export function applyCatalogJsonPatch(args: { catalogItems: CatalogEntry[]; json
   try {
     parsed = JSON.parse(args.jsonText);
   } catch (error: unknown) {
-    throw new Error(`JSON の解析に失敗しました: ${getErrorMessage(error)}`, { cause: error });
+    throw new Error(i18n.t('register:errors.jsonParseFailed', { detail: getErrorMessage(error) }), { cause: error });
   }
 
   const patchList = extractCatalogPatchList(parsed);

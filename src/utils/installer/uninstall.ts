@@ -1,3 +1,4 @@
+import { i18n } from '@/i18n';
 import { assertNever, formatUnknownError } from '../errors';
 import { removeInstalledId } from '../installed-map';
 import { bestEffortLogError, logInfo } from '../logging';
@@ -68,7 +69,7 @@ export async function runUninstallerForItem(
             emitTestOperation(onOperation, {
               kind: 'error',
               status: 'skip',
-              summary: '未対応アクション',
+              summary: i18n.t('register:tests.unsupportedAction'),
               detail: stepAction,
             });
             break;
@@ -80,7 +81,7 @@ export async function runUninstallerForItem(
         emitTestOperation(onOperation, {
           kind: stepOperation.kind,
           status: 'error',
-          summary: `${toTestOperationLabel(stepAction)} 失敗`,
+          summary: i18n.t('register:tests.operationFailed', { action: toTestOperationLabel(stepAction) }),
           detail: formatUnknownError(e),
           targetPath: stepOperation.targetPath,
         });

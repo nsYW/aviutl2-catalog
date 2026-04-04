@@ -1,3 +1,4 @@
+import { i18n } from '@/i18n';
 import { detectInstalledVersionsMap, loadInstalledMap, removeInstalledId } from '../installed-map';
 import type { CatalogDispatch } from '../catalogStore';
 import { runInstallerForItem } from './install';
@@ -31,7 +32,7 @@ export async function runPackageInstallAction(
   item: InstallerRunnableItem,
   dispatch: CatalogDispatch | null | undefined,
   onProgress?: (progress: InstallProgressPayload) => void,
-  missingInstallerMessage: string = 'インストーラーがありません',
+  missingInstallerMessage: string = i18n.t('package:actions.missingInstaller'),
 ): Promise<void> {
   if (!hasInstaller(item)) throw new Error(missingInstallerMessage);
   await runInstallerForItem(item, dispatch, onProgress);

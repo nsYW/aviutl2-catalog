@@ -6,6 +6,7 @@ import { logError } from './logging';
 const SETTINGS_FILE = 'settings.json';
 const settingsFileSchema = z.object({
   theme: z.string().optional(),
+  locale: z.string().optional(),
   aviutl2_root: z.string().optional(),
   is_portable_mode: z.boolean().optional(),
   package_state_opt_out: z.boolean().optional(),

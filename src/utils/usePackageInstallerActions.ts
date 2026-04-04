@@ -1,4 +1,6 @@
+import { i18n } from '@/i18n';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CatalogDispatch } from './catalogStore';
 import { runPackageInstallAction, runPackageRemoveAction } from './installer';
 import type { InstallProgressPayload, InstallerRunnableItem } from './installer/types';
@@ -25,17 +27,17 @@ export interface UsePackageInstallerActionsResult {
 
 function toErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;
-  return String(error || '不明なエラー');
+  return String(error || i18n.t('common:errors.unknown'));
 }
 
-export function createInitialInstallProgress(): InstallProgressPayload {
+export function createInitialInstallProgress(label: string): InstallProgressPayload {
   return {
     ratio: 0,
     percent: 0,
     step: null,
     stepIndex: null,
     totalSteps: 0,
-    label: '準備中…',
+    label,
     phase: 'init',
   };
 }
@@ -43,17 +45,21 @@ export function createInitialInstallProgress(): InstallProgressPayload {
 export default function usePackageInstallerActions({
   item,
   dispatch,
-  missingInstallerMessage = 'インストーラーがありません',
+  missingInstallerMessage,
 }: UsePackageInstallerActionsParams): UsePackageInstallerActionsResult {
+  const { t } = useTranslation(['common', 'package']);
+  const resolvedMissingInstallerMessage = missingInstallerMessage || t('package:actions.missingInstaller');
   const [error, setError] = useState('');
-  const [progress, setProgress] = useState<InstallProgressPayload>(createInitialInstallProgress);
+  const [progress, setProgress] = useState<InstallProgressPayload>(() =>
+    createInitialInstallProgress(t('common:status.preparing')),
+  );
   const { busyAction, beginAction, finishAction, isBusy } = useExclusiveBusyAction<PackageInstallBusyAction, 'idle'>(
     'idle',
   );
 
   const resetProgress = useCallback(() => {
-    setProgress(createInitialInstallProgress());
-  }, []);
+    setProgress(createInitialInstallProgress(t('common:status.preparing')));
+  }, [t]);
 
   const runInstall = useCallback(
     async (action: Extract<PackageInstallBusyAction, 'download' | 'update'>, actionLabel: string) => {
@@ -66,27 +72,27 @@ export default function usePackageInstallerActions({
           item,
           dispatch,
           (nextProgress) => {
-            setProgress(nextProgress ?? createInitialInstallProgress());
+            setProgress(nextProgress ?? createInitialInstallProgress(t('common:status.preparing')));
           },
-          missingInstallerMessage,
+          resolvedMissingInstallerMessage,
         );
       } catch (installError) {
-        setError(`${actionLabel}に失敗しました\n\n${toErrorMessage(installError)}`);
+        setError(t('package:errors.actionFailed', { action: actionLabel, detail: toErrorMessage(installError) }));
       } finally {
         finishAction();
         resetProgress();
       }
     },
-    [beginAction, dispatch, finishAction, item, missingInstallerMessage, resetProgress],
+    [beginAction, dispatch, finishAction, item, resolvedMissingInstallerMessage, resetProgress, t],
   );
 
   const onDownload = useCallback(async () => {
-    await runInstall('download', 'インストール');
-  }, [runInstall]);
+    await runInstall('download', t('package:actions.install'));
+  }, [runInstall, t]);
 
   const onUpdate = useCallback(async () => {
-    await runInstall('update', '更新');
-  }, [runInstall]);
+    await runInstall('update', t('package:actions.update'));
+  }, [runInstall, t]);
 
   const onRemove = useCallback(async () => {
     if (!item) return;
@@ -95,12 +101,14 @@ export default function usePackageInstallerActions({
     try {
       await runPackageRemoveAction(item, dispatch);
     } catch (removeError) {
-      setError(`削除に失敗しました\n\n${toErrorMessage(removeError)}`);
+      setError(
+        t('package:errors.actionFailed', { action: t('package:actions.remove'), detail: toErrorMessage(removeError) }),
+      );
     } finally {
       finishAction();
       resetProgress();
     }
-  }, [beginAction, dispatch, finishAction, item, resetProgress]);
+  }, [beginAction, dispatch, finishAction, item, resetProgress, t]);
 
   return {
     error,

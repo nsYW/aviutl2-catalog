@@ -1,5 +1,7 @@
 import { type ChangeEvent, useCallback, useState } from 'react';
 import * as tauriDialog from '@tauri-apps/plugin-dialog';
+import { useTranslation } from 'react-i18next';
+import { getCurrentUiLocale, normalizeUiLocale } from '@/i18n';
 import { useCatalog, useCatalogDispatch } from '@/utils/catalogStore';
 import { ipc } from '@/utils/invokeIpc';
 import { detectInstalledVersionsMap } from '@/utils/installed-map';
@@ -10,7 +12,14 @@ import type { SettingsFormState } from '../../model/types';
 import useSettingsDataManagement from './useSettingsDataManagement';
 import useSettingsInitialization from './useSettingsInitialization';
 
+async function logSettingsError(message: string, error: unknown): Promise<void> {
+  try {
+    await logError(`[settings] ${message}: ${toErrorMessage(error, 'unknown')}`);
+  } catch {}
+}
+
 export default function useSettingsPage() {
+  const { t, i18n } = useTranslation('settings');
   const { items } = useCatalog();
   const dispatch = useCatalogDispatch();
 
@@ -18,6 +27,7 @@ export default function useSettingsPage() {
     aviutl2Root: '',
     isPortableMode: false,
     theme: 'darkmode',
+    locale: getCurrentUiLocale(i18n),
     packageStateOptOut: false,
   });
   const [saving, setSaving] = useState(false);
@@ -48,6 +58,11 @@ export default function useSettingsPage() {
     setForm((prev) => ({ ...prev, isPortableMode: Boolean(next) }));
   }, []);
 
+  const onLocaleChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target;
+    setForm((prev) => ({ ...prev, locale: normalizeUiLocale(value) }));
+  }, []);
+
   const onPackageStateEnabledToggle = useCallback((nextEnabled: boolean) => {
     setForm((prev) => ({ ...prev, packageStateOptOut: !nextEnabled }));
   }, []);
@@ -65,15 +80,15 @@ export default function useSettingsPage() {
       const selected = await tauriDialog.open({
         directory: true,
         multiple: false,
-        title: 'AviUtl2 のルートフォルダ',
+        title: t('app.aviutl2Root.dialogTitle'),
       });
       const pathValue = Array.isArray(selected) ? selected[0] : selected;
       if (typeof pathValue !== 'string' || !pathValue.trim()) return;
       setForm((prev) => ({ ...prev, aviutl2Root: pathValue }));
     } catch {
-      setError('ディレクトリ選択に失敗しました');
+      setError(t('errors.directoryPickFailed'));
     }
-  }, []);
+  }, [t]);
 
   const onSave = useCallback(async () => {
     setSaving(true);
@@ -82,14 +97,22 @@ export default function useSettingsPage() {
     try {
       const resolved = await ipc.resolveAviutl2Root({ raw: String(form.aviutl2Root || '') });
       const aviutl2Root = String(resolved || '').trim();
-      if (!aviutl2Root) throw new Error('AviUtl2 のフォルダを指定してください。');
+      if (!aviutl2Root) throw new Error(t('errors.aviutl2Required'));
 
       await ipc.updateSettings({
         aviutl2Root,
         isPortableMode: Boolean(form.isPortableMode),
         theme: String(form.theme || 'darkmode').trim(),
+        locale: form.locale,
         packageStateOptOut: Boolean(form.packageStateOptOut),
       });
+
+      try {
+        await i18n.changeLanguage(form.locale);
+      } catch (languageError) {
+        setError(t('errors.languageApplyFailed'));
+        await logSettingsError('changeLanguage failed', languageError);
+      }
 
       applyTheme(form.theme);
       const nextOptOut = Boolean(form.packageStateOptOut);
@@ -101,19 +124,19 @@ export default function useSettingsPage() {
       try {
         const detected = await detectInstalledVersionsMap(items);
         dispatch({ type: 'SET_DETECTED_MAP', payload: detected });
-      } catch {}
+      } catch (refreshError) {
+        await logSettingsError('refresh installed versions failed', refreshError);
+      }
 
-      setSuccess('設定を保存しました。');
+      setSuccess(i18n.getFixedT(form.locale, 'settings')('messages.saveSuccess'));
       setTimeout(() => setSuccess(''), 3000);
     } catch (saveError) {
-      setError(toErrorMessage(saveError, '保存に失敗しました。権限やパスをご確認ください。'));
-      try {
-        await logError(`[settings] save failed: ${toErrorMessage(saveError, 'unknown')}`);
-      } catch {}
+      setError(toErrorMessage(saveError, t('errors.saveFailed')));
+      await logSettingsError('save failed', saveError);
     } finally {
       setSaving(false);
     }
-  }, [dispatch, form, initialPackageStateOptOut, items]);
+  }, [dispatch, form, i18n, initialPackageStateOptOut, items, t]);
 
   const packageStateEnabled = !form.packageStateOptOut;
 
@@ -127,6 +150,7 @@ export default function useSettingsPage() {
     syncStatus,
     packageStateEnabled,
     onAviutl2RootChange,
+    onLocaleChange,
     onPortableToggle,
     onPackageStateEnabledToggle,
     onToggleTheme,

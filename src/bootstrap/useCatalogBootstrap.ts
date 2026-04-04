@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { i18n } from '@/i18n';
 import { loadCatalogData } from '@/utils/catalog';
 import type { CatalogDispatch } from '@/utils/catalogStore';
 import { formatUnknownError } from '@/utils/errors';
@@ -14,29 +15,31 @@ async function logBootstrapError(message: string, error: unknown): Promise<void>
   } catch {}
 }
 
+async function runBootstrapStep(message: string, action: () => Promise<void>): Promise<void> {
+  try {
+    await action();
+  } catch (error: unknown) {
+    await logBootstrapError(message, error);
+  }
+}
+
 export function useCatalogBootstrap(dispatch: CatalogDispatch): void {
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const root = document?.documentElement;
-      try {
+      await runBootstrapStep('theme apply failed', async () => {
         const settings = await getSettings();
         let theme = settings && settings.theme ? String(settings.theme) : '';
         if (theme === 'noir') theme = 'darkmode';
         const isDark = theme !== 'lightmode';
         root?.classList.toggle('dark', isDark);
-      } catch (error: unknown) {
-        await logBootstrapError('theme apply failed', error);
-      }
+      });
       root?.classList.remove('theme-init');
 
-      try {
+      await runBootstrapStep('package-state flush failed', async () => {
         await flushPackageStateQueue();
-      } catch (error: unknown) {
-        try {
-          await logError(`[package-state] flush failed: ${formatUnknownError(error)}`);
-        } catch {}
-      }
+      });
 
       try {
         const installedMap = await loadInstalledMap();
@@ -54,28 +57,20 @@ export function useCatalogBootstrap(dispatch: CatalogDispatch): void {
         if (Array.isArray(catalogItems) && catalogItems.length > 0) {
           const items = catalogItems;
           if (!cancelled) dispatch({ type: 'SET_ITEMS', payload: items });
-          try {
+          await runBootstrapStep('set_catalog_index failed', async () => {
             await ipc.setCatalogIndex({ items });
-          } catch (error: unknown) {
-            await logBootstrapError('set_catalog_index failed', error);
-          }
+          });
           try {
             const detected = await detectInstalledVersionsMap(items);
             if (!cancelled) {
               dispatch({ type: 'SET_DETECTED_MAP', payload: detected });
-              try {
+              await runBootstrapStep('saveInstalledSnapshot failed', async () => {
                 const snap = await saveInstalledSnapshot(detected);
                 dispatch({ type: 'SET_INSTALLED_MAP', payload: snap });
-              } catch (error: unknown) {
-                await logBootstrapError('saveInstalledSnapshot failed', error);
-              }
-              try {
+              });
+              await runBootstrapStep('package-state snapshot failed', async () => {
                 await maybeSendPackageStateSnapshot(detected);
-              } catch (error: unknown) {
-                try {
-                  await logError(`[package-state] snapshot failed: ${formatUnknownError(error)}`);
-                } catch {}
-              }
+              });
             }
           } catch (error: unknown) {
             await logBootstrapError('detectInstalledVersionsMap failed', error);
@@ -84,13 +79,13 @@ export function useCatalogBootstrap(dispatch: CatalogDispatch): void {
           if (!cancelled) {
             dispatch({
               type: 'SET_ERROR',
-              payload: 'カタログの読み込みに失敗しました（ネットワーク/キャッシュなし）。',
+              payload: i18n.t('home:errors.catalogUnavailable'),
             });
           }
         }
       } catch (error: unknown) {
         console.error('Failed to load catalog:', error);
-        if (!cancelled) dispatch({ type: 'SET_ERROR', payload: 'カタログの読み込みに失敗しました。' });
+        if (!cancelled) dispatch({ type: 'SET_ERROR', payload: i18n.t('home:errors.catalogLoadFailed') });
       } finally {
         if (!cancelled) dispatch({ type: 'SET_LOADING', payload: false });
       }

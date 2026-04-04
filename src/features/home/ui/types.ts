@@ -5,13 +5,14 @@ import type {
   HomeInstallStatus,
   HomeSortOrder,
 } from '@/layouts/app-shell/types';
+import type { PackageTypeFilterKey } from '@/utils/query';
 
 export type { HomeContextValue, HomeDeprecationStatus, HomeInstallStatus, HomeSortOrder };
 
 export interface FiltersSectionProps {
   searchQuery: string;
-  categories: string[];
-  selectedCategory: string;
+  categories: readonly PackageTypeFilterKey[];
+  selectedCategory: PackageTypeFilterKey;
   filteredCount: number;
   installStatus: HomeInstallStatus;
   deprecationStatus: HomeDeprecationStatus;
@@ -24,7 +25,7 @@ export interface FiltersSectionProps {
   isSortMenuOpen: boolean;
   sortOrder: HomeSortOrder;
   onSearchQueryChange: (next: string) => void;
-  onCategoryChange: (category: string) => void;
+  onCategoryChange: (category: PackageTypeFilterKey) => void;
   onToggleInstallMenu: () => void;
   onCloseInstallMenu: () => void;
   onSelectInstallStatus: (status: HomeInstallStatus) => void;

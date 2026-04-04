@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import PackageCardActionSection from './sections/PackageCardActionSection';
 import PackageCardMetaSection from './sections/PackageCardMetaSection';
 import PackageCardThumbnailSection from './sections/PackageCardThumbnailSection';
@@ -24,6 +25,7 @@ export default function PackageCardView({
   onUpdate,
   onRemove,
 }: PackageCardViewProps) {
+  const { t } = useTranslation('package');
   const tags = Array.isArray(item.tags) ? item.tags : EMPTY_TAGS;
 
   return (
@@ -35,7 +37,7 @@ export default function PackageCardView({
     >
       <button
         type="button"
-        aria-label={`${item.name} の詳細を開く`}
+        aria-label={t('card.openDetails', { name: item.name })}
         className="absolute inset-0 z-0 rounded-2xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
         onClick={onOpenDetail}
       />

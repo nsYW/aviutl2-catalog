@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import ImageCarousel from '../components/ImageCarousel';
 import type { PackageContentSectionProps } from '../types';
 import { surface, text } from '@/components/ui/_styles';
@@ -21,6 +22,7 @@ export default function PackageContentSection({
   descriptionError,
   onOpenLink,
 }: PackageContentSectionProps) {
+  const { t } = useTranslation('package');
   const descriptionMarkup = useMemo(() => ({ __html: descriptionHtml }), [descriptionHtml]);
   const descriptionRef = useRef<HTMLDivElement | null>(null);
 
@@ -43,31 +45,29 @@ export default function PackageContentSection({
     <div className="space-y-6">
       {carouselImages.length ? (
         <section className="space-y-3">
-          <h2 className="text-lg font-bold">スクリーンショット</h2>
+          <h2 className="text-lg font-bold">{t('content.screenshots')}</h2>
           <ImageCarousel images={carouselImages} />
         </section>
       ) : null}
 
       <section className={surface.cardSection}>
-        <h2 className={sectionTitleClass}>概要</h2>
+        <h2 className={sectionTitleClass}>{t('common:labels.summary')}</h2>
         <p className="select-text text-base leading-7 text-slate-600 dark:text-slate-300">{item.summary || '?'}</p>
         {item.deprecation ? (
           <>
             <h3 className="text-sm font-bold text-yellow-600 dark:text-yellow-300 mt-4 mb-2 justify-center">
               <TriangleAlert className="inline text-yellow-600 dark:text-yellow-300 mr-1" />
-              非推奨
+              {t('content.deprecated')}
             </h3>
             {item.deprecation.message ? (
               <>
-                <p className="text-sm text-yellow-600 dark:text-yellow-300">
-                  このパッケージは以下の理由で非推奨となっています。
-                </p>
+                <p className="text-sm text-yellow-600 dark:text-yellow-300">{t('content.deprecatedReason')}</p>
                 <blockquote className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-500 dark:border-yellow-500 text-sm text-yellow-600 dark:text-yellow-300 rounded">
                   {item.deprecation.message}
                 </blockquote>
               </>
             ) : (
-              <p className="text-sm text-yellow-600 dark:text-yellow-300">このパッケージは非推奨となっています。</p>
+              <p className="text-sm text-yellow-600 dark:text-yellow-300">{t('content.deprecatedSimple')}</p>
             )}
           </>
         ) : null}
@@ -75,9 +75,9 @@ export default function PackageContentSection({
 
       {item.description ? (
         <section className={surface.cardSection}>
-          <h2 className="text-lg font-bold mb-3">詳細説明</h2>
+          <h2 className="text-lg font-bold mb-3">{t('common:labels.description')}</h2>
           {descriptionLoading ? (
-            <p className={text.mutedSm}>詳細説明を読み込み中です…</p>
+            <p className={text.mutedSm}>{t('content.descriptionLoading')}</p>
           ) : (
             <div
               ref={descriptionRef}
@@ -95,7 +95,7 @@ export default function PackageContentSection({
 
       {item.dependencies?.length ? (
         <section className={surface.cardSection}>
-          <h2 className={sectionTitleClass}>依存関係</h2>
+          <h2 className={sectionTitleClass}>{t('content.dependencies')}</h2>
           <p className={text.bodySmMuted}>{item.dependencies.join(', ')}</p>
         </section>
       ) : null}

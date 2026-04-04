@@ -1,3 +1,4 @@
+import { i18n } from '@/i18n';
 import * as tauriHttp from '@tauri-apps/plugin-http';
 import type { GithubSource } from '../catalogSchema';
 import { formatUnknownError } from '../errors';
@@ -23,16 +24,14 @@ class GitHubPrimaryRateLimitError extends Error {
   readonly resetAtUnixSeconds: number;
 
   constructor(resetAtUnixSeconds: number) {
-    super(
-      `GitHub API の primary rate limit に達しました。${formatResetAt(resetAtUnixSeconds)} まで待ってから再試行してください。`,
-    );
+    super(i18n.t('common:github.rateLimit', { resetAt: formatResetAt(resetAtUnixSeconds) }));
     this.name = 'GitHubPrimaryRateLimitError';
     this.resetAtUnixSeconds = resetAtUnixSeconds;
   }
 }
 
 function formatResetAt(resetAtUnixSeconds: number): string {
-  return new Intl.DateTimeFormat('ja-JP', {
+  return new Intl.DateTimeFormat(i18n.language, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',

@@ -46,6 +46,7 @@ type InvokeIpcMap = {
       aviutl2Root: string;
       isPortableMode: boolean;
       theme: string;
+      locale: string;
       packageStateOptOut: boolean;
     },
     void

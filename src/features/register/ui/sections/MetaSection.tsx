@@ -1,6 +1,7 @@
 /**
  * パッケージ基本情報登録セクションのコンポーネント
  */
+import { useTranslation } from 'react-i18next';
 import type { RegisterMetaSectionProps } from '../types';
 import PackageTypeEditor from './PackageTypeEditor';
 import TagEditor from './TagEditor';
@@ -13,16 +14,17 @@ export default function RegisterMetaSection({
   onUpdatePackageField,
   onTagsChange,
 }: RegisterMetaSectionProps) {
+  const { t } = useTranslation(['register', 'common']);
   return (
     <section className={surface.cardSection}>
       <div className={layout.rowBetweenWrapGap2}>
-        <h2 className={text.titleLg}>基本情報</h2>
+        <h2 className={text.titleLg}>{t('meta.title')}</h2>
       </div>
       <div className="grid gap-6">
         <div className={grid.twoColWideGap}>
           <div className="space-y-2">
             <label className={text.labelSm} htmlFor="package-id">
-              ID <span className="text-red-500">*</span>
+              {t('common:labels.id')} <span className="text-red-500">*</span>
             </label>
             <input
               id="package-id"
@@ -30,13 +32,13 @@ export default function RegisterMetaSection({
               value={packageForm.id}
               onChange={(e) => onUpdatePackageField('id', e.target.value)}
               required
-              placeholder="Kenkun.AviUtlExEdit2"
+              placeholder={t('meta.idPlaceholder')}
             />
-            <p className={text.mutedXs}>作者名.パッケージ名 の形式で入力してください。英数字と記号 ( . - _ ) のみ</p>
+            <p className={text.mutedXs}>{t('meta.idHint')}</p>
           </div>
           <div className="space-y-2">
             <label className={text.labelSm} htmlFor="package-name">
-              パッケージ名 <span className="text-red-500">*</span>
+              {t('meta.name')} <span className="text-red-500">*</span>
             </label>
             <input
               id="package-name"
@@ -44,7 +46,7 @@ export default function RegisterMetaSection({
               value={packageForm.name}
               onChange={(e) => onUpdatePackageField('name', e.target.value)}
               required
-              placeholder="AviUtl2"
+              placeholder={t('meta.namePlaceholder')}
             />
           </div>
         </div>
@@ -52,7 +54,7 @@ export default function RegisterMetaSection({
         <div className={grid.twoColWideGap}>
           <div className="space-y-2">
             <label className={text.labelSm} htmlFor="package-author">
-              作者名 <span className="text-red-500">*</span>
+              {t('meta.author')} <span className="text-red-500">*</span>
             </label>
             <input
               id="package-author"
@@ -60,19 +62,19 @@ export default function RegisterMetaSection({
               value={packageForm.author}
               onChange={(e) => onUpdatePackageField('author', e.target.value)}
               required
-              placeholder="KENくん"
+              placeholder={t('meta.authorPlaceholder')}
             />
           </div>
           <div className="space-y-2">
             <label className={text.labelSm} htmlFor="package-original-author">
-              オリジナル作者名 (任意)
+              {t('meta.originalAuthor')}
             </label>
             <input
               id="package-original-author"
               name="originalAuthor"
               value={packageForm.originalAuthor}
               onChange={(e) => onUpdatePackageField('originalAuthor', e.target.value)}
-              placeholder="オリジナル版がある場合に入力"
+              placeholder={t('meta.originalAuthorPlaceholder')}
             />
           </div>
           <div className="md:col-span-2">
@@ -80,21 +82,21 @@ export default function RegisterMetaSection({
           </div>
           <div className="space-y-2">
             <label className={text.labelSm} htmlFor="package-repo-url">
-              パッケージのサイト <span className="text-red-500">*</span>
+              {t('meta.repoUrl')} <span className="text-red-500">*</span>
             </label>
             <input
               id="package-repo-url"
               name="repoURL"
               value={packageForm.repoURL}
               onChange={(e) => onUpdatePackageField('repoURL', e.target.value)}
-              placeholder="パッケージのことが分かるURL"
+              placeholder={t('meta.repoUrlPlaceholder')}
               type="url"
               required
             />
           </div>
           <div className="space-y-2">
             <label className={text.labelSm} htmlFor="package-niconi-commons-id">
-              ニコニ・コモンズID (任意)
+              {t('meta.niconiCommonsId')}
             </label>
             <input
               id="package-niconi-commons-id"
@@ -109,14 +111,14 @@ export default function RegisterMetaSection({
         <div className={grid.twoColWideGap}>
           <div className="space-y-2">
             <label className={text.labelSm} htmlFor="package-dependencies">
-              依存パッケージ (現在非対応)
+              {t('meta.dependencies')}
             </label>
             <input
               id="package-dependencies"
               name="dependencies"
               value={packageForm.dependenciesText}
               onChange={(e) => onUpdatePackageField('dependenciesText', e.target.value)}
-              placeholder="パッケージID (カンマ区切り)"
+              placeholder={t('meta.dependenciesPlaceholder')}
             />
           </div>
         </div>
@@ -133,21 +135,19 @@ export default function RegisterMetaSection({
               onChange={(e) => onUpdatePackageField('deprecationEnabled', e.target.checked)}
               className="h-4 w-4"
             />
-            <span className={text.labelSm}>非推奨として表示する</span>
+            <span className={text.labelSm}>{t('meta.deprecationEnabled')}</span>
           </label>
           <div className="space-y-2">
             <label className={text.labelSm} htmlFor="package-deprecation-message">
-              非推奨メッセージ
+              {t('meta.deprecationMessage')}
             </label>
-            <p className={text.mutedXs}>
-              何らかの理由で非推奨としたい場合に、ここに理由や代替パッケージなどの情報を入力してください。
-            </p>
+            <p className={text.mutedXs}>{t('meta.deprecationHint')}</p>
             <input
               id="package-deprecation-message"
               name="deprecationMessage"
               value={packageForm.deprecationMessage}
               onChange={(e) => onUpdatePackageField('deprecationMessage', e.target.value)}
-              placeholder="代替パッケージや移行先がある場合に入力"
+              placeholder={t('meta.deprecationPlaceholder')}
               disabled={!packageForm.deprecationEnabled}
             />
           </div>

@@ -1,9 +1,12 @@
 import * as z from 'zod';
+import { normalizeUiLocale, type SupportedUiLocale } from '@/i18n';
+import { i18n } from '@/i18n';
 import type { InstalledImportMap, SettingsFormState } from './types';
 
 const installedImportSchema = z.union([z.array(z.string()), z.record(z.string(), z.string())]);
 const persistedSettingsSchema = z.object({
   theme: z.string().optional(),
+  locale: z.string().optional(),
   aviutl2_root: z.string().optional(),
   is_portable_mode: z.boolean().optional(),
   package_state_opt_out: z.boolean().optional(),
@@ -17,11 +20,12 @@ export function applyTheme(theme: string): void {
   root.classList.toggle('dark', isDark);
 }
 
-export function toSettingsForm(raw: unknown): SettingsFormState {
+export function toSettingsForm(raw: unknown, fallbackLocale: SupportedUiLocale = 'ja'): SettingsFormState {
   const parsed = persistedSettingsSchema.safeParse(raw);
   const source = parsed.success ? parsed.data : {};
   return {
     theme: String(source.theme || 'darkmode'),
+    locale: source.locale ? normalizeUiLocale(source.locale) : fallbackLocale,
     aviutl2Root: String(source.aviutl2_root || ''),
     isPortableMode: Boolean(source.is_portable_mode),
     packageStateOptOut: Boolean(source.package_state_opt_out),
@@ -31,7 +35,7 @@ export function toSettingsForm(raw: unknown): SettingsFormState {
 export function normalizeInstalledImport(data: unknown): InstalledImportMap {
   const parsed = installedImportSchema.safeParse(data);
   if (!parsed.success) {
-    throw new Error('インポートファイルの形式が正しくありません。');
+    throw new Error(i18n.t('settings:dataManagement.errors.invalidImportFormat'));
   }
   const normalized = parsed.data;
 

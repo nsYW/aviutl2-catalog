@@ -2,6 +2,7 @@
  * 送信 payload の構築と POST 実行を担当する hook
  */
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { catalogEntrySchema, catalogIndexSchema, type CatalogEntry } from '@/utils/catalogSchema';
 import { SUBMIT_ACTIONS, buildPackageEntry, getFileExtension, validatePackageForm } from '../../model/form';
@@ -47,6 +48,7 @@ export default function useRegisterSubmitHandler({
   setSelectedPackageId,
   setSuccessDialog,
 }: UseRegisterSubmitHandlerArgs) {
+  const { t } = useTranslation(['register', 'common']);
   const submitPackage = useCallback(
     async ({
       packageForm: targetForm,
@@ -57,10 +59,10 @@ export default function useRegisterSubmitHandler({
       openSuccessDialog = true,
     }: SubmitSinglePackageInput): Promise<SubmitSinglePackageResult> => {
       if (!submitEndpoint) {
-        throw new Error('VITE_SUBMIT_ENDPOINT が設定されていません。');
+        throw new Error(t('common:errors.submitEndpointRequired'));
       }
       if (!/^https:\/\//i.test(submitEndpoint)) {
-        throw new Error('VITE_SUBMIT_ENDPOINT には https:// で始まるURLを設定してください。');
+        throw new Error(t('common:errors.submitEndpointHttps'));
       }
       const validation = validatePackageForm(targetForm);
       if (validation) {
@@ -107,12 +109,12 @@ export default function useRegisterSubmitHandler({
       });
       // 外部 description 利用時のみ、md 添付ゼロを許可する。
       if (packageAttachmentCount === 0 && !useExternalDescription) {
-        throw new Error('Markdown と画像ファイルを添付してください');
+        throw new Error(t('errors.attachmentsRequired'));
       }
       const indexJsonBlob = new Blob([JSON.stringify(nextCatalog, null, 2)], { type: 'application/json' });
       appendAsset(indexJsonBlob, 'index.json', false);
 
-      const actionLabel = existingIndex >= 0 ? 'パッケージ更新' : 'パッケージ追加';
+      const actionLabel = existingIndex >= 0 ? t('page.submitActionUpdate') : t('page.submitActionCreate');
       const packageName = String(entry.name || entry.id || '');
       const packageId = String(entry.id || '');
       const senderName = targetPackageSender.trim();
@@ -157,7 +159,7 @@ export default function useRegisterSubmitHandler({
         (typeof responseJson?.public_issue_url === 'string' && responseJson.public_issue_url) ||
         (typeof responseJson?.url === 'string' && responseJson.url) ||
         '';
-      const defaultMessage = '送信が完了しました。';
+      const defaultMessage = t('common:submit.successDefault');
       const friendlyMessage =
         (typeof responseJson?.message === 'string' ? responseJson.message : '') || responseText || defaultMessage;
 
@@ -176,7 +178,7 @@ export default function useRegisterSubmitHandler({
         url: successUrl,
       };
     },
-    [setCatalogItems, setSelectedPackageId, setSuccessDialog, submitEndpoint],
+    [setCatalogItems, setSelectedPackageId, setSuccessDialog, submitEndpoint, t],
   );
 
   return { submitPackage };

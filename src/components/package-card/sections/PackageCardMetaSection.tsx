@@ -1,6 +1,7 @@
 import { memo, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, TriangleAlert, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Badge from '@/components/ui/Badge';
 import type { PackageCardItem } from '../types';
 import { cn } from '@/lib/cn';
@@ -23,6 +24,7 @@ interface PortalTooltipProps {
 }
 
 function PortalTooltip({ text: tooltipText, rect }: PortalTooltipProps) {
+  const { t } = useTranslation('package');
   const top = rect ? rect.bottom + 8 : 0;
   const left = rect ? rect.left : 0;
   const tooltipStyle = useMemo(
@@ -42,11 +44,11 @@ function PortalTooltip({ text: tooltipText, rect }: PortalTooltipProps) {
     >
       {tooltipText ? (
         <>
-          <strong className="text-yellow-600 dark:text-yellow-300">非推奨：</strong>
+          <strong className="text-yellow-600 dark:text-yellow-300">{t('meta.deprecatedPrefix')}</strong>
           {tooltipText}
         </>
       ) : (
-        <strong className="text-yellow-600 dark:text-yellow-300">非推奨</strong>
+        <strong className="text-yellow-600 dark:text-yellow-300">{t('content.deprecated')}</strong>
       )}
     </div>,
     document.body,
@@ -54,6 +56,7 @@ function PortalTooltip({ text: tooltipText, rect }: PortalTooltipProps) {
 }
 
 function PackageCardMetaSection({ item, lastUpdated, tags }: PackageCardMetaSectionProps) {
+  const { t } = useTranslation('package');
   const deprecationButtonRef = useRef<HTMLButtonElement | null>(null);
   const [hoverRect, setHoverRect] = useState<DOMRect | null>(null);
   const deprecatedNameClass = item.deprecation
@@ -78,7 +81,7 @@ function PackageCardMetaSection({ item, lastUpdated, tags }: PackageCardMetaSect
               <button
                 ref={deprecationButtonRef}
                 type="button"
-                aria-label="非推奨の詳細を表示"
+                aria-label={t('meta.deprecatedAria')}
                 className="inline-flex items-center gap-1 rounded-full border border-yellow-200 bg-yellow-50 px-2 py-1 text-[11px] font-bold leading-none text-yellow-600 transition-colors hover:border-yellow-300 hover:bg-yellow-100 hover:text-yellow-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50 dark:border-yellow-800/60 dark:bg-yellow-950/30 dark:text-yellow-300 dark:hover:border-yellow-700 dark:hover:bg-yellow-950/45 dark:hover:text-yellow-200"
                 onClick={(event) => {
                   handlePopoverTriggerClick(event);
@@ -90,7 +93,7 @@ function PackageCardMetaSection({ item, lastUpdated, tags }: PackageCardMetaSect
                 onBlur={() => setHoverRect(null)}
               >
                 <TriangleAlert size={12} />
-                <span>非推奨</span>
+                <span>{t('content.deprecated')}</span>
               </button>
               <PortalTooltip text={item.deprecation.message} rect={hoverRect} />
             </span>

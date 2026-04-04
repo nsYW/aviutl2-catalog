@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import { inputVariants } from '@/components/ui/Input';
 import { Check, FolderOpen, Moon, Settings as SettingsIcon, Sun } from 'lucide-react';
 import type { AppSettingsSectionProps } from '../types';
 import SettingToggleRow from './SettingToggleRow';
@@ -15,24 +17,27 @@ export default function AppSettingsSection({
   saving,
   success,
   onAviutl2RootChange,
+  onLocaleChange,
   onPortableToggle,
   onPackageStateEnabledToggle,
   onPickAviutl2Root,
   onToggleTheme,
   onSave,
 }: AppSettingsSectionProps) {
+  const { t } = useTranslation(['settings', 'common']);
+
   return (
     <section className={surface.panelOverflow}>
       <div className={surface.sectionHeader}>
         <SettingsIcon size={18} className="text-slate-500 dark:text-slate-400" />
-        <h3 className={text.headingSmBold}>アプリ設定</h3>
+        <h3 className={text.headingSmBold}>{t('sections.app')}</h3>
       </div>
       <div className="p-6 space-y-6">
         <div className="space-y-2">
           <label className="text-sm font-medium" htmlFor="settings-aviutl2-root">
-            AviUtl2 フォルダ
+            {t('app.aviutl2Root.label')}
           </label>
-          <div className={text.mutedXs}>aviutl2.exeを含むフォルダを指定してください。</div>
+          <div className={text.mutedXs}>{t('app.aviutl2Root.description')}</div>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <Input
               id="settings-aviutl2-root"
@@ -40,7 +45,7 @@ export default function AppSettingsSection({
               value={form.aviutl2Root}
               onChange={onAviutl2RootChange}
               className="flex-1 cursor-text select-text"
-              placeholder="aviutl2.exe のあるフォルダ"
+              placeholder={t('app.aviutl2Root.placeholder')}
             />
             <Button
               variant="secondary"
@@ -50,24 +55,43 @@ export default function AppSettingsSection({
               onClick={onPickAviutl2Root}
             >
               <FolderOpen size={16} />
-              参照
+              {t('common:actions.browse')}
             </Button>
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium" htmlFor="settings-locale">
+            {t('app.language.label')}
+          </label>
+          <div className={text.mutedXs}>{t('app.language.description')}</div>
+          <select
+            id="settings-locale"
+            name="locale"
+            value={form.locale}
+            onChange={onLocaleChange}
+            className={cn(inputVariants(), 'cursor-pointer')}
+            aria-label={t('app.language.label')}
+          >
+            <option value="ja">{t('app.language.options.ja')}</option>
+            <option value="en">{t('app.language.options.en')}</option>
+          </select>
         </div>
 
         <SettingToggleRow
           title={
             <>
-              ポータブルモード <span className={cn(text.mutedXs, 'font-normal')}>（オフ推奨）</span>
+              {t('app.portableMode.title')}{' '}
+              <span className={cn(text.mutedXs, 'font-normal')}>({t('app.portableMode.recommendedOff')})</span>
             </>
           }
-          description="プラグインやスクリプトを aviutl2.exe と同じ階層にある data フォルダに保存します"
+          description={t('app.portableMode.description')}
           checked={form.isPortableMode}
           onToggle={() => onPortableToggle(!form.isPortableMode)}
         />
 
         <SettingToggleRow
-          title="ダークモード"
+          title={t('app.theme.title')}
           checked={form.theme !== 'lightmode'}
           onToggle={onToggleTheme}
           thumbContent={
@@ -80,8 +104,8 @@ export default function AppSettingsSection({
         />
 
         <SettingToggleRow
-          title="匿名統計の送信"
-          description="利用状況を参考にした表示を提供するため、インストール・アンインストールされたパッケージID、およびインストール済みパッケージIDを匿名で送信します。ご協力をお願いします。"
+          title={t('app.packageState.title')}
+          description={t('app.packageState.description')}
           checked={packageStateEnabled}
           onToggle={() => onPackageStateEnabledToggle(!packageStateEnabled)}
         />
@@ -96,7 +120,7 @@ export default function AppSettingsSection({
             className="cursor-pointer"
           >
             {success && <Check size={16} />}
-            {success ? '保存しました' : '設定を保存'}
+            {success ? t('app.saved') : t('app.save')}
           </Button>
         </div>
       </div>

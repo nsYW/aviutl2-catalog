@@ -1,6 +1,7 @@
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { CheckCircle2, Download, RefreshCw, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ProgressCircle from '@/components/ProgressCircle';
 import type { PackageSidebarSectionProps } from '../../types';
 import { cn } from '@/lib/cn';
@@ -21,6 +22,7 @@ export default function PackageSidebarActionsCard({
   onUpdate,
   onRemove,
 }: PackageSidebarActionsCardProps) {
+  const { t } = useTranslation('package');
   const downloading = busyAction === 'download';
   const updating = busyAction === 'update';
   const removing = busyAction === 'remove';
@@ -32,7 +34,8 @@ export default function PackageSidebarActionsCard({
         <>
           {item.isLatest ? (
             <Badge variant="success" shape="pill" size="sm" className={cn(layout.inlineGap2, 'font-bold')}>
-              <CheckCircle2 size={14} /> 最新{item.installedVersion ? `（${item.installedVersion}）` : ''}
+              <CheckCircle2 size={14} /> {t('actions.latest')}
+              {item.installedVersion ? `（${item.installedVersion}）` : ''}
             </Badge>
           ) : (
             <button
@@ -57,7 +60,7 @@ export default function PackageSidebarActionsCard({
                 </span>
               ) : (
                 <>
-                  <RefreshCw size={18} /> 更新
+                  <RefreshCw size={18} /> {t('actions.update')}
                 </>
               )}
             </button>
@@ -73,10 +76,10 @@ export default function PackageSidebarActionsCard({
               type="button"
             >
               {removing ? (
-                '削除中…'
+                t('actions.removing')
               ) : (
                 <>
-                  <Trash2 size={18} /> 削除
+                  <Trash2 size={18} /> {t('actions.remove')}
                 </>
               )}
             </Button>
@@ -104,7 +107,7 @@ export default function PackageSidebarActionsCard({
             </span>
           ) : (
             <>
-              <Download size={18} /> インストール
+              <Download size={18} /> {t('actions.install')}
             </>
           )}
         </Button>

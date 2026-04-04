@@ -1,12 +1,8 @@
 import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Button from '@/components/ui/Button';
 import { layout } from '@/components/ui/_styles';
-import {
-  DEPRECATION_STATUS_LABELS,
-  DEPRECATION_STATUS_OPTIONS,
-  INSTALL_STATUS_LABELS,
-  INSTALL_STATUS_OPTIONS,
-} from '@/layouts/app-shell/constants';
+import { DEPRECATION_STATUS_OPTIONS, INSTALL_STATUS_OPTIONS } from '@/layouts/app-shell/constants';
 import { cn } from '@/lib/cn';
 import { renderDeprecationStatusIcon, renderInstallStatusIcon } from '../../filterIcons';
 import {
@@ -32,12 +28,17 @@ export default function HomeQuickFiltersRow({
   onSelectDeprecationStatus,
   onToggleFilterExpanded,
 }: HomeQuickFiltersRowProps) {
-  const installButtonLabel = INSTALL_STATUS_LABELS[installStatus];
+  const { t } = useTranslation('home');
+  const getInstallStatusLabel = (status: (typeof INSTALL_STATUS_OPTIONS)[number]) =>
+    status === 'all' ? t('shared.all') : t(`installStatus.${status}`);
+  const getDeprecationStatusLabel = (status: (typeof DEPRECATION_STATUS_OPTIONS)[number]) =>
+    status === 'all' ? t('shared.all') : t(`deprecationStatus.${status}`);
+  const installButtonLabel = getInstallStatusLabel(installStatus);
   const installButtonVariant =
     installStatus === 'installed' ? 'accentEmerald' : installStatus === 'not_installed' ? 'muted' : 'secondary';
   const installButtonTextClass =
     installStatus === 'installed' ? 'text-emerald-600 dark:text-emerald-300' : neutralControlTextClass;
-  const deprecationButtonLabel = DEPRECATION_STATUS_LABELS[deprecationStatus];
+  const deprecationButtonLabel = getDeprecationStatusLabel(deprecationStatus);
   const deprecationButtonClass =
     deprecationStatus === 'deprecated'
       ? 'border-yellow-200 bg-yellow-50 hover:bg-yellow-100 dark:border-yellow-800/60 dark:bg-yellow-950/30 dark:hover:bg-yellow-950/45'
@@ -54,7 +55,7 @@ export default function HomeQuickFiltersRow({
         )}
       >
         <Filter size={14} className="opacity-70" />
-        <span>絞り込み</span>
+        <span>{t('filters.label')}</span>
       </div>
 
       <div className="relative">
@@ -73,24 +74,24 @@ export default function HomeQuickFiltersRow({
           <>
             <button
               type="button"
-              aria-label="インストール状態メニューを閉じる"
+              aria-label={t('filters.closeInstallMenu')}
               className="fixed inset-0 z-10"
               onClick={onCloseInstallMenu}
             />
             <div className={dropdownPanelClass}>
               {INSTALL_STATUS_OPTIONS.map((option) => (
                 <button
-                  key={option.value}
-                  onClick={() => onSelectInstallStatus(option.value)}
+                  key={option}
+                  onClick={() => onSelectInstallStatus(option)}
                   className={cn(
                     dropdownItemBaseClass,
-                    installStatus === option.value ? dropdownItemSelectedClass : neutralControlTextClass,
+                    installStatus === option ? dropdownItemSelectedClass : neutralControlTextClass,
                   )}
                   type="button"
                 >
                   <span className="flex items-center gap-2">
-                    {renderInstallStatusIcon(option.value)}
-                    <span>{option.label}</span>
+                    {renderInstallStatusIcon(option)}
+                    <span>{getInstallStatusLabel(option)}</span>
                   </span>
                 </button>
               ))}
@@ -115,24 +116,24 @@ export default function HomeQuickFiltersRow({
           <>
             <button
               type="button"
-              aria-label="廃止状態メニューを閉じる"
+              aria-label={t('filters.closeDeprecationMenu')}
               className="fixed inset-0 z-10"
               onClick={onCloseDeprecationMenu}
             />
             <div className={dropdownPanelClass}>
               {DEPRECATION_STATUS_OPTIONS.map((option) => (
                 <button
-                  key={option.value}
-                  onClick={() => onSelectDeprecationStatus(option.value)}
+                  key={option}
+                  onClick={() => onSelectDeprecationStatus(option)}
                   className={cn(
                     dropdownItemBaseClass,
-                    deprecationStatus === option.value ? dropdownItemSelectedClass : neutralControlTextClass,
+                    deprecationStatus === option ? dropdownItemSelectedClass : neutralControlTextClass,
                   )}
                   type="button"
                 >
                   <span className="flex items-center gap-2">
-                    {renderDeprecationStatusIcon(option.value)}
-                    <span>{option.label}</span>
+                    {renderDeprecationStatusIcon(option)}
+                    <span>{getDeprecationStatusLabel(option)}</span>
                   </span>
                 </button>
               ))}
@@ -149,7 +150,7 @@ export default function HomeQuickFiltersRow({
         type="button"
       >
         <Filter size={16} className={neutralControlTextClass} />
-        <span className={cn('text-sm font-medium', neutralControlTextClass)}>タグ絞り込み</span>
+        <span className={cn('text-sm font-medium', neutralControlTextClass)}>{t('filters.tagFilter')}</span>
         {selectedTags.length > 0 ? (
           <span
             className={cn(

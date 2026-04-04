@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { loadCatalogData } from '@/utils/catalog';
 import { safeLog } from '../../model/helpers';
 import type { PackageItemsMap, PackageState, PackageStatesMap, RequiredPackageRow } from '../../model/types';
@@ -10,6 +11,7 @@ interface UseInitSetupCatalogStoreParams {
 }
 
 export default function useInitSetupCatalogStore({ requiredPluginIds, corePackageId }: UseInitSetupCatalogStoreParams) {
+  const { t } = useTranslation('initSetup');
   const [packageItems, setPackageItems] = useState<PackageItemsMap>({});
   const [packageStates, setPackageStates] = useState<PackageStatesMap>({});
   const [packagesLoading, setPackagesLoading] = useState(false);
@@ -52,11 +54,11 @@ export default function useInitSetupCatalogStore({ requiredPluginIds, corePackag
             return next;
           });
           if (missing.length) {
-            setPackagesError(`一部のパッケージ情報を取得できませんでした: ${missing.join(', ')}`);
+            setPackagesError(t('errors.packageInfoPartialFailed', { ids: missing.join(', ') }));
           }
         }
       } catch (requiredLoadError) {
-        if (!cancelled) setPackagesError('必須パッケージの情報を読み込めませんでした。');
+        if (!cancelled) setPackagesError(t('errors.requiredPackagesLoadFailed'));
         await safeLog('[init-window] required packages load failed', requiredLoadError);
       } finally {
         if (!cancelled) setPackagesLoading(false);
@@ -124,9 +126,9 @@ export default function useInitSetupCatalogStore({ requiredPluginIds, corePackag
         });
         return found;
       }
-      throw new Error(`パッケージ情報が見つかりません: ${id}`);
+      throw new Error(t('errors.packageInfoMissing', { id }));
     },
-    [fetchCatalogList, packageItems],
+    [fetchCatalogList, packageItems, t],
   );
 
   return {

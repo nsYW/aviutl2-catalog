@@ -2,6 +2,7 @@
  * バージョン編集関連のハンドラー群を提供する hook
  */
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { computeHashFromFile, createEmptyVersion, createEmptyVersionFile } from '../../model/form';
 import { basename } from '../../model/helpers';
 import type { RegisterPackageForm } from '../../model/types';
@@ -23,6 +24,7 @@ export default function useRegisterVersionHandlers({
   setError,
   onUserEdit,
 }: UseRegisterVersionHandlersArgs) {
+  const { t } = useTranslation('register');
   const notifyUserEdit = useCallback(() => {
     onUserEdit?.();
   }, [onUserEdit]);
@@ -134,7 +136,7 @@ export default function useRegisterVersionHandlers({
         setError('');
         const selection = await tauriDialog.open({
           multiple: false,
-          title: 'XXH3_128 を計算するファイルを選択',
+          title: t('errors.versionHashPickTitle'),
         });
         const selectedPath = Array.isArray(selection) ? selection[0] : selection;
         if (!selectedPath || typeof selectedPath !== 'string') return;
@@ -144,15 +146,15 @@ export default function useRegisterVersionHandlers({
         updateVersionFile(versionKey, fileKey, 'fileName', basename(selectedPath));
       } catch (err) {
         console.error(err);
-        const rawMessage = err instanceof Error ? err.message : 'XXH3_128 の計算に失敗しました';
+        const rawMessage = err instanceof Error ? err.message : t('errors.versionHashFailed');
         const friendly =
           typeof rawMessage === 'string' && /module/i.test(rawMessage)
-            ? 'ファイル選択機能を利用できません。Tauri 環境で実行してください。'
+            ? t('errors.versionHashUnavailable')
             : rawMessage;
         setError(friendly);
       }
     },
-    [setError, updateVersionFile],
+    [setError, t, updateVersionFile],
   );
 
   const openDatePicker = useCallback(

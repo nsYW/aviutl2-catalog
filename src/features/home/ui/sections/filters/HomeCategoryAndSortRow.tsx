@@ -1,8 +1,10 @@
 import { ArrowUpDown, ChevronDown, Layers } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Button from '@/components/ui/Button';
 import { layout, surface } from '@/components/ui/_styles';
-import { SORT_OPTIONS, SORT_OPTION_LABELS } from '@/layouts/app-shell/constants';
+import { SORT_OPTIONS } from '@/layouts/app-shell/constants';
 import { cn } from '@/lib/cn';
+import { packageTypeKeyToTranslationKey } from '@/utils/query';
 import { renderSortOrderIcon } from '../../filterIcons';
 import {
   dropdownItemBaseClass,
@@ -23,7 +25,11 @@ export default function HomeCategoryAndSortRow({
   onCloseSortMenu,
   onSelectSortOrder,
 }: HomeCategorySortRowProps) {
-  const selectedSortLabel = SORT_OPTION_LABELS[sortOrder];
+  const { t } = useTranslation('home');
+  const getSortLabel = (order: (typeof SORT_OPTIONS)[number]) => t(`sortOptions.${order}`);
+  const getCategoryLabel = (category: (typeof categories)[number]) =>
+    category === 'all' ? t('shared.all') : t(`common:packageTypes.${packageTypeKeyToTranslationKey(category)}`);
+  const selectedSortLabel = getSortLabel(sortOrder);
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -35,7 +41,7 @@ export default function HomeCategoryAndSortRow({
           )}
         >
           <Layers size={14} className="opacity-70" />
-          <span>種類</span>
+          <span>{t('filters.category')}</span>
         </div>
         <div
           className={cn(
@@ -55,7 +61,7 @@ export default function HomeCategoryAndSortRow({
               )}
               type="button"
             >
-              {category}
+              {getCategoryLabel(category)}
             </button>
           ))}
         </div>
@@ -71,7 +77,7 @@ export default function HomeCategoryAndSortRow({
           <span className={cn('text-lg font-black leading-none tabular-nums', neutralControlTextClass)}>
             {filteredCount}
           </span>
-          <span className={cn('ml-1 text-xs font-bold', neutralControlTextClass)}>件</span>
+          <span className={cn('ml-1 text-xs font-bold', neutralControlTextClass)}>{t('filters.count')}</span>
         </div>
 
         <div
@@ -81,7 +87,7 @@ export default function HomeCategoryAndSortRow({
           )}
         >
           <ArrowUpDown size={14} className="opacity-70" />
-          <span>並び替え</span>
+          <span>{t('filters.sort')}</span>
         </div>
         <div className="relative">
           <Button
@@ -89,7 +95,7 @@ export default function HomeCategoryAndSortRow({
             variant="secondary"
             size="actionSm"
             className={cn('cursor-pointer whitespace-nowrap', neutralControlTextClass)}
-            title="並び替え"
+            title={t('filters.sort')}
             type="button"
           >
             {renderSortOrderIcon(sortOrder, 'accent')}
@@ -100,24 +106,24 @@ export default function HomeCategoryAndSortRow({
             <>
               <button
                 type="button"
-                aria-label="並び替えメニューを閉じる"
+                aria-label={t('filters.closeSortMenu')}
                 className="fixed inset-0 z-10"
                 onClick={onCloseSortMenu}
               />
               <div className={dropdownPanelClass}>
                 {SORT_OPTIONS.map((option) => (
                   <button
-                    key={option.value}
-                    onClick={() => onSelectSortOrder(option.value)}
+                    key={option}
+                    onClick={() => onSelectSortOrder(option)}
                     className={cn(
                       dropdownItemBaseClass,
-                      sortOrder === option.value ? dropdownItemSelectedClass : neutralControlTextClass,
+                      sortOrder === option ? dropdownItemSelectedClass : neutralControlTextClass,
                     )}
                     type="button"
                   >
                     <span className="flex items-center gap-2">
-                      {renderSortOrderIcon(option.value)}
-                      <span>{option.label}</span>
+                      {renderSortOrderIcon(option)}
+                      <span>{getSortLabel(option)}</span>
                     </span>
                   </button>
                 ))}

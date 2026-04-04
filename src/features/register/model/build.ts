@@ -6,6 +6,7 @@ import { buildInstallerSource, serializeInstallStep, serializeUninstallStep } fr
 import { getFileExtension } from './parse';
 import type { RegisterInstallerTestItem, RegisterPackageForm } from './types';
 import type { CatalogEntry, Image, Installer, License, Version } from '@/utils/catalogSchema';
+import { i18n } from '@/i18n';
 import { ipc } from '@/utils/invokeIpc';
 
 export function buildInstallerPayload(form: RegisterPackageForm): Installer {
@@ -97,7 +98,7 @@ export async function computeHashFromFile(filePath: string): Promise<string> {
   if (!filePath) return '';
   const hex = await ipc.calcXxh3Hex({ path: filePath });
   if (!hex || typeof hex !== 'string') {
-    throw new Error('XXH3_128 を計算できませんでした。');
+    throw new Error(i18n.t('register:errors.versionHashFailed'));
   }
   return hex.toLowerCase();
 }

@@ -1,12 +1,9 @@
 import { Outlet, useOutletContext } from 'react-router-dom';
 import ErrorDialog from '@/components/ErrorDialog';
-import { SORT_OPTIONS } from './constants';
 import AppSidebar from './components/AppSidebar';
 import useAppShellState from './hooks/useAppShellState';
 import type { HomeContextValue } from './types';
 import { cn } from '@/lib/cn';
-
-export { SORT_OPTIONS };
 
 export default function AppShell() {
   const state = useAppShellState();

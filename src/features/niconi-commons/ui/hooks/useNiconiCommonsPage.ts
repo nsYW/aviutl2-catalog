@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as tauriShell from '@tauri-apps/plugin-shell';
 import * as z from 'zod';
 import { useCatalog } from '@/utils/catalogStore';
@@ -9,6 +10,7 @@ const DESELECTED_IDS_STORAGE_KEY = 'niconiCommonsDeselectedIds';
 const EMPTY_COPY_STATE: CopyState = { ok: false, count: 0 };
 
 export default function useNiconiCommonsPage() {
+  const { i18n } = useTranslation();
   const { items } = useCatalog();
   const skipPersistRef = useRef(true);
 
@@ -23,8 +25,8 @@ export default function useNiconiCommonsPage() {
   }, [items]);
 
   const sortedEligible = useMemo((): EligibleItem[] => {
-    return eligibleItems.toSorted((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ja'));
-  }, [eligibleItems]);
+    return eligibleItems.toSorted((a, b) => String(a.name || '').localeCompare(String(b.name || ''), i18n.language));
+  }, [eligibleItems, i18n.language]);
 
   const queryKey = useMemo(() => normalize(query), [query]);
 

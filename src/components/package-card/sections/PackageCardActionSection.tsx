@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react';
 import { CheckCircle2, CirclePause, Download, RefreshCw, Trash2, type LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ProgressCircle from '../../ProgressCircle';
 import type { PackageCardActionHandler, PackageCardBusyAction, PackageCardProgressView } from '../types';
 import { layout, surface } from '@/components/ui/_styles';
@@ -98,18 +99,28 @@ function StatusBadge({ icon: Icon, label, className }: { icon: LucideIcon; label
 }
 
 function InstalledActionBadge() {
-  return <StatusBadge icon={CheckCircle2} label="導入済" className={cn(installedActionClass, surface.baseMuted)} />;
+  const { t } = useTranslation('package');
+  return (
+    <StatusBadge
+      icon={CheckCircle2}
+      label={t('actions.installed')}
+      className={cn(installedActionClass, surface.baseMuted)}
+    />
+  );
 }
 
 function PausedUpdateBadge() {
-  return <StatusBadge icon={CirclePause} label="停止中" className={pausedActionClass} />;
+  const { t } = useTranslation('package');
+  return <StatusBadge icon={CirclePause} label={t('actions.paused')} className={pausedActionClass} />;
 }
 
 function RemoveActionButton({ disabled, onRemove }: { disabled: boolean; onRemove: PackageCardActionHandler }) {
+  const { t } = useTranslation('package');
   return (
     <button
       className={cn(layout.center, removeButtonClass)}
-      title="削除"
+      title={t('actions.remove')}
+      aria-label={t('actions.remove')}
       onClick={handleActionClick(onRemove)}
       disabled={disabled}
       type="button"
@@ -133,6 +144,7 @@ export default function PackageCardActionSection({
   onUpdate,
   onRemove,
 }: PackageCardActionSectionProps) {
+  const { t } = useTranslation('package');
   const downloading = busyAction === 'download';
   const updating = busyAction === 'update';
   const primaryDisabled = isBusy || !canInstall;
@@ -155,8 +167,8 @@ export default function PackageCardActionSection({
             busy={downloading}
             disabled={primaryDisabled}
             progress={progress}
-            label="インストール"
-            title="インストール"
+            label={t('actions.install')}
+            title={t('actions.install')}
             icon={Download}
             progressClassName="text-white"
             className="h-9 w-full gap-1.5 px-2 bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 active:scale-95 cursor-pointer disabled:cursor-not-allowed"
@@ -170,8 +182,8 @@ export default function PackageCardActionSection({
               busy={updating}
               disabled={updateDisabled}
               progress={progress}
-              label="更新"
-              title="更新"
+              label={t('actions.update')}
+              title={t('actions.update')}
               icon={RefreshCw}
               iconClassName="animate-spin-slow"
               progressClassName="text-amber-600 dark:text-amber-400"

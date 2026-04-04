@@ -7,6 +7,7 @@ export interface AppSettingsSectionProps {
   saving: boolean;
   success: string;
   onAviutl2RootChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onLocaleChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   onPortableToggle: (next: boolean) => void;
   onPackageStateEnabledToggle: (nextEnabled: boolean) => void;
   onPickAviutl2Root: () => void;

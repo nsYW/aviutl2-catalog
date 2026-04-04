@@ -1,6 +1,7 @@
 /**
  * Draft persistence utilities for register form
  */
+import { i18n } from '@/i18n';
 import type { CatalogEntry } from '@/utils/catalogSchema';
 import { basename, commaListToArray, computeStableTextHash, generateKey, normalizeArrayText } from './helpers';
 import { normalizeInstallStepState, normalizeUninstallStepState } from './installerRules';
@@ -271,7 +272,7 @@ async function restoreImageEntry(
       previewUrl: URL.createObjectURL(file),
     };
   } catch {
-    warnings.push(`${label} の元ファイルを再読み込みできませんでした: ${sourcePath}`);
+    warnings.push(i18n.t('register:errors.restoreImageSourceMissing', { label, sourcePath }));
     return {
       key,
       existingPath,
@@ -291,7 +292,7 @@ export function saveRegisterDraft(args: {
 }): RegisterDraftRecord {
   const storage = getStorage();
   if (!storage) {
-    throw new Error('一時保存を利用できません。');
+    throw new Error(i18n.t('register:errors.draftUnavailable'));
   }
   const requestedDraftId = String(args.draftId || '').trim();
   const requestedPackageId = String(args.packageId || '').trim();
@@ -301,7 +302,7 @@ export function saveRegisterDraft(args: {
     : getRegisterDraft(requestedPackageId || fallbackPackageId);
   const packageId = requestedPackageId || fallbackPackageId || String(previous?.packageId || '').trim();
   if (!packageId) {
-    throw new Error('一時保存には ID の入力が必要です。');
+    throw new Error(i18n.t('register:errors.draftIdRequired'));
   }
   const draftId = String(previous?.draftId || requestedDraftId || createDraftId()).trim();
   const contentHash = computeRegisterDraftContentHash(args);
@@ -444,12 +445,16 @@ export async function restoreRegisterDraft(record: RegisterDraftRecord): Promise
   const source = (record.form || {}) as RegisterDraftFormSnapshot;
   const imageSnapshot = source.images || { thumbnail: null, info: [] };
   const thumbnail = imageSnapshot.thumbnail
-    ? await restoreImageEntry(imageSnapshot.thumbnail, warnings, 'サムネイル')
+    ? await restoreImageEntry(imageSnapshot.thumbnail, warnings, i18n.t('register:images.thumbnailTitle'))
     : null;
   const infoEntries = Array.isArray(imageSnapshot.info) ? imageSnapshot.info : [];
   const info: RegisterImageEntry[] = [];
   for (let i = 0; i < infoEntries.length; i += 1) {
-    const restored = await restoreImageEntry(infoEntries[i], warnings, `説明画像${i + 1}`);
+    const restored = await restoreImageEntry(
+      infoEntries[i],
+      warnings,
+      i18n.t('register:errors.infoImageLabel', { index: i + 1 }),
+    );
     info.push(restored);
   }
   const { images: _images, ...rest } = source;
