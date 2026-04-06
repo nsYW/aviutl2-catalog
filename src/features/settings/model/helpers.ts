@@ -1,6 +1,7 @@
 import * as z from 'zod';
 import { normalizeUiLocale, type SupportedUiLocale } from '@/i18n';
 import { i18n } from '@/i18n';
+import { DEFAULT_APP_THEME, normalizeTheme } from '@/utils/appSettings';
 import type { InstalledImportMap, SettingsFormState } from './types';
 
 const installedImportSchema = z.union([z.array(z.string()), z.record(z.string(), z.string())]);
@@ -24,7 +25,7 @@ export function toSettingsForm(raw: unknown, fallbackLocale: SupportedUiLocale =
   const parsed = persistedSettingsSchema.safeParse(raw);
   const source = parsed.success ? parsed.data : {};
   return {
-    theme: String(source.theme || 'darkmode'),
+    theme: normalizeTheme(source.theme ?? DEFAULT_APP_THEME),
     locale: source.locale ? normalizeUiLocale(source.locale) : fallbackLocale,
     aviutl2Root: String(source.aviutl2_root || ''),
     isPortableMode: Boolean(source.is_portable_mode),

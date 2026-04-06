@@ -1,7 +1,8 @@
 import { type ChangeEvent, useCallback, useState } from 'react';
 import * as tauriDialog from '@tauri-apps/plugin-dialog';
 import { useTranslation } from 'react-i18next';
-import { getCurrentUiLocale, normalizeUiLocale } from '@/i18n';
+import { changeUiLocale, getCurrentUiLocale, normalizeUiLocale } from '@/i18n';
+import { DEFAULT_APP_THEME, updateAppSettings } from '@/utils/appSettings';
 import { useCatalog, useCatalogDispatch } from '@/utils/catalogStore';
 import { ipc } from '@/utils/invokeIpc';
 import { detectInstalledVersionsMap } from '@/utils/installed-map';
@@ -26,7 +27,7 @@ export default function useSettingsPage() {
   const [form, setForm] = useState<SettingsFormState>({
     aviutl2Root: '',
     isPortableMode: false,
-    theme: 'darkmode',
+    theme: DEFAULT_APP_THEME,
     locale: getCurrentUiLocale(i18n),
     packageStateOptOut: false,
   });
@@ -99,16 +100,17 @@ export default function useSettingsPage() {
       const aviutl2Root = String(resolved || '').trim();
       if (!aviutl2Root) throw new Error(t('errors.aviutl2Required'));
 
-      await ipc.updateSettings({
+      const updated = await updateAppSettings({
         aviutl2Root,
-        isPortableMode: Boolean(form.isPortableMode),
-        theme: String(form.theme || 'darkmode').trim(),
+        isPortableMode: form.isPortableMode,
+        theme: form.theme,
         locale: form.locale,
-        packageStateOptOut: Boolean(form.packageStateOptOut),
+        packageStateOptOut: form.packageStateOptOut,
       });
+      if (!updated) throw new Error(t('errors.aviutl2Required'));
 
       try {
-        await i18n.changeLanguage(form.locale);
+        await changeUiLocale(form.locale);
       } catch (languageError) {
         setError(t('errors.languageApplyFailed'));
         await logSettingsError('changeLanguage failed', languageError);

@@ -6,6 +6,8 @@
   },
   "steps": {
     "intro": "Start",
+    "installStatus": "Setup status",
+    "detailsExisting": "Review settings",
     "detailsInstall": "Install",
     "packages": "Recommended packages"
   },

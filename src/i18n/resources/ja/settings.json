@@ -17,11 +17,7 @@
     },
     "language": {
       "label": "表示言語",
-      "description": "アプリUIの表示言語を選択します。",
-      "options": {
-        "ja": "日本語",
-        "en": "English"
-      }
+      "description": "アプリUIの表示言語を選択します。"
     },
     "portableMode": {
       "title": "ポータブルモード",

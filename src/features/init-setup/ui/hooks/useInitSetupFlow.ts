@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import * as tauriDialog from '@tauri-apps/plugin-dialog';
 import { useTranslation } from 'react-i18next';
-import { getCurrentUiLocale, i18n } from '@/i18n';
+import { changeUiLocale, getCurrentUiLocale, i18n, type SupportedUiLocale } from '@/i18n';
+import { DEFAULT_APP_THEME, updateAppSettings } from '@/utils/appSettings';
 import { ipc } from '@/utils/invokeIpc';
+import { getSettings } from '@/utils/settings';
 import { fetchWindowLabel, getErrorMessage, safeLog } from '../../model/helpers';
 import type { InitSetupStep, InstalledChoice, PickDirKind } from '../../model/types';
 
@@ -17,6 +19,7 @@ export default function useInitSetupFlow() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [label, setLabel] = useState('');
+  const [localeBusy, setLocaleBusy] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,31 +65,34 @@ export default function useInitSetupFlow() {
     };
   }, []);
 
-  const persistAviutlSettings = useCallback(async (rootPath: string, portableMode: boolean) => {
-    const normalized = rootPath.trim();
-    if (!normalized) throw new Error(t('errors.aviutlRootRequired'));
-    let resolved = normalized;
-    try {
-      const candidate = await ipc.resolveAviutl2Root({ raw: normalized });
-      if (candidate) resolved = String(candidate);
-    } catch (resolveError) {
-      await safeLog('[init-window] resolve aviutl2 root failed', resolveError);
-    }
-    try {
-      await ipc.updateSettings({
-        aviutl2Root: resolved,
-        isPortableMode: Boolean(portableMode),
-        theme: 'dark',
-        locale: getCurrentUiLocale(i18n),
-        packageStateOptOut: false,
-      });
-    } catch (updateErrorInner) {
-      await safeLog('[init-window] update_settings invoke failed', updateErrorInner);
-      throw updateErrorInner;
-    }
-    setAviutlRoot(resolved);
-    return resolved;
-  }, []);
+  const persistAviutlSettings = useCallback(
+    async (rootPath: string, portableMode: boolean) => {
+      const normalized = rootPath.trim();
+      if (!normalized) throw new Error(t('errors.aviutlRootRequired'));
+      let resolved = normalized;
+      try {
+        const candidate = await ipc.resolveAviutl2Root({ raw: normalized });
+        if (candidate) resolved = String(candidate);
+      } catch (resolveError) {
+        await safeLog('[init-window] resolve aviutl2 root failed', resolveError);
+      }
+      try {
+        const updated = await updateAppSettings({
+          aviutl2Root: resolved,
+          isPortableMode: portableMode,
+          theme: DEFAULT_APP_THEME,
+          locale: getCurrentUiLocale(i18n),
+        });
+        if (!updated) throw new Error(t('errors.aviutlRootRequired'));
+      } catch (updateErrorInner) {
+        await safeLog('[init-window] update_settings invoke failed', updateErrorInner);
+        throw updateErrorInner;
+      }
+      setAviutlRoot(resolved);
+      return resolved;
+    },
+    [t],
+  );
 
   const canProceedDetails = useCallback(() => {
     if (installed === true) return Boolean(aviutlRoot.trim());
@@ -129,6 +135,34 @@ export default function useInitSetupFlow() {
     }
   }, [t]);
 
+  const changeLocale = useCallback(
+    async (nextLocale: SupportedUiLocale) => {
+      const currentLocale = getCurrentUiLocale(i18n);
+      if (currentLocale === nextLocale) return;
+      setLocaleBusy(true);
+      try {
+        await changeUiLocale(nextLocale);
+      } catch (languageError) {
+        await safeLog('[init-window] changeLanguage failed', languageError);
+      }
+
+      try {
+        const draftRoot = String((installed === true ? aviutlRoot : installDir) || '').trim();
+        const persisted = await getSettings();
+        await updateAppSettings({
+          aviutl2Root: draftRoot || undefined,
+          isPortableMode: typeof persisted.is_portable_mode === 'boolean' ? persisted.is_portable_mode : portable,
+          locale: nextLocale,
+        });
+      } catch (persistError) {
+        await safeLog('[init-window] locale persistence failed', persistError);
+      } finally {
+        setLocaleBusy(false);
+      }
+    },
+    [aviutlRoot, installDir, installed, portable],
+  );
+
   return {
     step,
     setStep,
@@ -145,10 +179,12 @@ export default function useInitSetupFlow() {
     setError,
     busy,
     label,
+    localeBusy,
     persistAviutlSettings,
     canProceedDetails,
     proceedInstalled,
     pickDir,
     finalizeSetup,
+    changeLocale,
   };
 }

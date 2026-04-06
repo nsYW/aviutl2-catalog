@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
+import { UI_LOCALE_OPTIONS } from '@/i18n';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { inputVariants } from '@/components/ui/Input';
@@ -73,8 +74,11 @@ export default function AppSettingsSection({
             className={cn(inputVariants(), 'cursor-pointer')}
             aria-label={t('app.language.label')}
           >
-            <option value="ja">{t('app.language.options.ja')}</option>
-            <option value="en">{t('app.language.options.en')}</option>
+            {UI_LOCALE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
 

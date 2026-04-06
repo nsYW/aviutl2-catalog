@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import * as tauriApp from '@tauri-apps/api/app';
 import { useTranslation } from 'react-i18next';
 import type { Dispatch, SetStateAction } from 'react';
-import { getCurrentUiLocale } from '@/i18n';
+import { changeUiLocale, getCurrentUiLocale } from '@/i18n';
 import { logError } from '@/utils/logging';
 import { getSettings } from '@/utils/settings';
 import { applyTheme, toErrorMessage, toSettingsForm } from '../../model/helpers';
@@ -35,9 +35,7 @@ export default function useSettingsInitialization({
           setInitialPackageStateOptOut(nextForm.packageStateOptOut);
           applyTheme(nextForm.theme);
         }
-        if (currentLocale !== nextForm.locale) {
-          await i18n.changeLanguage(nextForm.locale);
-        }
+        await changeUiLocale(nextForm.locale);
       } catch (settingsError) {
         try {
           await logError(`[settings] getSettings failed: ${toErrorMessage(settingsError, 'unknown')}`);

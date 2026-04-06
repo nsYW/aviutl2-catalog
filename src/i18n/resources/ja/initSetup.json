@@ -6,6 +6,8 @@
   },
   "steps": {
     "intro": "開始",
+    "installStatus": "導入状況",
+    "detailsExisting": "設定確認",
     "detailsInstall": "インストール",
     "packages": "推奨パッケージ"
   },

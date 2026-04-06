@@ -26,6 +26,7 @@ import registerVersionsJa from './resources/ja/register/versions.json';
 import registerWorkflowJa from './resources/ja/register/workflow.json';
 import settingsJa from './resources/ja/settings.json';
 import updatesJa from './resources/ja/updates.json';
+import type { SupportedUiLocale } from './uiLocale';
 
 export const defaultNS = 'common';
 export const namespaces = [
@@ -89,4 +90,4 @@ const enResources = {
 export const resources = {
   ja: jaResources,
   en: enResources,
-} as const satisfies Record<'ja' | 'en', LocaleResourceSchema>;
+} as const satisfies Record<SupportedUiLocale, LocaleResourceSchema>;
