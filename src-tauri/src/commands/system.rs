@@ -159,11 +159,11 @@ fn run_auo_setup_impl(exe_path: PathBuf, args: Vec<String>) -> Result<i32, Strin
     if hwnd_edit.0.is_null() {
         return Err("EDIT control not found in AUO_SETUP window".into());
     }
-    let keyword = "を使用する準備が完了しました。";
+    let keyword = crate::paths::AUO_SETUP_READY_KEYWORD;
     let mut last_len_u16 = 0usize;
     let mut close_sent = false;
     loop {
-        if !close_sent && drain_new_text_from_edit_and_check(hwnd_edit, &mut last_len_u16, keyword) {
+        if !close_sent && drain_new_text_from_edit_and_check(hwnd_edit, &mut last_len_u16, &keyword) {
             unsafe {
                 let _ = PostMessageW(Some(hwnd_dialog), WM_CLOSE, WPARAM(0), LPARAM(0));
             }
@@ -191,15 +191,13 @@ pub fn launch_aviutl2() -> Result<(), String> {
     let exe_path = dirs.aviutl2_root.join("aviutl2.exe");
     let locale = crate::paths::current_ui_locale();
     if !exe_path.exists() {
-        return Err(crate::paths::localized_message_for(
-            &locale,
-            &format!("aviutl2.exe が見つかりませんでした: {}", exe_path.display()),
-            &format!("aviutl2.exe was not found: {}", exe_path.display()),
-        ));
+        let path = exe_path.display().to_string();
+        return Err(crate::paths::common_message_with_args(locale, "backend.errors.aviutlExeNotFound", &[("path", &path)]));
     }
 
     std::process::Command::new(&exe_path).current_dir(&dirs.aviutl2_root).spawn().map_err(|e| {
-        crate::paths::localized_message_for(&locale, &format!("起動に失敗しました: {}", e), &format!("Failed to launch AviUtl2: {}", e))
+        let detail = e.to_string();
+        crate::paths::common_message_with_args(locale, "backend.errors.launchAviutlFailed", &[("detail", &detail)])
     })?;
 
     tracing::info!("Launched AviUtl2: {}", exe_path.display());
@@ -229,20 +227,12 @@ pub async fn run_auo_setup(app: AppHandle, exe_path: String) -> Result<i32, Stri
         tracing::info!("Running in portable mode");
         let core_installed = crate::read_installed_map(&app).get("Kenkun.AviUtlExEdit2").map(|s| !s.trim().is_empty()).unwrap_or(false);
         if !core_installed {
-            let msg = crate::paths::localized_message_for(
-                &settings.locale,
-                "Kenkun.AviUtlExEdit2 がインストールされていません。インストール後に再度実行してください。",
-                "Kenkun.AviUtlExEdit2 is not installed. Install it and try again.",
-            );
+            let msg = crate::paths::common_message(crate::paths::UiLocale::parse(&settings.locale), "backend.errors.exedit2NotInstalled");
             tracing::error!("{}", msg);
             return Err(msg);
         }
         if settings.aviutl2_root.as_os_str().is_empty() {
-            let msg = crate::paths::localized_message_for(
-                &settings.locale,
-                "settings.json に AviUtl2 のルートフォルダが設定されていません。",
-                "The AviUtl2 root folder is not configured in settings.json.",
-            );
+            let msg = crate::paths::common_message(crate::paths::UiLocale::parse(&settings.locale), "backend.errors.aviutlRootNotConfigured");
             tracing::error!("{}", msg);
             return Err(msg);
         }

@@ -5,6 +5,11 @@ import { defaultNS, namespaces, resources } from './resources';
 import { normalizeUiLocale, SUPPORTED_UI_LOCALES, type SupportedUiLocale } from './uiLocale';
 type I18nLanguageSource = Pick<typeof i18n, 'resolvedLanguage' | 'language'>;
 
+function applyDocumentLanguage(locale: string): void {
+  if (typeof document === 'undefined') return;
+  document.documentElement.lang = locale;
+}
+
 export function getCurrentUiLocale(source: I18nLanguageSource = i18n): SupportedUiLocale {
   return normalizeUiLocale(source.resolvedLanguage ?? source.language);
 }
@@ -13,17 +18,18 @@ export async function changeUiLocale(locale: SupportedUiLocale): Promise<void> {
   if (getCurrentUiLocale(i18n) === locale) return;
   // eslint-disable-next-line import/no-named-as-default-member
   await i18n.changeLanguage(locale);
+  applyDocumentLanguage(locale);
 }
 
-function resolveInitialLanguage(settingsLocale: unknown): string {
+function resolveInitialLanguage(settingsLocale: unknown): SupportedUiLocale {
   const saved = typeof settingsLocale === 'string' ? settingsLocale.trim() : '';
-  if (saved) return saved;
+  if (saved) return normalizeUiLocale(saved);
 
   const browserLocale =
     navigator.languages?.map((value) => value.trim()).find(Boolean) ??
     (typeof navigator.language === 'string' ? navigator.language.trim() : '');
 
-  return browserLocale || 'ja';
+  return normalizeUiLocale(browserLocale || 'ja');
 }
 
 export async function initializeI18n(): Promise<typeof i18n> {
@@ -40,8 +46,7 @@ export async function initializeI18n(): Promise<typeof i18n> {
     lng: resolveInitialLanguage(settingsLocale),
     fallbackLng: 'ja',
     supportedLngs: [...SUPPORTED_UI_LOCALES],
-    nonExplicitSupportedLngs: true,
-    load: 'languageOnly',
+    load: 'currentOnly',
     defaultNS,
     ns: [...namespaces],
     interpolation: {
@@ -52,6 +57,7 @@ export async function initializeI18n(): Promise<typeof i18n> {
     },
   });
 
+  applyDocumentLanguage(getCurrentUiLocale(i18n));
   return i18n;
 }
 

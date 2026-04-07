@@ -100,5 +100,20 @@
     "minimize": "最小化",
     "maximize": "最大化",
     "restore": "元に戻す"
+  },
+  "backend": {
+    "windowTitles": {
+      "setup": "セットアップ",
+      "main": "AviUtl2 カタログ",
+      "boothLogin": "BOOTH ログイン"
+    },
+    "errors": {
+      "aviutlFolderRequired": "AviUtl2 のフォルダを選択してください。",
+      "packageIdEmpty": "パッケージIDが空です。",
+      "aviutlExeNotFound": "aviutl2.exe が見つかりませんでした: {{path}}",
+      "launchAviutlFailed": "起動に失敗しました: {{detail}}",
+      "exedit2NotInstalled": "Kenkun.AviUtlExEdit2 がインストールされていません。インストール後に再度実行してください。",
+      "aviutlRootNotConfigured": "settings.json に AviUtl2 のルートフォルダが設定されていません。"
+    }
   }
 }

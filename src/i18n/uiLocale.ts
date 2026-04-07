@@ -1,4 +1,4 @@
-export const SUPPORTED_UI_LOCALES = ['ja', 'en'] as const;
+export const SUPPORTED_UI_LOCALES = ['ja', 'en', 'ko', 'zh-CN', 'zh-TW'] as const;
 
 export type SupportedUiLocale = (typeof SUPPORTED_UI_LOCALES)[number];
 
@@ -10,12 +10,27 @@ export interface UiLocaleOption {
 const UI_LOCALE_LABELS: Record<SupportedUiLocale, string> = {
   ja: '日本語',
   en: 'English',
+  ko: '한국어',
+  'zh-CN': '简体中文',
+  'zh-TW': '繁體中文',
 };
 
 const UI_LOCALE_ALIASES: Record<SupportedUiLocale, readonly string[]> = {
   ja: ['ja'],
   en: ['en'],
+  ko: ['ko'],
+  'zh-CN': ['zh-cn', 'zh-hans', 'zh-sg'],
+  'zh-TW': ['zh-tw', 'zh-hk', 'zh-mo', 'zh-hant'],
 };
+
+function matchUiLocale(locale: string): SupportedUiLocale | null {
+  if (locale === 'zh') return 'zh-CN';
+  return (
+    SUPPORTED_UI_LOCALES.find((candidate) =>
+      UI_LOCALE_ALIASES[candidate].some((alias) => locale === alias || locale.startsWith(`${alias}-`)),
+    ) ?? null
+  );
+}
 
 export const UI_LOCALE_OPTIONS: readonly UiLocaleOption[] = SUPPORTED_UI_LOCALES.map((locale) => ({
   value: locale,
@@ -24,10 +39,7 @@ export const UI_LOCALE_OPTIONS: readonly UiLocaleOption[] = SUPPORTED_UI_LOCALES
 
 export function normalizeUiLocale(value: unknown): SupportedUiLocale {
   const locale = typeof value === 'string' ? value.trim().toLowerCase() : '';
-  const matched = SUPPORTED_UI_LOCALES.find((candidate) =>
-    UI_LOCALE_ALIASES[candidate].some((alias) => locale.startsWith(alias)),
-  );
-  return matched ?? 'ja';
+  return matchUiLocale(locale) ?? 'ja';
 }
 
 export function getUiLocaleLabel(locale: string): string {
@@ -35,10 +47,6 @@ export function getUiLocaleLabel(locale: string): string {
     .trim()
     .toLowerCase();
   if (!normalized) return 'Unknown';
-  const directMatch = UI_LOCALE_LABELS[normalized as SupportedUiLocale];
-  if (directMatch) return directMatch;
-  const baseLocale = normalized.split('-')[0];
-  const baseMatch = UI_LOCALE_LABELS[baseLocale as SupportedUiLocale];
-  if (baseMatch) return baseMatch;
-  return normalized.toUpperCase();
+  const matched = matchUiLocale(normalized);
+  return matched ? UI_LOCALE_LABELS[matched] : normalized.toUpperCase();
 }

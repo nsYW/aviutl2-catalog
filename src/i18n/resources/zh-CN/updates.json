@@ -1,0 +1,31 @@
+{
+  "page": {
+    "title": "更新中心",
+    "description": "查看可更新的包",
+    "updateAll": "全部更新"
+  },
+  "sections": {
+    "available": "可用更新",
+    "paused": "已暂停"
+  },
+  "empty": {
+    "available": "没有可更新的包",
+    "loadingPaused": "正在加载暂停的更新设置...",
+    "paused": "没有已暂停的包"
+  },
+  "table": {
+    "package": "包",
+    "before": "当前",
+    "after": "最新",
+    "resume": "恢复",
+    "pause": "暂停",
+    "update": "更新",
+    "saving": "保存中...",
+    "progressAria": "{{name}} 的更新进度"
+  },
+  "errors": {
+    "bulkFailed": "{{count}} 个包更新失败（例如：{{name}}：{{detail}}）",
+    "updateFailed": "更新失败\n\n{{detail}}",
+    "pauseSaveFailed": "无法保存已暂停的更新设置\n\n{{detail}}"
+  }
+}

@@ -2,6 +2,7 @@ use arc_swap::ArcSwap;
 use once_cell::sync::Lazy;
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::sync::{Arc, Mutex};
 use std::{
     fs,
@@ -12,30 +13,110 @@ use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 
 static APP_DIR: OnceCell<ArcSwap<AppDirs>> = OnceCell::new();
 static SETTINGS_FILE_LOCK: Lazy<Mutex<()>> = Lazy::new(|| Mutex::new(()));
+pub const AUO_SETUP_READY_KEYWORD: &str = "を使用する準備が完了しました。";
+pub const UNKNOWN_DETECTED_VERSION: &str = "不明";
 
 fn pathbuf_to_string(path: &Path) -> String {
     path.to_string_lossy().into_owned()
 }
 
-pub fn is_english_locale(locale: &str) -> bool {
-    locale.trim().to_ascii_lowercase().starts_with("en")
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UiLocale {
+    Ja,
+    En,
+    Ko,
+    ZhCn,
+    ZhTw,
 }
 
-pub fn current_ui_locale() -> String {
+impl UiLocale {
+    pub fn parse(locale: &str) -> Self {
+        let normalized = locale.trim().to_ascii_lowercase();
+        if normalized == "zh" || normalized.starts_with("zh-cn") || normalized.starts_with("zh-hans") || normalized.starts_with("zh-sg") {
+            Self::ZhCn
+        } else if normalized.starts_with("zh-tw") || normalized.starts_with("zh-hk") || normalized.starts_with("zh-mo") || normalized.starts_with("zh-hant") {
+            Self::ZhTw
+        } else if normalized.starts_with("ko") {
+            Self::Ko
+        } else if normalized.starts_with("en") {
+            Self::En
+        } else {
+            Self::Ja
+        }
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Ja => "ja",
+            Self::En => "en",
+            Self::Ko => "ko",
+            Self::ZhCn => "zh-CN",
+            Self::ZhTw => "zh-TW",
+        }
+    }
+}
+
+static COMMON_RESOURCES_JA: Lazy<Value> = Lazy::new(|| {
+    serde_json::from_str(include_str!("../../src/i18n/resources/ja/common.json")).expect("failed to parse ja common.json")
+});
+static COMMON_RESOURCES_EN: Lazy<Value> = Lazy::new(|| {
+    serde_json::from_str(include_str!("../../src/i18n/resources/en/common.json")).expect("failed to parse en common.json")
+});
+static COMMON_RESOURCES_KO: Lazy<Value> = Lazy::new(|| {
+    serde_json::from_str(include_str!("../../src/i18n/resources/ko/common.json")).expect("failed to parse ko common.json")
+});
+static COMMON_RESOURCES_ZH_CN: Lazy<Value> = Lazy::new(|| {
+    serde_json::from_str(include_str!("../../src/i18n/resources/zh-CN/common.json")).expect("failed to parse zh-CN common.json")
+});
+static COMMON_RESOURCES_ZH_TW: Lazy<Value> = Lazy::new(|| {
+    serde_json::from_str(include_str!("../../src/i18n/resources/zh-TW/common.json")).expect("failed to parse zh-TW common.json")
+});
+
+fn common_resources(locale: UiLocale) -> &'static Value {
+    match locale {
+        UiLocale::Ja => &COMMON_RESOURCES_JA,
+        UiLocale::En => &COMMON_RESOURCES_EN,
+        UiLocale::Ko => &COMMON_RESOURCES_KO,
+        UiLocale::ZhCn => &COMMON_RESOURCES_ZH_CN,
+        UiLocale::ZhTw => &COMMON_RESOURCES_ZH_TW,
+    }
+}
+
+fn lookup_common_message(locale: UiLocale, key: &str) -> Option<&'static str> {
+    let mut current = common_resources(locale);
+    for segment in key.split('.') {
+        current = current.get(segment)?;
+    }
+    current.as_str()
+}
+
+fn interpolate_message(template: &str, args: &[(&str, &str)]) -> String {
+    let mut output = template.to_string();
+    for (key, value) in args {
+        output = output.replace(&format!("{{{{{key}}}}}"), value);
+    }
+    output
+}
+
+pub fn current_ui_locale() -> UiLocale {
     let Some(app_dirs) = APP_DIR.get().map(|cell| cell.load_full()) else {
-        return String::from("ja");
+        return UiLocale::Ja;
     };
     let settings_path = app_dirs.catalog_config_dir.join("settings.json");
-    let locale = Settings::load_from_file(&settings_path).locale.trim().to_string();
-    if locale.is_empty() { String::from("ja") } else { locale }
+    UiLocale::parse(&Settings::load_from_file(&settings_path).locale)
 }
 
-pub fn localized_message_for(locale: &str, ja: &str, en: &str) -> String {
-    if is_english_locale(locale) { en.to_string() } else { ja.to_string() }
+pub fn common_message(locale: UiLocale, key: &str) -> String {
+    common_message_with_args(locale, key, &[])
 }
 
-pub fn localized_message(ja: &str, en: &str) -> String {
-    localized_message_for(&current_ui_locale(), ja, en)
+pub fn common_message_with_args(locale: UiLocale, key: &str, args: &[(&str, &str)]) -> String {
+    let template = lookup_common_message(locale, key).or_else(|| lookup_common_message(UiLocale::En, key)).unwrap_or(key);
+    interpolate_message(template, args)
+}
+
+pub fn common_message_current(key: &str) -> String {
+    common_message(current_ui_locale(), key)
 }
 
 // settings.jsonから読み込む項目
@@ -183,7 +264,7 @@ fn finalize_settings(app: &AppHandle, settings: &mut Settings, settings_path: &P
 fn open_init_setup_window(app: &AppHandle) -> std::io::Result<()> {
     if app.get_webview_window("init-setup").is_none() {
         let mut builder = WebviewWindowBuilder::new(app, "init-setup", WebviewUrl::App("/".into()))
-            .title("セットアップ")
+            .title(common_message_current("backend.windowTitles.setup"))
             .inner_size(850.0, 640.0)
             .center()
             .resizable(true)
@@ -224,7 +305,7 @@ fn open_main_window(app: &AppHandle) -> Result<(), String> {
     }
 
     let mut builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("/".into()))
-        .title(localized_message("AviUtl2 カタログ", "AviUtl2 Catalog"))
+        .title(common_message_current("backend.windowTitles.main"))
         .inner_size(950.0, 760.0)
         .resizable(true)
         .decorations(false)
@@ -290,8 +371,8 @@ pub async fn update_settings(
     locale: String,
     package_state_opt_out: bool,
 ) -> Result<(), String> {
-    let locale = locale.trim().to_string();
-    let missing_root_message = localized_message_for(&locale, "AviUtl2 のフォルダを選択してください。", "Please select the AviUtl2 folder.");
+    let locale = UiLocale::parse(&locale);
+    let missing_root_message = common_message(locale, "backend.errors.aviutlFolderRequired");
     let trimmed = aviutl2_root.trim();
     if trimmed.is_empty() {
         return Err(missing_root_message.clone());
@@ -308,7 +389,7 @@ pub async fn update_settings(
     settings.aviutl2_root = root_path;
     settings.is_portable_mode = is_portable_mode;
     settings.theme = theme.to_string();
-    settings.locale = locale;
+    settings.locale = locale.as_str().to_string();
     settings.package_state_opt_out = package_state_opt_out;
     finalize_settings(&app, &mut settings, &settings_path, &catalog_config_dir).map_err(|e| e.to_string())
 }
@@ -317,7 +398,7 @@ pub async fn update_settings(
 pub async fn set_package_update_paused(app: AppHandle, package_id: String, paused: bool) -> Result<Vec<String>, String> {
     let package_id = package_id.trim();
     if package_id.is_empty() {
-        return Err(localized_message("パッケージIDが空です。", "Package ID is empty."));
+        return Err(common_message_current("backend.errors.packageIdEmpty"));
     }
 
     let catalog_config_dir = app.path().app_config_dir().map_err(|e| e.to_string())?;
@@ -364,7 +445,7 @@ fn resolve_aviutl_root(raw: &str) -> PathBuf {
 pub fn resolve_aviutl2_root(raw: String) -> Result<String, String> {
     let resolved = resolve_aviutl_root(&raw);
     if resolved.as_os_str().is_empty() {
-        Err(localized_message("AviUtl2 のフォルダを選択してください。", "Please select the AviUtl2 folder."))
+        Err(common_message_current("backend.errors.aviutlFolderRequired"))
     } else {
         Ok(pathbuf_to_string(&resolved))
     }

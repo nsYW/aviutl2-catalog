@@ -1,0 +1,66 @@
+{
+  "page": {
+    "title": "链接",
+    "description": "访问相关网站和支持资源"
+  },
+  "sections": {
+    "official": {
+      "title": "AviUtl2",
+      "description": "AviUtl2 官方网站和相关资料"
+    },
+    "community": {
+      "title": "社区",
+      "description": "AviUtl2 社区链接"
+    },
+    "support": {
+      "title": "支持",
+      "description": "AviUtl2 目录的支持链接"
+    },
+    "developers": {
+      "title": "开发者",
+      "description": "面向在 AviUtl2 目录发布包的开发者资源"
+    },
+    "catalog": {
+      "title": "GitHub 仓库",
+      "description": "与 AviUtl2 目录相关的 GitHub 仓库"
+    }
+  },
+  "entries": {
+    "official-site": {
+      "title": "官方网站",
+      "description": "AviUtl2 官方网站"
+    },
+    "official-changelog": {
+      "title": "更新日志（Nanashi.）",
+      "description": "用于查看 AviUtl2 发布历史的非官方网站"
+    },
+    "community-discord": {
+      "title": "Discord",
+      "description": "用于讨论和提问 AviUtl2 的非官方 Discord 社区"
+    },
+    "support-feedback": {
+      "title": "反馈",
+      "description": "提交错误报告、功能请求和询问的表单"
+    },
+    "support-register": {
+      "title": "包登记",
+      "description": "用于添加新包或更新现有条目的表单"
+    },
+    "developers-register-guide": {
+      "title": "如何发布包",
+      "description": "说明如何发布包的指南"
+    },
+    "developers-update-status": {
+      "title": "自动更新支持状态",
+      "description": "汇总已列出包的自动更新支持情况的文档"
+    },
+    "catalog-github-app": {
+      "title": "AviUtl2 目录仓库",
+      "description": "AviUtl2 目录应用的 GitHub 仓库"
+    },
+    "catalog-github-data": {
+      "title": "目录数据仓库",
+      "description": "包列表数据的 GitHub 仓库"
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "intro": {
+    "title": "AviUtl2 目录",
+    "description": "为首次使用配置 AviUtl2 目录",
+    "start": "开始设置"
+  },
+  "steps": {
+    "intro": "开始",
+    "installStatus": "安装状态",
+    "detailsExisting": "确认设置",
+    "detailsInstall": "安装",
+    "packages": "推荐包"
+  },
+  "installStatus": {
+    "title": "安装状态",
+    "description": "请选择与当前 AviUtl2 环境相符的选项",
+    "installedTitle": "已安装",
+    "installedDescription": "如果 AviUtl2 已经安装，请选择此项",
+    "freshTitle": "全新安装",
+    "freshDescription": "如果 AviUtl2 尚未安装，请选择此项。\n系统会自动下载并安装最新版本。"
+  },
+  "details": {
+    "portableMode": "便携模式",
+    "standard": "标准（推荐）",
+    "portable": "便携",
+    "standardDescription": "将插件和脚本安装到 ProgramData。",
+    "portableDescription": "将插件和脚本安装到 aviutl2.exe 旁边的 data 文件夹。",
+    "existing": {
+      "title": "选择文件夹",
+      "description": "请选择已安装 AviUtl2 的文件夹",
+      "label": "AviUtl2 文件夹路径",
+      "hint": "请选择包含 aviutl2.exe 的文件夹"
+    },
+    "install": {
+      "title": "选择安装位置",
+      "description": "请选择要安装 AviUtl2 的文件夹",
+      "label": "安装文件夹",
+      "next": "安装并继续",
+      "installing": "安装中...",
+      "progressAria": "安装进度"
+    }
+  },
+  "packages": {
+    "title": "推荐包",
+    "allInstalled": "所有推荐包均已安装",
+    "description": "安装标准使用所需的核心插件",
+    "loading": "正在加载包信息...",
+    "missingSummary": "加载详细信息失败",
+    "progressAria": "{{name}} 的进度",
+    "installed": "已安装",
+    "notInstalled": "未安装",
+    "skip": "不安装并继续",
+    "installAndNext": "全部安装并继续"
+  },
+  "done": {
+    "title": "设置完成",
+    "description": "所有设置均已准备就绪",
+    "openApp": "打开 AviUtl2 目录"
+  },
+  "errors": {
+    "aviutlRootRequired": "请输入 AviUtl2 文件夹。",
+    "saveFailed": "保存设置失败。",
+    "installDirRequired": "请输入安装文件夹。",
+    "setupFailed": "设置失败。",
+    "installFailed": "安装失败。",
+    "bulkInstallPartialFailed": "部分安装失败。",
+    "generic": "发生错误。",
+    "packageInfoPartialFailed": "无法加载部分包信息：{{ids}}",
+    "requiredPackagesLoadFailed": "无法加载必需包信息。",
+    "packageInfoMissing": "未找到包信息：{{id}}",
+    "networkRequired": "请连接到互联网。",
+    "packageInfoUnavailable": "无法获取包信息。",
+    "packageNotInstallable": "此包无法安装。",
+    "pickInstallDir": "选择安装文件夹",
+    "pickExistingDir": "选择 AviUtl2 文件夹",
+    "pickDirFailed": "选择文件夹失败。",
+    "finalizeFailed": "无法完成初始设置。"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "actions": {
+    "latest": "已是最新",
+    "installed": "已安裝",
+    "paused": "已暫停",
+    "update": "更新",
+    "removing": "移除中...",
+    "remove": "移除",
+    "install": "安裝",
+    "missingInstaller": "尚未實作安裝功能"
+  },
+  "card": {
+    "openDetails": "開啟 {{name}} 的詳細資訊"
+  },
+  "carousel": {
+    "region": "截圖輪播",
+    "previous": "上一張圖片",
+    "next": "下一張圖片",
+    "slide": "第 {{current}}/{{total}} 張"
+  },
+  "content": {
+    "screenshots": "截圖",
+    "deprecated": "已棄用",
+    "deprecatedReason": "此套件因以下原因已棄用。",
+    "deprecatedSimple": "此套件已棄用。",
+    "descriptionLoading": "正在載入說明...",
+    "dependencies": "相依項目"
+  },
+  "descriptionErrors": {
+    "loadFailed": "載入說明失敗。"
+  },
+  "errors": {
+    "actionFailed": "{{action}} 失敗\n\n{{detail}}"
+  },
+  "header": {
+    "uncategorized": "未分類"
+  },
+  "licenseModal": {
+    "title": "授權：{{type}}",
+    "bodyMissing": "沒有可用的授權文字。"
+  },
+  "list": {
+    "backToList": "返回 {{label}}"
+  },
+  "meta": {
+    "deprecatedAria": "顯示棄用詳情",
+    "deprecatedPrefix": "已棄用："
+  },
+  "page": {
+    "notFound": "找不到套件。"
+  },
+  "sidebar": {
+    "updatedAt": "更新日期",
+    "latestVersion": "最新版本",
+    "currentVersion": "目前版本",
+    "licenseUnknown": "未知",
+    "openLicenseAria": "開啟 {{type}} 的授權文字"
+  }
+}
