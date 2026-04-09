@@ -5,7 +5,11 @@ import { isHttpsUrl } from './helpers';
 import { getInstallStepIssue, getInstallerSourceIssue, getUninstallStepIssue } from './installerRules';
 import { getFileExtension } from './parse';
 import { ID_PATTERN, INSTALL_ACTIONS, SPECIAL_INSTALL_ACTIONS, UNINSTALL_ACTIONS } from './constants';
-import { requiresTemplateCopyrightFields } from '@/utils/licenseTemplates';
+import {
+  isOtherRegisterLicenseType,
+  isUnknownRegisterLicenseType,
+  requiresTemplateCopyrightFields,
+} from '@/utils/licenseTemplates';
 import { i18n } from '@/i18n';
 import type { RegisterPackageForm } from './types';
 
@@ -125,14 +129,15 @@ export function validatePackageForm(form: RegisterPackageForm): string {
   for (const license of form.licenses) {
     const type = String(license.type || '').trim();
     if (!type) return i18n.t('register:validation.licenseTypeRequired');
-    if (type === 'その他' && !String(license.licenseName || '').trim())
+    if (isOtherRegisterLicenseType(type) && !String(license.licenseName || '').trim())
       return i18n.t('register:validation.licenseNameRequired');
     const needsCustomBody =
-      type === 'その他' ||
-      (type !== '不明' && (license.isCustom || (license.licenseBody && license.licenseBody.trim().length > 0)));
+      isOtherRegisterLicenseType(type) ||
+      (!isUnknownRegisterLicenseType(type) &&
+        (license.isCustom || (license.licenseBody && license.licenseBody.trim().length > 0)));
     if (needsCustomBody && !String(license.licenseBody || '').trim())
       return i18n.t('register:validation.licenseBodyRequired');
-    const usesTemplate = type !== '不明' && type !== 'その他' && !license.isCustom;
+    const usesTemplate = !isUnknownRegisterLicenseType(type) && !isOtherRegisterLicenseType(type) && !license.isCustom;
     const requiresCopyright = usesTemplate && requiresTemplateCopyrightFields(type);
     if (requiresCopyright) {
       const entries = Array.isArray(license.copyrights) ? license.copyrights : [];

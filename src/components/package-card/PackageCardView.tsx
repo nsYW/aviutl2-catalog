@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { getInstalledVersionLabel } from '@/utils/detectResult';
 import PackageCardActionSection from './sections/PackageCardActionSection';
 import PackageCardMetaSection from './sections/PackageCardMetaSection';
 import PackageCardThumbnailSection from './sections/PackageCardThumbnailSection';
@@ -27,6 +28,11 @@ export default function PackageCardView({
 }: PackageCardViewProps) {
   const { t } = useTranslation('package');
   const tags = Array.isArray(item.tags) ? item.tags : EMPTY_TAGS;
+  const installedVersionLabel = getInstalledVersionLabel(
+    item.installedVersion,
+    item.detectedResult,
+    t('sidebar.versionUnknown'),
+  );
 
   return (
     <article
@@ -52,7 +58,7 @@ export default function PackageCardView({
           busyAction={busyAction}
           isBusy={isBusy}
           progress={progress}
-          installedVersion={item.installedVersion}
+          installedVersionLabel={installedVersionLabel}
           onDownload={onDownload}
           onUpdate={onUpdate}
           onRemove={onRemove}

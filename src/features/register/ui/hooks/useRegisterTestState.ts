@@ -3,6 +3,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getDetectedVersion, isDetectedResult } from '@/utils/detectResult';
 import { detectInstalledVersionsMap } from '@/utils/installed-map';
 import { runInstallerForItem, runUninstallerForItem } from '@/utils/installer';
 import { buildInstallerTestItem, validateInstallerForTest, validateUninstallerForTest } from '../../model/form';
@@ -213,20 +214,22 @@ export default function useRegisterTestState({
         },
       );
       if (installerTestTokenRef.current !== token) return;
-      let detected = '';
+      let detectedVersion = '';
+      let detectedSuccessfully = false;
       try {
-        const map = (await detectInstalledVersionsMap([testItem])) as Record<string, unknown>;
+        const map = await detectInstalledVersionsMap([testItem]);
         if (installerTestTokenRef.current !== token) return;
-        const detectedValue = map?.[testItem.id];
-        detected = typeof detectedValue === 'string' ? detectedValue : String(detectedValue || '');
+        const detectedResult = map[testItem.id];
+        detectedVersion = getDetectedVersion(detectedResult);
+        detectedSuccessfully = isDetectedResult(detectedResult);
       } catch {
         if (installerTestTokenRef.current !== token) return;
-        detected = '';
+        detectedVersion = '';
+        detectedSuccessfully = false;
       }
       if (installerTestTokenRef.current !== token) return;
-      setInstallerTestDetectedVersion(detected);
-      const normalizedDetected = detected.trim();
-      if (!normalizedDetected || normalizedDetected === '不明') {
+      setInstallerTestDetectedVersion(detectedVersion);
+      if (!detectedSuccessfully || !detectedVersion.trim()) {
         throw new Error(t('errors.installerDetectIncomplete'));
       }
       if (installerTestTokenRef.current === token) {

@@ -8,6 +8,7 @@ import type { RegisterInstallerTestItem, RegisterPackageForm } from './types';
 import type { CatalogEntry, Image, Installer, License, Version } from '@/utils/catalogSchema';
 import { i18n } from '@/i18n';
 import { ipc } from '@/utils/invokeIpc';
+import { isOtherRegisterLicenseType, isUnknownRegisterLicenseType } from '@/utils/licenseTemplates';
 
 export function buildInstallerPayload(form: RegisterPackageForm): Installer {
   const source = buildInstallerSource(form.installer);
@@ -23,9 +24,17 @@ function buildLicensesPayload(form: RegisterPackageForm): License[] {
     .map((license): License | null => {
       const type = String(license.type || '').trim();
       const licenseName = String(license.licenseName || '').trim();
-      const resolvedType = type === 'その他' ? licenseName : type;
+      const resolvedType = isOtherRegisterLicenseType(type)
+        ? licenseName
+        : isUnknownRegisterLicenseType(type)
+          ? '不明'
+          : type;
       const licenseBody = String(license.licenseBody || '').trim();
-      const isCustom = license.isCustom || type === '不明' || type === 'その他' || licenseBody.length > 0;
+      const isCustom =
+        license.isCustom ||
+        isUnknownRegisterLicenseType(type) ||
+        isOtherRegisterLicenseType(type) ||
+        licenseBody.length > 0;
       const copyrights = Array.isArray(license.copyrights)
         ? license.copyrights
             .map((c) => ({

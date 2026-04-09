@@ -1,5 +1,6 @@
 import { i18n } from '@/i18n';
 import type { InstallerAction } from '../catalogSchema';
+import { isUnknownDetectResult } from '../detectResult';
 import { formatUnknownError } from '../errors';
 import { addInstalledId } from '../installed-map';
 import { bestEffortLogError, logInfo } from '../logging';
@@ -91,9 +92,9 @@ export async function runInstallerForItem(
     }
 
     await addInstalledId(item.id, version);
-    const detectedVersion = await syncDetectedVersionWithDispatch(item, dispatch);
-    if (dispatch && detectedVersion === '不明') {
-      dispatch({ type: 'SET_DETECTED_ONE', payload: { id: item.id, version: detectedVersion, forceLatest: true } });
+    const detectedResult = await syncDetectedVersionWithDispatch(item, dispatch);
+    if (dispatch && isUnknownDetectResult(detectedResult)) {
+      dispatch({ type: 'SET_DETECTED_ONE', payload: { id: item.id, result: detectedResult, forceLatest: true } });
     }
     try {
       await recordPackageStateEvent('install', item.id);

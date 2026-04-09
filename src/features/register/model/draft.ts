@@ -3,6 +3,7 @@
  */
 import { i18n } from '@/i18n';
 import type { CatalogEntry } from '@/utils/catalogSchema';
+import { normalizeRegisterLicenseType } from '@/utils/licenseTemplates';
 import { basename, commaListToArray, computeStableTextHash, generateKey, normalizeArrayText } from './helpers';
 import { normalizeInstallStepState, normalizeUninstallStepState } from './installerRules';
 import { entryToForm, getFileExtension } from './parse';
@@ -131,7 +132,7 @@ function normalizeDraftFormSnapshot(form: RegisterDraftFormSnapshot) {
   return {
     ...form,
     licenses: form.licenses.map((license) => ({
-      type: license.type,
+      type: normalizeRegisterLicenseType(license.type),
       licenseName: license.licenseName,
       isCustom: license.isCustom,
       licenseBody: license.licenseBody,
@@ -460,6 +461,12 @@ export async function restoreRegisterDraft(record: RegisterDraftRecord): Promise
   const { images: _images, ...rest } = source;
   const packageForm: RegisterPackageForm = {
     ...(rest as Omit<RegisterPackageForm, 'images'>),
+    licenses: Array.isArray(rest.licenses)
+      ? rest.licenses.map((license) => ({
+          ...license,
+          type: normalizeRegisterLicenseType(license.type),
+        }))
+      : [],
     images: {
       thumbnail,
       info,

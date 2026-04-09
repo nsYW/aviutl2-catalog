@@ -1,5 +1,6 @@
 import { i18n } from '@/i18n';
 import type { InstallerAction } from '../catalogSchema';
+import { MISSING_DETECT_RESULT, type DetectResult } from '../detectResult';
 import { formatUnknownError } from '../errors';
 import { detectInstalledVersionsMap } from '../installed-map';
 import { logInfo } from '../logging';
@@ -10,12 +11,12 @@ import type { CatalogDispatchFn, InstallerMacroContext, InstallerRunnableItem, S
 export async function syncDetectedVersionWithDispatch(
   item: InstallerRunnableItem,
   dispatch: CatalogDispatchFn,
-): Promise<string> {
-  if (!dispatch) return '';
+): Promise<DetectResult> {
+  if (!dispatch) return MISSING_DETECT_RESULT;
   const map = await detectInstalledVersionsMap([item]);
-  const detected = String(map[item.id] || '');
-  dispatch({ type: 'SET_DETECTED_ONE', payload: { id: item.id, version: detected } });
-  return detected;
+  const result = map[item.id] ?? MISSING_DETECT_RESULT;
+  dispatch({ type: 'SET_DETECTED_ONE', payload: { id: item.id, result } });
+  return result;
 }
 
 export async function executeDeleteAction(params: {

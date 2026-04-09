@@ -2,6 +2,7 @@
  * register 関連の型定義
  */
 import type { Installer, Version } from '@/utils/catalogSchema';
+import type { RegisterLicenseType } from '@/utils/licenseTemplates';
 
 export type RegisterDescriptionMode = 'inline' | 'external';
 export type RegisterInstallerSourceType = 'direct' | 'github' | 'GoogleDrive' | 'booth';
@@ -46,7 +47,7 @@ export interface RegisterCopyright {
 
 export interface RegisterLicense {
   key: string;
-  type: string;
+  type: RegisterLicenseType | '';
   licenseName: string;
   isCustom: boolean;
   licenseBody: string;

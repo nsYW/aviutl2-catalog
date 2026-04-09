@@ -7,7 +7,7 @@ import ErrorDialog from '@/components/ErrorDialog';
 import { latestVersionOf } from '@/utils/catalog';
 import { useCatalog, useCatalogDispatch } from '@/utils/catalogStore';
 import { hasInstaller } from '@/utils/installer';
-import { buildLicenseBody } from '@/utils/licenseTemplates';
+import { buildLicenseBody, resolveCatalogLicenseTypeLabel } from '@/utils/licenseTemplates';
 import { HOME_LIST_RESTORE_STATE } from '@/layouts/app-shell/types';
 import {
   collectPackageImages,
@@ -86,18 +86,24 @@ export default function PackagePage() {
   const licenseEntries = useMemo<PackageLicenseEntry[]>(() => {
     if (!item) return [];
     const rawLicenses = Array.isArray(item.licenses) ? item.licenses : [];
-    const entries = rawLicenses.map((license, idx) => ({
-      ...license,
-      key: `${license.type || 'license'}-${idx}`,
-      body: String(buildLicenseBody(license) || ''),
-    }));
+    const entries = rawLicenses.map((license, idx) => {
+      const typeLabel = resolveCatalogLicenseTypeLabel(license.type);
+      return {
+        ...license,
+        type: typeLabel,
+        key: `${typeLabel || 'license'}-${idx}`,
+        body: String(buildLicenseBody(license) || ''),
+      };
+    });
     return entries;
   }, [item]);
 
   const renderableLicenses = useMemo(() => licenseEntries.filter((entry) => entry.body), [licenseEntries]);
 
   const licenseTypesLabel = useMemo(() => {
-    const types = Array.isArray(item?.licenses) ? item.licenses.map((license) => license?.type).filter(Boolean) : [];
+    const types = Array.isArray(item?.licenses)
+      ? item.licenses.map((license) => resolveCatalogLicenseTypeLabel(license?.type)).filter(Boolean)
+      : [];
     return types.length ? types.join(', ') : '?';
   }, [item]);
 

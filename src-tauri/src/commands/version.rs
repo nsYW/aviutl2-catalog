@@ -2,9 +2,17 @@ use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
 use rayon::prelude::*;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tauri::Manager;
 use xxhash_rust::xxh3::xxh3_128;
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum DetectResult {
+    Missing,
+    Unknown,
+    Detected { version: String },
+}
 
 fn xxh3_128_hex<P: AsRef<Path>>(path: P) -> Result<String, String> {
     let buf = std::fs::read(path).map_err(|e| format!("open/read error: {}", e))?;
@@ -191,7 +199,7 @@ fn build_file_hash_cache(app: &tauri::AppHandle, unique_paths: &HashSet<std::pat
     file_hash_cache
 }
 
-fn determine_versions(_app: &tauri::AppHandle, list: &[VersionItemInput], file_hash_cache: &HashMap<std::path::PathBuf, String>) -> HashMap<String, String> {
+fn determine_versions(_app: &tauri::AppHandle, list: &[VersionItemInput], file_hash_cache: &HashMap<std::path::PathBuf, String>) -> HashMap<String, DetectResult> {
     let mut out = HashMap::new();
     tracing::info!("Detecting installed versions...");
     for it in list {
@@ -199,7 +207,7 @@ fn determine_versions(_app: &tauri::AppHandle, list: &[VersionItemInput], file_h
         if id.is_empty() {
             continue;
         }
-        let mut detected = String::new();
+        let mut detected = DetectResult::Missing;
         let mut any_present = false;
         let mut any_mismatch = false;
         for ver in it.versions.iter().rev() {
@@ -225,12 +233,12 @@ fn determine_versions(_app: &tauri::AppHandle, list: &[VersionItemInput], file_h
                 }
             }
             if ok {
-                detected = ver.version.clone();
+                detected = DetectResult::Detected { version: ver.version.clone() };
                 break;
             }
         }
-        if detected.is_empty() && (any_present || any_mismatch) {
-            detected = crate::paths::UNKNOWN_DETECTED_VERSION.to_string();
+        if matches!(detected, DetectResult::Missing) && (any_present || any_mismatch) {
+            detected = DetectResult::Unknown;
         }
         out.insert(id, detected);
     }
@@ -239,7 +247,7 @@ fn determine_versions(_app: &tauri::AppHandle, list: &[VersionItemInput], file_h
 }
 
 #[tauri::command]
-pub fn detect_versions_map(app: tauri::AppHandle, items: Vec<VersionItemInput>) -> Result<HashMap<String, String>, String> {
+pub fn detect_versions_map(app: tauri::AppHandle, items: Vec<VersionItemInput>) -> Result<HashMap<String, DetectResult>, String> {
     let list = items;
     tracing::info!("detect map start count={}", list.len());
     let unique_paths = collect_unique_paths(&app, &list)?;

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { loadCatalogData } from '@/utils/catalog';
+import { isInstalledDetectResult, type DetectResultMap } from '@/utils/detectResult';
 import { safeLog } from '../../model/helpers';
 import type { PackageItemsMap, PackageState, PackageStatesMap, RequiredPackageRow } from '../../model/types';
 import { createDefaultPackageState } from './initSetupPackageState';
@@ -80,15 +81,14 @@ export default function useInitSetupCatalogStore({ requiredPluginIds, corePackag
     [],
   );
 
-  const applyDetectedVersions = useCallback((versions: Record<string, string>) => {
+  const applyDetectedVersions = useCallback((versions: DetectResultMap) => {
     const detectedIds = Object.keys(versions || {});
     if (detectedIds.length === 0) return;
     setPackageStates((prev) => {
       const next = { ...prev };
       detectedIds.forEach((id) => {
         const current = next[id] || createDefaultPackageState();
-        const version = String(versions[id] || '').trim();
-        next[id] = { ...current, installed: version !== '', error: '' };
+        next[id] = { ...current, installed: isInstalledDetectResult(versions[id]), error: '' };
       });
       return next;
     });

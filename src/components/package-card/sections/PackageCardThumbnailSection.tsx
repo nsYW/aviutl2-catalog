@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { AppWindow, FileCode2, FileInput, FileOutput, Package, Puzzle, SlidersHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { resolvePackageTypeLabel } from '@/features/package/model/helpers';
 import { placeholderPatternStyle } from '../helpers';
 import { getPrimaryPackageTypeMeta } from '@/utils/query';
 import { layout, media } from '@/components/ui/_styles';
@@ -25,7 +26,7 @@ function PackageCardThumbnailSection({ thumbnail, itemName, category }: PackageC
   const { t } = useTranslation('common');
   const packageTypeMeta = getPrimaryPackageTypeMeta(category);
   const CategoryIcon = packageTypeMeta ? categoryIconMap[packageTypeMeta.icon] : Package;
-  const categoryLabel = category || t('packageTypes.other');
+  const categoryLabel = resolvePackageTypeLabel(category, t, t('packageTypes.other'));
 
   return (
     <div

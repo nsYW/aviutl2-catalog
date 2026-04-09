@@ -15,7 +15,7 @@ interface PackageCardActionSectionProps {
   busyAction: PackageCardBusyAction;
   isBusy: boolean;
   progress: PackageCardProgressView;
-  installedVersion?: string;
+  installedVersionLabel?: string;
   onDownload: PackageCardActionHandler;
   onUpdate: PackageCardActionHandler;
   onRemove: PackageCardActionHandler;
@@ -139,7 +139,7 @@ export default function PackageCardActionSection({
   busyAction,
   isBusy,
   progress,
-  installedVersion,
+  installedVersionLabel,
   onDownload,
   onUpdate,
   onRemove,
@@ -153,10 +153,10 @@ export default function PackageCardActionSection({
   return (
     <div className="relative z-20 flex items-end justify-between gap-3">
       <div className="flex items-center mb-1">
-        {isInstalled ? (
+        {isInstalled && installedVersionLabel ? (
           <div className={cn(layout.inlineGap1_5, 'text-xs font-mono text-slate-500 dark:text-slate-400')}>
             <CheckCircle2 size={14} className={hasUpdate ? 'text-amber-500' : 'text-emerald-500'} />
-            <span>{installedVersion}</span>
+            <span>{installedVersionLabel}</span>
           </div>
         ) : null}
       </div>

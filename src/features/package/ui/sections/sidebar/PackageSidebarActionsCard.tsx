@@ -3,6 +3,7 @@ import Button from '@/components/ui/Button';
 import { CheckCircle2, Download, RefreshCw, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ProgressCircle from '@/components/ProgressCircle';
+import { getInstalledVersionLabel } from '@/utils/detectResult';
 import type { PackageSidebarSectionProps } from '../../types';
 import { cn } from '@/lib/cn';
 import { layout, surface } from '@/components/ui/_styles';
@@ -27,6 +28,11 @@ export default function PackageSidebarActionsCard({
   const updating = busyAction === 'update';
   const removing = busyAction === 'remove';
   const primaryDisabled = isBusy || !canInstall;
+  const installedVersionLabel = getInstalledVersionLabel(
+    item.installedVersion,
+    item.detectedResult,
+    t('sidebar.versionUnknown'),
+  );
 
   return (
     <div className={cn(surface.cardSection, 'space-y-3')}>
@@ -35,7 +41,7 @@ export default function PackageSidebarActionsCard({
           {item.isLatest ? (
             <Badge variant="success" shape="pill" size="sm" className={cn(layout.inlineGap2, 'font-bold')}>
               <CheckCircle2 size={14} /> {t('actions.latest')}
-              {item.installedVersion ? `（${item.installedVersion}）` : ''}
+              {installedVersionLabel ? `（${installedVersionLabel}）` : ''}
             </Badge>
           ) : (
             <button

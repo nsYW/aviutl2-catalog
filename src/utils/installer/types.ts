@@ -1,4 +1,5 @@
 import type { Installer, InstallerAction, InstallerSource } from '../catalogSchema';
+import type { DetectResult } from '../detectResult';
 
 export type InstallerMacroContext = {
   tmpDir: string;
@@ -36,7 +37,7 @@ export type InstallerRunnableItem = {
 
 export type SetDetectedOneAction = {
   type: 'SET_DETECTED_ONE';
-  payload: { id: string; version: string; forceLatest?: boolean };
+  payload: { id: string; result: DetectResult; forceLatest?: boolean };
 };
 
 export type CatalogDispatchFn = ((action: SetDetectedOneAction) => void) | null | undefined;

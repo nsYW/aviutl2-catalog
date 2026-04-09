@@ -4,6 +4,7 @@ import * as tauriFs from '@tauri-apps/plugin-fs';
 import { useTranslation } from 'react-i18next';
 import type { Dispatch, SetStateAction } from 'react';
 import type { CatalogAction, CatalogEntryState } from '@/utils/catalogStore';
+import { isInstalledDetectResult } from '@/utils/detectResult';
 import { detectInstalledVersionsMap, loadInstalledMap, saveInstalledSnapshot } from '@/utils/installed-map';
 import { hasInstaller, runInstallerForItem, runUninstallerForItem } from '@/utils/installer';
 import { logError } from '@/utils/logging';
@@ -124,10 +125,10 @@ export default function useSettingsDataManagement({
       setSyncStatus(t('dataManagement.status.detecting'));
       const detected = await detectInstalledVersionsMap(catalogItems);
       const currentIds = Object.entries(detected || {})
-        .filter(([, version]) => Boolean(version))
+        .filter(([, result]) => isInstalledDetectResult(result))
         .map(([id]) => id);
 
-      const toInstall = targetIds.filter((id) => idToItem.has(id) && !detected?.[id]);
+      const toInstall = targetIds.filter((id) => idToItem.has(id) && !isInstalledDetectResult(detected?.[id]));
       const toRemove = currentIds.filter((id) => !targetIdSet.has(id));
 
       const skippedInstall: string[] = [];

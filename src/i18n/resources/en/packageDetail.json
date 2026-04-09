@@ -53,6 +53,7 @@
     "updatedAt": "Updated",
     "latestVersion": "Latest version",
     "currentVersion": "Current version",
+    "versionUnknown": "Unknown",
     "licenseUnknown": "Unknown",
     "openLicenseAria": "Open license text for {{type}}"
   }

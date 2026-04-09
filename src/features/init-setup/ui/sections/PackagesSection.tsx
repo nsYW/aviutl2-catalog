@@ -1,5 +1,6 @@
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import { getDetectedVersion, getInstalledVersionLabel } from '@/utils/detectResult';
 import { Check, CheckCircle2, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ProgressCircle from '@/components/ProgressCircle';
@@ -19,7 +20,7 @@ export default function PackagesSection({
   onSkip,
   onInstallAndNext,
 }: PackagesSectionProps) {
-  const { t } = useTranslation(['initSetup', 'common']);
+  const { t } = useTranslation(['initSetup', 'package', 'common']);
 
   return (
     <div className={cn(layout.centerCol, state.enterSlideRight500, 'h-full max-w-2xl w-full flex-1')}>
@@ -53,6 +54,13 @@ export default function PackagesSection({
               const ratio = progress?.ratio ?? 0;
               const progressPercent = progress?.percent;
               const percent = Number.isFinite(progressPercent) ? progressPercent : Math.round(ratio * 100);
+              const detectedResult = packageVersions[id];
+              const detectedVersion = getDetectedVersion(detectedResult);
+              const installedVersionLabel = getInstalledVersionLabel(
+                detectedVersion,
+                detectedResult,
+                t('package:sidebar.versionUnknown'),
+              );
 
               return (
                 <div key={id} className={cn(surface.panel, 'group flex items-center gap-4 p-4 transition-all')}>
@@ -61,13 +69,13 @@ export default function PackagesSection({
                       <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
                         {item?.name || id}
                       </h3>
-                      {packageVersions[id] && (
+                      {installedVersionLabel && (
                         <Badge
                           shape="rounded"
                           size="xxs"
                           className="font-mono font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
                         >
-                          {packageVersions[id]}
+                          {installedVersionLabel}
                         </Badge>
                       )}
                     </div>

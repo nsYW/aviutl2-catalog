@@ -6,7 +6,13 @@ import type { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import Button from '@/components/ui/Button';
 import { Check, ChevronDown, Copy } from 'lucide-react';
-import { LICENSE_TYPE_OPTIONS, buildLicenseBody, requiresTemplateCopyrightFields } from '@/utils/licenseTemplates';
+import {
+  LICENSE_TYPE_OPTIONS,
+  buildLicenseBody,
+  isOtherRegisterLicenseType,
+  isUnknownRegisterLicenseType,
+  requiresTemplateCopyrightFields,
+} from '@/utils/licenseTemplates';
 import { createEmptyLicense } from '../../model/form';
 import type { PackageLicenseSectionProps } from '../types';
 import ActionDropdown from '../components/ActionDropdown';
@@ -23,8 +29,8 @@ const PackageLicenseSection = memo(
     const { t } = useTranslation(['register', 'common']);
     const activeLicense = license || createEmptyLicense();
     const type = activeLicense.type;
-    const isOtherType = type === 'その他';
-    const isUnknown = type === '不明';
+    const isOtherType = isOtherRegisterLicenseType(type);
+    const isUnknown = isUnknownRegisterLicenseType(type);
     const forceBodyInput = isOtherType;
     const useTemplate = !forceBodyInput && !isUnknown && !activeLicense.isCustom;
     const needsCopyrightInput = useTemplate && requiresTemplateCopyrightFields(type);
@@ -36,9 +42,9 @@ const PackageLicenseSection = memo(
         ...LICENSE_TYPE_OPTIONS.map((option) => ({
           value: option.value,
           label:
-            option.value === 'その他'
+            option.value === 'other'
               ? t('license.typeOptions.other')
-              : option.value === '不明'
+              : option.value === 'unknown'
                 ? t('license.typeOptions.unknown')
                 : option.label,
         })),

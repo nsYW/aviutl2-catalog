@@ -53,6 +53,7 @@
     "updatedAt": "更新日期",
     "latestVersion": "最新版本",
     "currentVersion": "当前版本",
+    "versionUnknown": "未知",
     "licenseUnknown": "未知",
     "openLicenseAria": "打开 {{type}} 的许可证文本"
   }

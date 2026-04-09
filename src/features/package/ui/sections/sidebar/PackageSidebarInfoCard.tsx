@@ -5,6 +5,7 @@ import { Calendar, ExternalLink, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { HOME_SEARCH_RESTORE_STATE } from '@/layouts/app-shell/types';
+import { getInstalledVersionLabel } from '@/utils/detectResult';
 import { buildPackageListSearch, resolvePackageTypeLabel } from '../../../model/helpers';
 import type { PackageSidebarSectionProps } from '../../types';
 import { layout, surface, text } from '@/components/ui/_styles';
@@ -29,6 +30,11 @@ export default function PackageSidebarInfoCard({
 }: PackageSidebarInfoCardProps) {
   const { t } = useTranslation('package');
   const packageTypeLabel = resolvePackageTypeLabel(item.type, t, '?');
+  const installedVersionLabel = getInstalledVersionLabel(
+    item.installedVersion,
+    item.detectedResult,
+    t('sidebar.versionUnknown'),
+  );
   const authorLink = useMemo(() => {
     const author = String(item.author || '').trim();
     if (!author) return null;
@@ -89,10 +95,10 @@ export default function PackageSidebarInfoCard({
         <span>{t('sidebar.latestVersion')}</span>
         <span className="text-slate-800 dark:text-slate-200">{latest}</span>
       </div>
-      {item.installedVersion ? (
+      {item.installed && installedVersionLabel ? (
         <div className={cn(layout.rowBetween, text.bodySmMuted)}>
           <span>{t('sidebar.currentVersion')}</span>
-          <span className="text-slate-800 dark:text-slate-200">{item.installedVersion}</span>
+          <span className="text-slate-800 dark:text-slate-200">{installedVersionLabel}</span>
         </div>
       ) : null}
       {item.niconiCommonsId ? (

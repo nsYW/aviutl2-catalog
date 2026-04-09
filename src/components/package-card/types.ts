@@ -5,7 +5,12 @@ export type PackageCardItem = Pick<
   PackageItem,
   'id' | 'name' | 'author' | 'type' | 'tags' | 'summary' | 'images' | 'updatedAt' | 'installed' | 'deprecation'
 > &
-  Partial<Pick<PackageItem, 'description' | 'isLatest' | 'installedVersion' | 'installer' | 'latest-version'>>;
+  Partial<
+    Pick<
+      PackageItem,
+      'description' | 'isLatest' | 'installedVersion' | 'detectedResult' | 'installer' | 'latest-version'
+    >
+  >;
 
 export interface PackageCardProps {
   item: PackageCardItem;

@@ -1,4 +1,5 @@
 import type { CatalogEntry } from '@/utils/catalogSchema';
+import type { DetectResultMap } from '@/utils/detectResult';
 import type { InstallProgressPayload } from '@/utils/installer/types';
 
 export type InitSetupStep = 'intro' | 'installStatus' | 'details' | 'packages' | 'done';
@@ -27,4 +28,4 @@ export interface RequiredPackageRow {
 
 export type PackageItemsMap = Record<string, CatalogEntry | null>;
 export type PackageStatesMap = Record<string, PackageState>;
-export type PackageVersionsMap = Record<string, string>;
+export type PackageVersionsMap = DetectResultMap;

@@ -7,6 +7,14 @@
 import { createContext, useReducer, useContext, useMemo } from 'react';
 import { latestVersionOf } from './catalog';
 import { CatalogEntry } from './catalogSchema';
+import {
+  getDetectedVersion,
+  isDetectedResult,
+  isInstalledDetectResult,
+  MISSING_DETECT_RESULT,
+  type DetectResult,
+  type DetectResultMap,
+} from './detectResult';
 import { normalize } from './text';
 
 type CatalogState = {
@@ -17,7 +25,7 @@ type CatalogState = {
   allTypes: string[];
   installedIds: string[];
   installedMap: Record<string, string>; // id -> version
-  detectedMap: Record<string, string>; // id -> version
+  detectedMap: DetectResultMap; // id -> detection result
 };
 
 export type CatalogEntryState = CatalogEntry & {
@@ -28,8 +36,23 @@ export type CatalogEntryState = CatalogEntry & {
   installed: boolean;
   installedVersion?: string;
   isLatest?: boolean;
+  detectedResult: DetectResult;
   catalogIndex: number;
 };
+
+function applyDetectedResult(item: CatalogEntryState, result: DetectResult, forceLatest = false): CatalogEntryState {
+  const detectedVersion = getDetectedVersion(result);
+  const latest = latestVersionOf(item) || '';
+  const installed = isInstalledDetectResult(result);
+  const isLatest = Boolean(forceLatest) || (isDetectedResult(result) && !!latest && detectedVersion === latest);
+  return {
+    ...item,
+    installed,
+    installedVersion: detectedVersion || undefined,
+    isLatest,
+    detectedResult: result,
+  };
+}
 
 // 読み取り用/更新用の Context を分離して、再レンダリングを最小化
 const CatalogStateContext = createContext<CatalogState | null>(null);
@@ -83,8 +106,8 @@ export type CatalogAction =
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_INSTALLED_IDS'; payload: string[] }
   | { type: 'SET_INSTALLED_MAP'; payload: Record<string, string> }
-  | { type: 'SET_DETECTED_MAP'; payload: Record<string, string> }
-  | { type: 'SET_DETECTED_ONE'; payload: { id: string; version: string; forceLatest?: boolean } };
+  | { type: 'SET_DETECTED_MAP'; payload: DetectResultMap }
+  | { type: 'SET_DETECTED_ONE'; payload: { id: string; result: DetectResult; forceLatest?: boolean } };
 
 function catalogReducerInternal(state: CatalogState, action: CatalogAction): CatalogState {
   switch (action.type) {
@@ -92,19 +115,19 @@ function catalogReducerInternal(state: CatalogState, action: CatalogAction): Cat
       // カタログ本体の差し替え
       // - installer があるものは downloadURL を installer:// に置き換え（UI でインストーラ起動）
       // - detectedMap（検出済みバージョン）から installed/isLatest を付加
-      const items = (action.payload || [])
-        .map((item, index) => ({ ...enrich({ ...item }), catalogIndex: index }))
-        .map((it) => {
-          const detectedVersion = state.detectedMap?.[it.id] || '';
-          const latest = latestVersionOf(it) || '';
-          const isLatest = !!detectedVersion && !!latest && detectedVersion === latest;
-          return {
-            ...it,
-            installed: detectedVersion !== '',
-            installedVersion: detectedVersion,
-            isLatest,
-          };
-        });
+      const items = (action.payload || []).map((item, index) =>
+        applyDetectedResult(
+          {
+            ...enrich({ ...item }),
+            catalogIndex: index,
+            installed: false,
+            installedVersion: undefined,
+            isLatest: false,
+            detectedResult: MISSING_DETECT_RESULT,
+          },
+          state.detectedMap?.[item.id] ?? MISSING_DETECT_RESULT,
+        ),
+      );
       // タグ・種類の候補一覧を集計（重複排除）
       const tagSet = new Set(items.flatMap((item) => item.tags));
       const typeSet = new Set(items.map((item) => item.type));
@@ -130,37 +153,22 @@ function catalogReducerInternal(state: CatalogState, action: CatalogAction): Cat
     case 'SET_DETECTED_MAP': {
       // まとめて検出されたインストールバージョンを反映
       const detectedMap = action.payload || {};
-      const items = state.items.map((it) => {
-        const v = detectedMap[it.id] || '';
-        const latest = latestVersionOf(it) || '';
-        const isLatest = !!v && !!latest && v === latest;
-        return { ...it, installed: v !== '', installedVersion: v, isLatest };
-      });
+      const items = state.items.map((it) => applyDetectedResult(it, detectedMap[it.id] ?? MISSING_DETECT_RESULT));
       return { ...state, detectedMap, items };
     }
     case 'SET_DETECTED_ONE': {
       // 単一パッケージの検出結果を反映（インストール/アンインストール直後など）
-      const { id, version, forceLatest } = action.payload || {};
+      const { id, result, forceLatest } = action.payload || {};
       if (!id) return state;
 
-      const detectedVersion = version || '';
       const detectedMap = { ...state.detectedMap };
-      detectedMap[id] = detectedVersion;
+      detectedMap[id] = result ?? MISSING_DETECT_RESULT;
 
       const index = state.items.findIndex((it) => it.id === id);
       if (index < 0) return { ...state, detectedMap };
 
-      const current = state.items[index];
-      const latest = latestVersionOf(current) || '';
-      const isLatest = Boolean(forceLatest) || (!!detectedVersion && !!latest && detectedVersion === latest);
-
       const items = [...state.items];
-      items[index] = {
-        ...current,
-        installed: detectedVersion !== '',
-        installedVersion: detectedVersion,
-        isLatest,
-      };
+      items[index] = applyDetectedResult(state.items[index], detectedMap[id], forceLatest);
       return { ...state, detectedMap, items };
     }
     default:

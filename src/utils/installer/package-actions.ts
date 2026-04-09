@@ -1,4 +1,5 @@
 import { i18n } from '@/i18n';
+import { MISSING_DETECT_RESULT } from '../detectResult';
 import { detectInstalledVersionsMap, loadInstalledMap, removeInstalledId } from '../installed-map';
 import type { CatalogDispatch } from '../catalogStore';
 import { runInstallerForItem } from './install';
@@ -23,8 +24,10 @@ async function syncRemovedPackageState(
     dispatch({ type: 'SET_INSTALLED_MAP', payload: installedMap });
 
     const detectedMap = await detectInstalledVersionsMap([item]);
-    const detectedVersion = String(detectedMap?.[item.id] || '');
-    dispatch({ type: 'SET_DETECTED_ONE', payload: { id: item.id, version: detectedVersion } });
+    dispatch({
+      type: 'SET_DETECTED_ONE',
+      payload: { id: item.id, result: detectedMap[item.id] ?? MISSING_DETECT_RESULT },
+    });
   }
 }
 

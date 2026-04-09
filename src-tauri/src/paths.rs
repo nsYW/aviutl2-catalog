@@ -14,7 +14,6 @@ use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 static APP_DIR: OnceCell<ArcSwap<AppDirs>> = OnceCell::new();
 static SETTINGS_FILE_LOCK: Lazy<Mutex<()>> = Lazy::new(|| Mutex::new(()));
 pub const AUO_SETUP_READY_KEYWORD: &str = "を使用する準備が完了しました。";
-pub const UNKNOWN_DETECTED_VERSION: &str = "不明";
 
 fn pathbuf_to_string(path: &Path) -> String {
     path.to_string_lossy().into_owned()

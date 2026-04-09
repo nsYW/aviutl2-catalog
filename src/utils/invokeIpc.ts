@@ -1,5 +1,6 @@
 import * as tauriCore from '@tauri-apps/api/core';
 import type { DeviceInfo } from './diagnostics/types';
+import type { DetectResultMap } from './detectResult';
 
 type CommandSpec<Args = void, Result = unknown> = {
   args: Args;
@@ -13,7 +14,7 @@ type InvokeIpcMap = {
   getInstalledMapCmd: CommandSpec<void, unknown>;
   addInstalledIdCmd: CommandSpec<{ id: string; version: string }, void>;
   removeInstalledIdCmd: CommandSpec<{ id: string }, void>;
-  detectVersionsMap: CommandSpec<{ items: unknown[] }, Record<string, string> | null>;
+  detectVersionsMap: CommandSpec<{ items: unknown[] }, DetectResultMap | null>;
   downloadFileToPath: CommandSpec<{ url: string; destPath: string; taskId: string }, string>;
   driveDownloadToFile: CommandSpec<{ fileId: string; destPath: string }, string>;
   ensureBoothAuthWindow: CommandSpec<void, void>;

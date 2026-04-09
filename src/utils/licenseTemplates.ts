@@ -19,8 +19,9 @@ export const LICENSE_TEMPLATES = {
   Unlicense: unlicenseTextRaw.trim(),
 } as const;
 
-type LicenseTemplateType = keyof typeof LICENSE_TEMPLATES;
-type LicenseTypeOptionValue = LicenseTemplateType | 'その他' | '不明';
+export type LicenseTemplateType = keyof typeof LICENSE_TEMPLATES;
+export type RegisterLicenseType = LicenseTemplateType | 'other' | 'unknown';
+type LicenseTypeOptionValue = RegisterLicenseType;
 
 interface LicenseTypeOption {
   value: LicenseTypeOptionValue;
@@ -32,8 +33,8 @@ const COPYRIGHT_PLACEHOLDER_RE = /<years>|<holder>/i;
 
 export const LICENSE_TYPE_OPTIONS: ReadonlyArray<LicenseTypeOption> = [
   ...LICENSE_TEMPLATE_TYPE_VALUES.map((value) => ({ value, label: value })),
-  { value: 'その他', label: 'その他' },
-  { value: '不明', label: '不明' },
+  { value: 'other', label: 'other' },
+  { value: 'unknown', label: 'unknown' },
 ];
 
 function toTrimmedString(value: unknown): string {
@@ -42,6 +43,29 @@ function toTrimmedString(value: unknown): string {
 
 function isLicenseTemplateType(value: unknown): value is LicenseTemplateType {
   return typeof value === 'string' && Object.prototype.hasOwnProperty.call(LICENSE_TEMPLATES, value);
+}
+
+export function normalizeRegisterLicenseType(value: unknown): RegisterLicenseType | '' {
+  const normalized = toTrimmedString(value);
+  if (!normalized) return '';
+  if (isLicenseTemplateType(normalized)) return normalized;
+  if (normalized === 'other' || normalized === 'その他') return 'other';
+  if (normalized === 'unknown' || normalized === '不明') return 'unknown';
+  return '';
+}
+
+export function isOtherRegisterLicenseType(value: unknown): boolean {
+  return normalizeRegisterLicenseType(value) === 'other';
+}
+
+export function isUnknownRegisterLicenseType(value: unknown): boolean {
+  return normalizeRegisterLicenseType(value) === 'unknown';
+}
+
+export function resolveCatalogLicenseTypeLabel(value: unknown): string {
+  const normalized = normalizeRegisterLicenseType(value);
+  if (normalized === 'unknown' || normalized === 'other') return '';
+  return toTrimmedString(value);
 }
 
 function normalizeCopyrightEntries(copyrights: Copyright[]): Copyright[] {

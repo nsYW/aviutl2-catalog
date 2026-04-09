@@ -53,6 +53,7 @@
     "updatedAt": "更新日",
     "latestVersion": "最新バージョン",
     "currentVersion": "現在のバージョン",
+    "versionUnknown": "不明",
     "licenseUnknown": "不明",
     "openLicenseAria": "ライセンス {{type}} の本文を表示"
   }

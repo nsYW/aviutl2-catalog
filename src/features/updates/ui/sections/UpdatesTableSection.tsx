@@ -1,7 +1,9 @@
 import ProgressCircle from '@/components/ProgressCircle';
 import PackageNameLink from '@/components/PackageNameLink';
 import { useTranslation } from 'react-i18next';
+import { resolvePackageTypeLabel } from '@/features/package/model/helpers';
 import { latestVersionOf } from '@/utils/catalog';
+import { getInstalledVersionLabel } from '@/utils/detectResult';
 import type { UpdatesTableSectionProps } from '../types';
 import { surface, table, text } from '@/components/ui/_styles';
 import { cn } from '@/lib/cn';
@@ -18,7 +20,7 @@ export default function UpdatesTableSection({
   onUpdate,
   onTogglePause,
 }: UpdatesTableSectionProps) {
-  const { t } = useTranslation(['updates', 'common']);
+  const { t } = useTranslation(['updates', 'package', 'common']);
 
   return (
     <div className={surface.panel}>
@@ -47,6 +49,13 @@ export default function UpdatesTableSection({
                 const progress = itemProgress[item.id];
                 const paused = pausedPackageIds.has(item.id);
                 const pauseBusy = pauseBusyIds.has(item.id);
+                const packageTypeLabel = resolvePackageTypeLabel(item.type, t, '?');
+                const installedVersionLabel =
+                  getInstalledVersionLabel(
+                    item.installedVersion,
+                    item.detectedResult,
+                    t('package:sidebar.versionUnknown'),
+                  ) || '?';
                 return (
                   <div
                     key={item.id}
@@ -60,8 +69,8 @@ export default function UpdatesTableSection({
                       <PackageNameLink id={item.id} name={item.name} source="updates" />
                     </div>
                     <div className={cellTruncateClass}>{item.author || '?'}</div>
-                    <div className={cellTruncateClass}>{item.type || '?'}</div>
-                    <div className={text.bodySmMutedAlt}>{item.installedVersion || '?'}</div>
+                    <div className={cellTruncateClass}>{packageTypeLabel}</div>
+                    <div className={text.bodySmMutedAlt}>{installedVersionLabel}</div>
                     <div className="text-sm font-semibold text-green-600 dark:text-green-400">
                       {latestVersionOf(item) || ''}
                     </div>

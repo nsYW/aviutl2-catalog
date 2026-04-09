@@ -19,6 +19,11 @@ import type {
   RegisterPackageForm,
   RegisterVersion,
 } from './types';
+import {
+  isOtherRegisterLicenseType,
+  isUnknownRegisterLicenseType,
+  normalizeRegisterLicenseType,
+} from '@/utils/licenseTemplates';
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -259,12 +264,18 @@ export function parseLicenses(rawLicenses: unknown, legacyLicense = ''): Registe
     .map((target) => {
       // 旧スキーマ／新スキーマの両方を吸収し、UI では一貫した編集モデルに正規化する。
       const rawType = target.type;
-      const isUnknown = rawType === '不明';
+      const normalizedType = normalizeRegisterLicenseType(rawType);
+      const isUnknown = isUnknownRegisterLicenseType(normalizedType);
       const isTemplateType = LICENSE_TEMPLATE_TYPES.has(rawType);
-      const type = isUnknown || isTemplateType ? rawType : 'その他';
+      const type: RegisterLicense['type'] =
+        normalizedType || (isTemplateType ? (rawType as RegisterLicense['type']) : 'other');
       const licenseName = !isUnknown && !isTemplateType ? rawType : '';
       const licenseBody = target.licenseBody;
-      const isCustom = target.isCustom || type === '不明' || type === 'その他' || !!licenseBody.trim();
+      const isCustom =
+        target.isCustom ||
+        isUnknownRegisterLicenseType(type) ||
+        isOtherRegisterLicenseType(type) ||
+        !!licenseBody.trim();
       const copyrights = target.copyrights.length
         ? target.copyrights.map((c) => ({
             key: generateKey(),
@@ -286,9 +297,11 @@ export function parseLicenses(rawLicenses: unknown, legacyLicense = ''): Registe
   }
   if (legacyLicense) {
     const rawType = String(legacyLicense || '');
-    const isUnknown = rawType === '不明';
+    const normalizedType = normalizeRegisterLicenseType(rawType);
+    const isUnknown = isUnknownRegisterLicenseType(normalizedType);
     const isTemplateType = LICENSE_TEMPLATE_TYPES.has(rawType);
-    const type = isUnknown || isTemplateType ? rawType : 'その他';
+    const type: RegisterLicense['type'] =
+      normalizedType || (isTemplateType ? (rawType as RegisterLicense['type']) : 'other');
     const licenseName = !isUnknown && !isTemplateType ? rawType : '';
     return [
       {
